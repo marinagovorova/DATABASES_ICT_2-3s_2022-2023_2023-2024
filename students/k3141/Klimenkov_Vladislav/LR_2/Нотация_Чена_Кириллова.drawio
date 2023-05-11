@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-05-04T14:59:08.156Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 YaBrowser/23.3.3.719 Yowser/2.5 Safari/537.36" etag="dFSRuFpf7iidzmlvLKg3" version="21.2.7" type="google">
+<mxfile host="app.diagrams.net" modified="2023-05-11T16:02:23.288Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 YaBrowser/23.3.3.719 Yowser/2.5 Safari/537.36" etag="pZlzovCTnudnYcHtrLRZ" version="21.2.9" type="google">
   <diagram name="Страница 1" id="S42jck6jjWr-jjIjM3en">
     <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -81,6 +81,11 @@
             </Array>
           </mxGeometry>
         </mxCell>
+        <mxCell id="FpZzWHBCPRENnyKyFC07-12" value="М" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" connectable="0" vertex="1" parent="Vttz6XFYR83p1Urtk-70-21">
+          <mxGeometry x="-0.8724" y="2" relative="1" as="geometry">
+            <mxPoint x="-13" y="5" as="offset" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="Vttz6XFYR83p1Urtk-70-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" edge="1" parent="1" source="Vttz6XFYR83p1Urtk-70-6" target="Vttz6XFYR83p1Urtk-70-9">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
@@ -120,6 +125,11 @@
               <mxPoint x="300" y="210" />
               <mxPoint x="300" y="150" />
             </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FpZzWHBCPRENnyKyFC07-14" value="М" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" connectable="0" vertex="1" parent="Vttz6XFYR83p1Urtk-70-27">
+          <mxGeometry x="-0.9484" y="1" relative="1" as="geometry">
+            <mxPoint x="9" y="-13" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="Vttz6XFYR83p1Urtk-70-6" value="Дисциплина в &lt;br&gt;учебном плане" style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
@@ -494,12 +504,6 @@
         <mxCell id="Vttz6XFYR83p1Urtk-70-116" value="Номер зачётной книжки студента" style="ellipse;whiteSpace=wrap;html=1;align=center;fontStyle=4;" vertex="1" parent="1">
           <mxGeometry x="-155" y="620" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="Vttz6XFYR83p1Urtk-70-124" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" edge="1" parent="1" source="Vttz6XFYR83p1Urtk-70-117" target="Vttz6XFYR83p1Urtk-70-5">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="Vttz6XFYR83p1Urtk-70-117" value="Код учебной группы" style="ellipse;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
-          <mxGeometry x="9" y="536" width="88" height="50" as="geometry" />
-        </mxCell>
         <mxCell id="Vttz6XFYR83p1Urtk-70-123" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" edge="1" parent="1" source="Vttz6XFYR83p1Urtk-70-118" target="Vttz6XFYR83p1Urtk-70-5">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
@@ -582,13 +586,13 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="Vttz6XFYR83p1Urtk-70-148" value="Код ОП" style="ellipse;whiteSpace=wrap;html=1;align=center;fontStyle=4;" vertex="1" parent="1">
-          <mxGeometry x="-503.63" y="735" width="65" height="35" as="geometry" />
+          <mxGeometry x="-485" y="709" width="65" height="35" as="geometry" />
         </mxCell>
         <mxCell id="Vttz6XFYR83p1Urtk-70-154" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" edge="1" parent="1" source="Vttz6XFYR83p1Urtk-70-149" target="Vttz6XFYR83p1Urtk-70-11">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="Vttz6XFYR83p1Urtk-70-149" value="Название" style="ellipse;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
-          <mxGeometry x="-567.25" y="790" width="70" height="40" as="geometry" />
+          <mxGeometry x="-533" y="757" width="70" height="40" as="geometry" />
         </mxCell>
         <mxCell id="Vttz6XFYR83p1Urtk-70-155" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" edge="1" parent="1" source="Vttz6XFYR83p1Urtk-70-150" target="Vttz6XFYR83p1Urtk-70-11">
           <mxGeometry relative="1" as="geometry" />
@@ -838,6 +842,24 @@
         </mxCell>
         <mxCell id="ia29Cefz2oMwzW306gzN-5" value="Дата" style="ellipse;whiteSpace=wrap;html=1;align=center;fontStyle=4;" vertex="1" parent="1">
           <mxGeometry x="-105" y="50" width="60" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="FpZzWHBCPRENnyKyFC07-2" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" edge="1" parent="1" source="FpZzWHBCPRENnyKyFC07-1" target="Vttz6XFYR83p1Urtk-70-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="FpZzWHBCPRENnyKyFC07-1" value="Код учебной группы" style="ellipse;whiteSpace=wrap;html=1;align=center;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="24" y="530" width="81" height="49.5" as="geometry" />
+        </mxCell>
+        <mxCell id="FpZzWHBCPRENnyKyFC07-11" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="110" y="604" as="sourcePoint" />
+            <mxPoint x="130" y="604" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FpZzWHBCPRENnyKyFC07-13" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="199" y="662" as="sourcePoint" />
+            <mxPoint x="219" y="662" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
