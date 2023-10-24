@@ -1,0 +1,1033 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 16.0
+-- Dumped by pg_dump version 16.0
+
+-- Started on 2023-10-24 21:04:34
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 6 (class 2615 OID 16398)
+-- Name: bankDB; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA "bankDB";
+
+
+ALTER SCHEMA "bankDB" OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 218 (class 1259 OID 16409)
+-- Name: Client; Type: TABLE; Schema: bankDB; Owner: postgres
+--
+
+CREATE TABLE "bankDB"."Client" (
+    "PassportNumber" bigint NOT NULL,
+    "FullName" character varying(50) NOT NULL,
+    "Address" character varying(150) NOT NULL,
+    "Phone" bigint NOT NULL,
+    "E-mail" character varying(30) NOT NULL
+);
+
+
+ALTER TABLE "bankDB"."Client" OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 16414)
+-- Name: Currency; Type: TABLE; Schema: bankDB; Owner: postgres
+--
+
+CREATE TABLE "bankDB"."Currency" (
+    "IdCurrency" integer NOT NULL,
+    "Name" character varying(25) NOT NULL,
+    "Country" character varying(30) NOT NULL
+);
+
+
+ALTER TABLE "bankDB"."Currency" OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 16668)
+-- Name: Currency_IdCurrency_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."Currency" ALTER COLUMN "IdCurrency" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "bankDB"."Currency_IdCurrency_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 10000
+    CACHE 1
+);
+
+
+--
+-- TOC entry 221 (class 1259 OID 16442)
+-- Name: DepositAgreement; Type: TABLE; Schema: bankDB; Owner: postgres
+--
+
+CREATE TABLE "bankDB"."DepositAgreement" (
+    "AgreementNumber" integer NOT NULL,
+    "Name" character varying(30) NOT NULL,
+    "Description" character varying(200) NOT NULL,
+    "DepositDate" date NOT NULL,
+    "PaymentDay" integer NOT NULL,
+    "FactCloseDate" date,
+    "PlanCloseDate" date NOT NULL,
+    "Status" character varying(10) DEFAULT 'Open'::character varying NOT NULL,
+    "DepositRate" integer NOT NULL,
+    "StartSum" integer NOT NULL,
+    "SummaryPayment" integer DEFAULT 0 NOT NULL,
+    "TabelNumber" integer NOT NULL,
+    "PassportNumber" integer NOT NULL,
+    "IdCurrency" integer NOT NULL
+);
+
+
+ALTER TABLE "bankDB"."DepositAgreement" OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 16643)
+-- Name: DepositAgreement_AgreementNumber_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."DepositAgreement" ALTER COLUMN "AgreementNumber" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "bankDB"."DepositAgreement_AgreementNumber_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 99999999
+    CACHE 1
+    CYCLE
+);
+
+
+--
+-- TOC entry 223 (class 1259 OID 16457)
+-- Name: DepositPaySchedule; Type: TABLE; Schema: bankDB; Owner: postgres
+--
+
+CREATE TABLE "bankDB"."DepositPaySchedule" (
+    "AgreementNumber" integer NOT NULL,
+    "PlanPaymentDate" date NOT NULL,
+    "Payment" integer NOT NULL,
+    "FactPaymentDate" date
+);
+
+
+ALTER TABLE "bankDB"."DepositPaySchedule" OWNER TO postgres;
+
+--
+-- TOC entry 216 (class 1259 OID 16399)
+-- Name: Employee; Type: TABLE; Schema: bankDB; Owner: postgres
+--
+
+CREATE TABLE "bankDB"."Employee" (
+    "TabelNumber" integer NOT NULL,
+    "FullName" character varying(50) NOT NULL,
+    "PassportNumber" bigint NOT NULL,
+    "Age" integer NOT NULL,
+    "Phone" bigint NOT NULL,
+    "Address" character varying(150) NOT NULL,
+    "IdCategory" integer NOT NULL
+);
+
+
+ALTER TABLE "bankDB"."Employee" OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 16404)
+-- Name: EmployeeCategory; Type: TABLE; Schema: bankDB; Owner: postgres
+--
+
+CREATE TABLE "bankDB"."EmployeeCategory" (
+    "IdCategory" integer NOT NULL,
+    "Name" character varying(50) NOT NULL,
+    "Description" character varying(200) NOT NULL,
+    "Salary" integer NOT NULL
+);
+
+
+ALTER TABLE "bankDB"."EmployeeCategory" OWNER TO postgres;
+
+--
+-- TOC entry 228 (class 1259 OID 16684)
+-- Name: EmployeeCategory_IdCategory_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."EmployeeCategory" ALTER COLUMN "IdCategory" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "bankDB"."EmployeeCategory_IdCategory_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 1000
+    CACHE 1
+);
+
+
+--
+-- TOC entry 224 (class 1259 OID 16642)
+-- Name: Employee_TabelNumber_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."Employee" ALTER COLUMN "TabelNumber" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "bankDB"."Employee_TabelNumber_seq"
+    START WITH 100000
+    INCREMENT BY 1
+    MINVALUE 100000
+    MAXVALUE 999999
+    CACHE 1
+);
+
+
+--
+-- TOC entry 220 (class 1259 OID 16424)
+-- Name: LoanAgreement; Type: TABLE; Schema: bankDB; Owner: postgres
+--
+
+CREATE TABLE "bankDB"."LoanAgreement" (
+    "AgreementNumber" integer NOT NULL,
+    "Name" character varying(30) NOT NULL,
+    "Description" character varying(200) NOT NULL,
+    "LoanDate" date NOT NULL,
+    "PaymentDay" integer NOT NULL,
+    "FactCloseDate" date,
+    "PlanCloseDate" date NOT NULL,
+    "Status" character varying(10) DEFAULT 'Open'::character varying NOT NULL,
+    "InterestRate" integer NOT NULL,
+    "StartSum" integer NOT NULL,
+    "Debt" integer NOT NULL,
+    "TabelNumber" integer NOT NULL,
+    "PassportNumber" integer NOT NULL,
+    "IdCurrency" integer NOT NULL
+);
+
+
+ALTER TABLE "bankDB"."LoanAgreement" OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 16644)
+-- Name: LoanAgreeement_AgreementNumber_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."LoanAgreement" ALTER COLUMN "AgreementNumber" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "bankDB"."LoanAgreeement_AgreementNumber_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 99999999
+    CACHE 1
+);
+
+
+--
+-- TOC entry 222 (class 1259 OID 16452)
+-- Name: LoanPaySchedule; Type: TABLE; Schema: bankDB; Owner: postgres
+--
+
+CREATE TABLE "bankDB"."LoanPaySchedule" (
+    "AgreementNumber" integer NOT NULL,
+    "PlanPaymentDate" date NOT NULL,
+    "DebtPayment" integer NOT NULL,
+    "InterestPayment" integer NOT NULL,
+    "FactPaymentDate" date
+);
+
+
+ALTER TABLE "bankDB"."LoanPaySchedule" OWNER TO postgres;
+
+--
+-- TOC entry 4867 (class 0 OID 16409)
+-- Dependencies: 218
+-- Data for Name: Client; Type: TABLE DATA; Schema: bankDB; Owner: postgres
+--
+
+COPY "bankDB"."Client" ("PassportNumber", "FullName", "Address", "Phone", "E-mail") FROM stdin;
+793918777	Русакова Агафья Артемовна	к. Чулым, ул. Микрорайон, д. 3, 335873	85528615464	galina08@gmail.com
+157712532	Лихачев Харитон Богданович	п. Истра, бул. Строительный, д. 8/3, 202939	86818727677	krasilnikovaija@yahoo.com
+15334936	Елизавета Святославовна Лихачева	д. Одинцово, ш. Дарвина, д. 2/2 к. 14, 030959	78710512920	tretjakovilarion@yandex.ru
+997403724	Мария Тарасовна Зыкова	с. Киржач, пр. Вавилова, д. 143 к. 7/3, 581848	78393157982	sokolovdemid@gmail.com
+710751005	Назар Фомич Крылов	клх Кирово-Чепецк, пр. Пархоменко, д. 51 к. 220, 022893	86007944257	milenfomichev@rambler.ru
+121748022	Галина Святославовна Некрасова	п. Усть-Катав, бул. Кочубея, д. 606 к. 3/5, 846641	77476804830	isidor69@gmail.com
+189266391	Крюкова Елизавета Борисовна	д. Оленегорск (Якут.), пр. Королева, д. 95, 771803	86970156808	oktjabrina_16@gmail.com
+856093670	Мухин Потап Вячеславович	к. Новочеркасск, ул. Халтурина, д. 3 стр. 4/5, 323611	76921434582	evdokimovboris@yandex.ru
+324629513	Владимирова Ольга Романовна	к. Старая Русса, алл. Приморская, д. 39 стр. 2/5, 500187	80745955216	kuprijan_23@mail.ru
+116549023	Фадеев Милан Гаврилович	ст. Одинцово, алл. Заливная, д. 612 стр. 863, 913075	79178544542	simonovsaveli@yandex.ru
+51690385	Фадеев Фока Яковлевич	ст. Ногинск (Моск.), пр. Щорса, д. 813 стр. 5, 756425	89348592289	vorobevelizar@hotmail.com
+571140644	Оксана Аркадьевна Соловьева	д. Хасавюрт, ш. Станционное, д. 4, 640885	80209282910	makar24@hotmail.com
+123609496	Лука Вячеславович Наумов	д. Карачаевск, ш. Астраханское, д. 9/8 к. 522, 901051	72381924356	seliverst_1983@yandex.ru
+129798791	Носов Анисим Владиславович	г. Валаам, бул. Баумана, д. 9/8 стр. 60, 046782	71400117644	tkonovalov@hotmail.com
+952442573	Ираклий Елисеевич Макаров	клх Клин, алл. Детская, д. 9/4, 976363	71988453310	evstigne_1973@yahoo.com
+\.
+
+
+--
+-- TOC entry 4868 (class 0 OID 16414)
+-- Dependencies: 219
+-- Data for Name: Currency; Type: TABLE DATA; Schema: bankDB; Owner: postgres
+--
+
+COPY "bankDB"."Currency" ("IdCurrency", "Name", "Country") FROM stdin;
+1	Российский Рубль	Россия
+2	Доллар США	США
+3	Евро	Европа
+4	Фунт стерлингов	Великобритания
+\.
+
+
+--
+-- TOC entry 4870 (class 0 OID 16442)
+-- Dependencies: 221
+-- Data for Name: DepositAgreement; Type: TABLE DATA; Schema: bankDB; Owner: postgres
+--
+
+COPY "bankDB"."DepositAgreement" ("AgreementNumber", "Name", "Description", "DepositDate", "PaymentDay", "FactCloseDate", "PlanCloseDate", "Status", "DepositRate", "StartSum", "SummaryPayment", "TabelNumber", "PassportNumber", "IdCurrency") FROM stdin;
+15	Красивый	Спорт кидать теория основание промолчать инструкция скользить. Угроза район призыв дрогнуть привлекать плод привлекать.	2023-06-20	6	\N	2024-06-20	Open	7	100000	0	100014	952442573	2
+16	Умный	Видимо хлеб за песня художественный теория. Войти столетие дошлый совет пространство затянуться лиловый адвокат.	2023-08-13	20	\N	2025-08-13	Open	12	202000	0	100020	123609496	2
+17	Умный	Видимо хлеб за песня художественный теория. Войти столетие дошлый совет пространство затянуться лиловый адвокат.	2023-01-03	23	\N	2025-01-03	Open	12	197000	0	100013	324629513	1
+18	Молодёжный	Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.	2023-05-28	24	\N	2025-05-28	Open	10	273000	0	100015	157712532	1
+19	Молодёжный	Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.	2023-09-07	25	\N	2025-09-07	Open	10	146000	0	100016	129798791	1
+20	Красивый	Спорт кидать теория основание промолчать инструкция скользить. Угроза район призыв дрогнуть привлекать плод привлекать.	2023-07-17	22	\N	2024-07-17	Open	7	277000	0	100016	189266391	4
+\.
+
+
+--
+-- TOC entry 4872 (class 0 OID 16457)
+-- Dependencies: 223
+-- Data for Name: DepositPaySchedule; Type: TABLE DATA; Schema: bankDB; Owner: postgres
+--
+
+COPY "bankDB"."DepositPaySchedule" ("AgreementNumber", "PlanPaymentDate", "Payment", "FactPaymentDate") FROM stdin;
+15	2023-07-06	583	\N
+15	2023-08-06	587	\N
+15	2023-09-06	590	\N
+15	2023-10-06	594	\N
+15	2023-11-06	597	\N
+15	2023-12-06	601	\N
+15	2024-01-06	604	\N
+15	2024-02-06	608	\N
+15	2024-03-06	611	\N
+15	2024-04-06	615	\N
+15	2024-05-06	618	\N
+15	2024-06-06	622	\N
+16	2023-09-20	2020	\N
+16	2023-10-20	2040	\N
+16	2023-11-20	2061	\N
+16	2023-12-20	2081	\N
+16	2024-01-20	2102	\N
+16	2024-02-20	2123	\N
+16	2024-03-20	2144	\N
+16	2024-04-20	2166	\N
+16	2024-05-20	2187	\N
+16	2024-06-20	2209	\N
+16	2024-07-20	2231	\N
+16	2024-08-20	2254	\N
+16	2024-09-20	2276	\N
+16	2024-10-20	2299	\N
+16	2024-11-20	2322	\N
+16	2024-12-20	2345	\N
+16	2025-01-20	2369	\N
+16	2025-02-20	2392	\N
+16	2025-03-20	2416	\N
+16	2025-04-20	2440	\N
+16	2025-05-20	2465	\N
+16	2025-06-20	2489	\N
+16	2025-07-20	2514	\N
+16	2025-08-20	2539	\N
+17	2023-02-23	1970	\N
+17	2023-03-23	1990	\N
+17	2023-04-23	2010	\N
+17	2023-05-23	2030	\N
+17	2023-06-23	2050	\N
+17	2023-07-23	2070	\N
+17	2023-08-23	2091	\N
+17	2023-09-23	2112	\N
+17	2023-10-23	2133	\N
+17	2023-11-23	2155	\N
+17	2023-12-23	2176	\N
+17	2024-01-23	2198	\N
+17	2024-02-23	2220	\N
+17	2024-03-23	2242	\N
+17	2024-04-23	2264	\N
+17	2024-05-23	2287	\N
+17	2024-06-23	2310	\N
+17	2024-07-23	2333	\N
+17	2024-08-23	2356	\N
+17	2024-09-23	2380	\N
+17	2024-10-23	2404	\N
+17	2024-11-23	2428	\N
+17	2024-12-23	2452	\N
+17	2025-01-23	2477	\N
+18	2023-06-24	2275	\N
+18	2023-07-24	2294	\N
+18	2023-08-24	2313	\N
+18	2023-09-24	2332	\N
+18	2023-10-24	2352	\N
+18	2023-11-24	2371	\N
+18	2023-12-24	2391	\N
+18	2024-01-24	2411	\N
+18	2024-02-24	2431	\N
+18	2024-03-24	2451	\N
+18	2024-04-24	2472	\N
+18	2024-05-24	2492	\N
+18	2024-06-24	2513	\N
+18	2024-07-24	2534	\N
+18	2024-08-24	2555	\N
+18	2024-09-24	2577	\N
+18	2024-10-24	2598	\N
+18	2024-11-24	2620	\N
+18	2024-12-24	2642	\N
+18	2025-01-24	2664	\N
+18	2025-02-24	2686	\N
+18	2025-03-24	2708	\N
+18	2025-04-24	2731	\N
+18	2025-05-24	2753	\N
+19	2023-10-25	1217	\N
+19	2023-11-25	1227	\N
+19	2023-12-25	1237	\N
+19	2024-01-25	1247	\N
+19	2024-02-25	1258	\N
+19	2024-03-25	1268	\N
+19	2024-04-25	1279	\N
+19	2024-05-25	1289	\N
+19	2024-06-25	1300	\N
+19	2024-07-25	1311	\N
+19	2024-08-25	1322	\N
+19	2024-09-25	1333	\N
+19	2024-10-25	1344	\N
+19	2024-11-25	1355	\N
+19	2024-12-25	1367	\N
+19	2025-01-25	1378	\N
+19	2025-02-25	1389	\N
+19	2025-03-25	1401	\N
+19	2025-04-25	1413	\N
+19	2025-05-25	1424	\N
+19	2025-06-25	1436	\N
+19	2025-07-25	1448	\N
+19	2025-08-25	1460	\N
+19	2025-09-25	1473	\N
+20	2023-08-22	1616	\N
+20	2023-09-22	1625	\N
+20	2023-10-22	1635	\N
+20	2023-11-22	1644	\N
+20	2023-12-22	1654	\N
+20	2024-01-22	1664	\N
+20	2024-02-22	1673	\N
+20	2024-03-22	1683	\N
+20	2024-04-22	1693	\N
+20	2024-05-22	1703	\N
+20	2024-06-22	1713	\N
+20	2024-07-22	1723	\N
+\.
+
+
+--
+-- TOC entry 4865 (class 0 OID 16399)
+-- Dependencies: 216
+-- Data for Name: Employee; Type: TABLE DATA; Schema: bankDB; Owner: postgres
+--
+
+COPY "bankDB"."Employee" ("TabelNumber", "FullName", "PassportNumber", "Age", "Phone", "Address", "IdCategory") FROM stdin;
+100011	Арсений Вилорович Рыбаков	17880135	52	75788605119	ст. Новый Оскол, ш. Мелиоративное, д. 984, 623840	3
+100012	Мухин Георгий Тимурович	250497905	36	79586804890	к. Троицк (Моск.), алл. Павлова, д. 5, 965930	4
+100013	Лукия Михайловна Лобанова	779012004	29	73658656011	г. Углич, ул. Верхняя, д. 1 стр. 251, 680122	3
+100014	Трофим Богданович Корнилов	405184786	37	83731616739	ст. Красноярск, ул. Торговая, д. 6/9 стр. 6, 945303	2
+100015	Пономарев Олег Иосипович	198566376	34	85140617390	клх Арзамас, бул. Гвардейский, д. 30, 774957	1
+100016	Лихачев Корнил Якубович	199708425	41	87968201626	д. Сыктывкар, бул. Раздольный, д. 369, 029151	2
+100017	Агап Адамович Матвеев	154603810	37	73705470174	ст. Кинешма, алл. Широкая, д. 599 стр. 6/7, 749607	1
+100018	Новиков Феликс Ярославович	782762631	46	75790699785	п. Диксон, пер. Кузнецкий, д. 8, 391558	2
+100019	Михайлова Агата Владимировна	320158094	58	89213833510	д. Миллерово, ш. Николаева, д. 4/5 стр. 50, 477472	2
+100020	Доронин Касьян Арсеньевич	440271121	22	72213679224	к. Азов (Рост.), пер. Волжский, д. 2/7 стр. 173, 240859	1
+\.
+
+
+--
+-- TOC entry 4866 (class 0 OID 16404)
+-- Dependencies: 217
+-- Data for Name: EmployeeCategory; Type: TABLE DATA; Schema: bankDB; Owner: postgres
+--
+
+COPY "bankDB"."EmployeeCategory" ("IdCategory", "Name", "Description", "Salary") FROM stdin;
+1	Оператор call-центра банка	Выбирать школьный полностью дальний вытаскивать освободить. Выкинуть угодный деловой рис солнце другой рай. Наткнуться непривычный еврейский число строительство порядок провал.	45000
+2	Менеджер по продажам банковских услуг	Желание поздравлять лиловый. Дружно скользить разводить коммунизм деньги. Намерение фонарик порода привлекать. Означать ответить инвалид войти.	80000
+3	Сотрудник по работе с клиентами	Четко функция бочок видимо отражение. Одиннадцать мимо грудь багровый трясти. Сынок одиннадцать угол вчера витрина коробка зима.	60000
+4	Менеджер обслуживания	Разуметься радость висеть единый самостоятельно указанный уронить. Карандаш страсть бегать совещание рис школьный четко. Ставить успокоиться пол ручей.	68000
+\.
+
+
+--
+-- TOC entry 4869 (class 0 OID 16424)
+-- Dependencies: 220
+-- Data for Name: LoanAgreement; Type: TABLE DATA; Schema: bankDB; Owner: postgres
+--
+
+COPY "bankDB"."LoanAgreement" ("AgreementNumber", "Name", "Description", "LoanDate", "PaymentDay", "FactCloseDate", "PlanCloseDate", "Status", "InterestRate", "StartSum", "Debt", "TabelNumber", "PassportNumber", "IdCurrency") FROM stdin;
+1	Молодёжный	Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.	2023-02-20	9	\N	2025-02-20	Open	8	154000	154000	100015	123609496	2
+2	Выгодный	Сынок очко уронить дорогой промолчать роса. Тяжелый инвалид промолчать. Пропасть находить запретить.	2023-09-29	27	\N	2025-09-29	Open	5	282000	282000	100017	571140644	4
+3	Молодёжный	Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.	2023-07-22	11	\N	2025-07-22	Open	8	158000	158000	100017	324629513	1
+4	Молодёжный	Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.	2023-08-04	20	\N	2025-08-04	Open	8	288000	288000	100013	51690385	3
+5	Молодёжный	Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.	2023-03-28	21	\N	2025-03-28	Open	8	226000	226000	100014	121748022	4
+6	Классный	Аж анализ покинуть бетонный счастье. Спешить промолчать механический что бок. Потянуться хозяйка пропаганда миф.	2023-08-10	27	\N	2024-08-10	Open	14	200000	200000	100011	129798791	2
+\.
+
+
+--
+-- TOC entry 4871 (class 0 OID 16452)
+-- Dependencies: 222
+-- Data for Name: LoanPaySchedule; Type: TABLE DATA; Schema: bankDB; Owner: postgres
+--
+
+COPY "bankDB"."LoanPaySchedule" ("AgreementNumber", "PlanPaymentDate", "DebtPayment", "InterestPayment", "FactPaymentDate") FROM stdin;
+1	2023-03-09	6417	1027	\N
+1	2023-04-09	6417	984	\N
+1	2023-05-09	6417	941	\N
+1	2023-06-09	6417	898	\N
+1	2023-07-09	6417	856	\N
+1	2023-08-09	6417	813	\N
+1	2023-09-09	6417	770	\N
+1	2023-10-09	6417	727	\N
+1	2023-11-09	6417	684	\N
+1	2023-12-09	6417	642	\N
+1	2024-01-09	6417	599	\N
+1	2024-02-09	6417	556	\N
+1	2024-03-09	6417	513	\N
+1	2024-04-09	6417	471	\N
+1	2024-05-09	6417	428	\N
+1	2024-06-09	6417	385	\N
+1	2024-07-09	6417	342	\N
+1	2024-08-09	6417	299	\N
+1	2024-09-09	6417	257	\N
+1	2024-10-09	6417	214	\N
+1	2024-11-09	6417	171	\N
+1	2024-12-09	6417	128	\N
+1	2025-01-09	6417	86	\N
+1	2025-02-09	6417	43	\N
+2	2023-10-27	11750	1175	\N
+2	2023-11-27	11750	1126	\N
+2	2023-12-27	11750	1077	\N
+2	2024-01-27	11750	1028	\N
+2	2024-02-27	11750	979	\N
+2	2024-03-27	11750	930	\N
+2	2024-04-27	11750	881	\N
+2	2024-05-27	11750	832	\N
+2	2024-06-27	11750	783	\N
+2	2024-07-27	11750	734	\N
+2	2024-08-27	11750	685	\N
+2	2024-09-27	11750	636	\N
+2	2024-10-27	11750	588	\N
+2	2024-11-27	11750	539	\N
+2	2024-12-27	11750	490	\N
+2	2025-01-27	11750	441	\N
+2	2025-02-27	11750	392	\N
+2	2025-03-27	11750	343	\N
+2	2025-04-27	11750	294	\N
+2	2025-05-27	11750	245	\N
+2	2025-06-27	11750	196	\N
+2	2025-07-27	11750	147	\N
+2	2025-08-27	11750	98	\N
+2	2025-09-27	11750	49	\N
+3	2023-08-11	6584	1053	\N
+3	2023-09-11	6584	1009	\N
+3	2023-10-11	6584	966	\N
+3	2023-11-11	6584	922	\N
+3	2023-12-11	6584	878	\N
+3	2024-01-11	6584	834	\N
+3	2024-02-11	6584	790	\N
+3	2024-03-11	6584	746	\N
+3	2024-04-11	6584	702	\N
+3	2024-05-11	6584	658	\N
+3	2024-06-11	6584	614	\N
+3	2024-07-11	6584	571	\N
+3	2024-08-11	6584	527	\N
+3	2024-09-11	6584	483	\N
+3	2024-10-11	6584	439	\N
+3	2024-11-11	6584	395	\N
+3	2024-12-11	6584	351	\N
+3	2025-01-11	6584	307	\N
+3	2025-02-11	6584	263	\N
+3	2025-03-11	6584	219	\N
+3	2025-04-11	6584	175	\N
+3	2025-05-11	6584	132	\N
+3	2025-06-11	6584	88	\N
+3	2025-07-11	6584	44	\N
+4	2023-09-20	12000	1920	\N
+4	2023-10-20	12000	1840	\N
+4	2023-11-20	12000	1760	\N
+4	2023-12-20	12000	1680	\N
+4	2024-01-20	12000	1600	\N
+4	2024-02-20	12000	1520	\N
+4	2024-03-20	12000	1440	\N
+4	2024-04-20	12000	1360	\N
+4	2024-05-20	12000	1280	\N
+4	2024-06-20	12000	1200	\N
+4	2024-07-20	12000	1120	\N
+4	2024-08-20	12000	1040	\N
+4	2024-09-20	12000	960	\N
+4	2024-10-20	12000	880	\N
+4	2024-11-20	12000	800	\N
+4	2024-12-20	12000	720	\N
+4	2025-01-20	12000	640	\N
+4	2025-02-20	12000	560	\N
+4	2025-03-20	12000	480	\N
+4	2025-04-20	12000	400	\N
+4	2025-05-20	12000	320	\N
+4	2025-06-20	12000	240	\N
+4	2025-07-20	12000	160	\N
+4	2025-08-20	12000	80	\N
+5	2023-04-21	9417	1507	\N
+5	2023-05-21	9417	1444	\N
+5	2023-06-21	9417	1381	\N
+5	2023-07-21	9417	1318	\N
+5	2023-08-21	9417	1256	\N
+5	2023-09-21	9417	1193	\N
+5	2023-10-21	9417	1130	\N
+5	2023-11-21	9417	1067	\N
+5	2023-12-21	9417	1004	\N
+5	2024-01-21	9417	942	\N
+5	2024-02-21	9417	879	\N
+5	2024-03-21	9417	816	\N
+5	2024-04-21	9417	753	\N
+5	2024-05-21	9417	691	\N
+5	2024-06-21	9417	628	\N
+5	2024-07-21	9417	565	\N
+5	2024-08-21	9417	502	\N
+5	2024-09-21	9417	439	\N
+5	2024-10-21	9417	377	\N
+5	2024-11-21	9417	314	\N
+5	2024-12-21	9417	251	\N
+5	2025-01-21	9417	188	\N
+5	2025-02-21	9417	126	\N
+5	2025-03-21	9417	63	\N
+6	2023-09-27	16667	2333	\N
+6	2023-10-27	16667	2139	\N
+6	2023-11-27	16667	1944	\N
+6	2023-12-27	16667	1750	\N
+6	2024-01-27	16667	1556	\N
+6	2024-02-27	16667	1361	\N
+6	2024-03-27	16667	1167	\N
+6	2024-04-27	16667	972	\N
+6	2024-05-27	16667	778	\N
+6	2024-06-27	16667	583	\N
+6	2024-07-27	16667	389	\N
+6	2024-08-27	16667	194	\N
+\.
+
+
+--
+-- TOC entry 4883 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: Currency_IdCurrency_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"bankDB"."Currency_IdCurrency_seq"', 4, true);
+
+
+--
+-- TOC entry 4884 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: DepositAgreement_AgreementNumber_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"bankDB"."DepositAgreement_AgreementNumber_seq"', 20, true);
+
+
+--
+-- TOC entry 4885 (class 0 OID 0)
+-- Dependencies: 228
+-- Name: EmployeeCategory_IdCategory_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"bankDB"."EmployeeCategory_IdCategory_seq"', 4, true);
+
+
+--
+-- TOC entry 4886 (class 0 OID 0)
+-- Dependencies: 224
+-- Name: Employee_TabelNumber_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"bankDB"."Employee_TabelNumber_seq"', 100020, true);
+
+
+--
+-- TOC entry 4887 (class 0 OID 0)
+-- Dependencies: 226
+-- Name: LoanAgreeement_AgreementNumber_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"bankDB"."LoanAgreeement_AgreementNumber_seq"', 6, true);
+
+
+--
+-- TOC entry 4706 (class 2606 OID 16484)
+-- Name: DepositAgreement AgreementNumber; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."DepositAgreement"
+    ADD CONSTRAINT "AgreementNumber" UNIQUE ("AgreementNumber") INCLUDE ("AgreementNumber");
+
+
+--
+-- TOC entry 4696 (class 2606 OID 16647)
+-- Name: Client Client_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."Client"
+    ADD CONSTRAINT "Client_pkey" PRIMARY KEY ("PassportNumber");
+
+
+--
+-- TOC entry 4698 (class 2606 OID 16418)
+-- Name: Currency Currency_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."Currency"
+    ADD CONSTRAINT "Currency_pkey" PRIMARY KEY ("IdCurrency");
+
+
+--
+-- TOC entry 4675 (class 2606 OID 16600)
+-- Name: LoanAgreement Debt; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."LoanAgreement"
+    ADD CONSTRAINT "Debt" CHECK (("Debt" >= 0)) NOT VALID;
+
+
+--
+-- TOC entry 4708 (class 2606 OID 16446)
+-- Name: DepositAgreement DepositAgreement_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."DepositAgreement"
+    ADD CONSTRAINT "DepositAgreement_pkey" PRIMARY KEY ("AgreementNumber");
+
+
+--
+-- TOC entry 4681 (class 2606 OID 16540)
+-- Name: DepositAgreement DepositRate; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."DepositAgreement"
+    ADD CONSTRAINT "DepositRate" CHECK ((("DepositRate" < 101) AND ("DepositRate" > '-1'::integer))) NOT VALID;
+
+
+--
+-- TOC entry 4692 (class 2606 OID 16408)
+-- Name: EmployeeCategory EmployeeCategory_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."EmployeeCategory"
+    ADD CONSTRAINT "EmployeeCategory_pkey" PRIMARY KEY ("IdCategory");
+
+
+--
+-- TOC entry 4688 (class 2606 OID 16403)
+-- Name: Employee Employee_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."Employee"
+    ADD CONSTRAINT "Employee_pkey" PRIMARY KEY ("TabelNumber");
+
+
+--
+-- TOC entry 4682 (class 2606 OID 16539)
+-- Name: DepositAgreement FactCloseDate; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."DepositAgreement"
+    ADD CONSTRAINT "FactCloseDate" CHECK (("FactCloseDate" > "DepositDate")) NOT VALID;
+
+
+--
+-- TOC entry 4676 (class 2606 OID 16596)
+-- Name: LoanAgreement FactCloseDate; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."LoanAgreement"
+    ADD CONSTRAINT "FactCloseDate" CHECK (("FactCloseDate" > "LoanDate")) NOT VALID;
+
+
+--
+-- TOC entry 4677 (class 2606 OID 16598)
+-- Name: LoanAgreement InterestRate; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."LoanAgreement"
+    ADD CONSTRAINT "InterestRate" CHECK ((("InterestRate" < 101) AND ("InterestRate" > '-1'::integer))) NOT VALID;
+
+
+--
+-- TOC entry 4702 (class 2606 OID 16428)
+-- Name: LoanAgreement LoanAgreeement_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."LoanAgreement"
+    ADD CONSTRAINT "LoanAgreeement_pkey" PRIMARY KEY ("AgreementNumber");
+
+
+--
+-- TOC entry 4710 (class 2606 OID 16456)
+-- Name: LoanPaySchedule LoanPayShedule_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."LoanPaySchedule"
+    ADD CONSTRAINT "LoanPayShedule_pkey" PRIMARY KEY ("AgreementNumber", "PlanPaymentDate");
+
+
+--
+-- TOC entry 4678 (class 2606 OID 16595)
+-- Name: LoanAgreement PaymentDay; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."LoanAgreement"
+    ADD CONSTRAINT "PaymentDay" CHECK ((("PaymentDay" < 28) AND ("PaymentDay" > 0))) NOT VALID;
+
+
+--
+-- TOC entry 4683 (class 2606 OID 16541)
+-- Name: DepositAgreement StartSum; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."DepositAgreement"
+    ADD CONSTRAINT "StartSum" CHECK (("StartSum" > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4679 (class 2606 OID 16599)
+-- Name: LoanAgreement StartSum; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."LoanAgreement"
+    ADD CONSTRAINT "StartSum" CHECK (("StartSum" > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4684 (class 2606 OID 16542)
+-- Name: DepositAgreement Status; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."DepositAgreement"
+    ADD CONSTRAINT "Status" CHECK ((("Status")::text = 'Open'::text)) NOT VALID;
+
+
+--
+-- TOC entry 4680 (class 2606 OID 16597)
+-- Name: LoanAgreement Status; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."LoanAgreement"
+    ADD CONSTRAINT "Status" CHECK ((("Status")::text = 'Open'::text)) NOT VALID;
+
+
+--
+-- TOC entry 4685 (class 2606 OID 16543)
+-- Name: DepositAgreement SummaryPayment; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."DepositAgreement"
+    ADD CONSTRAINT "SummaryPayment" CHECK (("SummaryPayment" >= 0)) NOT VALID;
+
+
+--
+-- TOC entry 4690 (class 2606 OID 16465)
+-- Name: Employee TabelNumber; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."Employee"
+    ADD CONSTRAINT "TabelNumber" UNIQUE ("TabelNumber");
+
+
+--
+-- TOC entry 4704 (class 2606 OID 16579)
+-- Name: LoanAgreement agreement_loan_number; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."LoanAgreement"
+    ADD CONSTRAINT agreement_loan_number UNIQUE ("AgreementNumber") INCLUDE ("AgreementNumber");
+
+
+--
+-- TOC entry 4694 (class 2606 OID 16479)
+-- Name: EmployeeCategory category_id; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."EmployeeCategory"
+    ADD CONSTRAINT category_id UNIQUE ("IdCategory") INCLUDE ("IdCategory");
+
+
+--
+-- TOC entry 4700 (class 2606 OID 16482)
+-- Name: Currency currenct_id; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."Currency"
+    ADD CONSTRAINT currenct_id UNIQUE ("IdCurrency") INCLUDE ("IdCurrency");
+
+
+--
+-- TOC entry 4712 (class 2606 OID 16697)
+-- Name: DepositPaySchedule date_agreement_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."DepositPaySchedule"
+    ADD CONSTRAINT date_agreement_pkey PRIMARY KEY ("AgreementNumber", "PlanPaymentDate") INCLUDE ("AgreementNumber", "PlanPaymentDate");
+
+
+--
+-- TOC entry 4673 (class 2606 OID 16667)
+-- Name: Client valid_passport; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."Client"
+    ADD CONSTRAINT valid_passport CHECK ((("PassportNumber" < '9999999999'::bigint) AND ("PassportNumber" > (9999999)::bigint))) NOT VALID;
+
+
+--
+-- TOC entry 4670 (class 2606 OID 16682)
+-- Name: Employee valid_passport; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."Employee"
+    ADD CONSTRAINT valid_passport CHECK ((("PassportNumber" < '9999999999'::bigint) AND ("PassportNumber" > (999999)::bigint))) NOT VALID;
+
+
+--
+-- TOC entry 4686 (class 2606 OID 16687)
+-- Name: DepositAgreement valid_payment; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."DepositAgreement"
+    ADD CONSTRAINT valid_payment CHECK ((("PaymentDay" < 29) AND ("PaymentDay" > 0))) NOT VALID;
+
+
+--
+-- TOC entry 4674 (class 2606 OID 16666)
+-- Name: Client valid_phone; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."Client"
+    ADD CONSTRAINT valid_phone CHECK ((("Phone" < '999999999999'::bigint) AND ("Phone" > (999999999)::bigint))) NOT VALID;
+
+
+--
+-- TOC entry 4671 (class 2606 OID 16683)
+-- Name: Employee valid_phone; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."Employee"
+    ADD CONSTRAINT valid_phone CHECK ((("Phone" < '999999999999'::bigint) AND ("Phone" > '9999999999'::bigint))) NOT VALID;
+
+
+--
+-- TOC entry 4672 (class 2606 OID 16480)
+-- Name: EmployeeCategory valid_salary; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."EmployeeCategory"
+    ADD CONSTRAINT valid_salary CHECK (("Salary" > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4720 (class 2606 OID 16631)
+-- Name: LoanPaySchedule agreement_number_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."LoanPaySchedule"
+    ADD CONSTRAINT agreement_number_fk FOREIGN KEY ("AgreementNumber") REFERENCES "bankDB"."LoanAgreement"("AgreementNumber") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
+
+
+--
+-- TOC entry 4721 (class 2606 OID 16691)
+-- Name: DepositPaySchedule agreement_number_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."DepositPaySchedule"
+    ADD CONSTRAINT agreement_number_fk FOREIGN KEY ("AgreementNumber") REFERENCES "bankDB"."DepositAgreement"("AgreementNumber") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
+
+
+--
+-- TOC entry 4714 (class 2606 OID 16653)
+-- Name: LoanAgreement cliend_passport_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."LoanAgreement"
+    ADD CONSTRAINT cliend_passport_fk FOREIGN KEY ("PassportNumber") REFERENCES "bankDB"."Client"("PassportNumber") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
+
+
+--
+-- TOC entry 4717 (class 2606 OID 16648)
+-- Name: DepositAgreement client_passport_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."DepositAgreement"
+    ADD CONSTRAINT client_passport_fk FOREIGN KEY ("PassportNumber") REFERENCES "bankDB"."Client"("PassportNumber") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
+
+
+--
+-- TOC entry 4715 (class 2606 OID 16590)
+-- Name: LoanAgreement currenct_id_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."LoanAgreement"
+    ADD CONSTRAINT currenct_id_fk FOREIGN KEY ("IdCurrency") REFERENCES "bankDB"."Currency"("IdCurrency") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
+
+
+--
+-- TOC entry 4718 (class 2606 OID 16533)
+-- Name: DepositAgreement currency_id_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."DepositAgreement"
+    ADD CONSTRAINT currency_id_fk FOREIGN KEY ("IdCurrency") REFERENCES "bankDB"."Currency"("IdCurrency") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
+
+
+--
+-- TOC entry 4713 (class 2606 OID 16473)
+-- Name: Employee employee_id_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."Employee"
+    ADD CONSTRAINT employee_id_fk FOREIGN KEY ("IdCategory") REFERENCES "bankDB"."EmployeeCategory"("IdCategory") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
+
+
+--
+-- TOC entry 4719 (class 2606 OID 16523)
+-- Name: DepositAgreement employee_tabel_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."DepositAgreement"
+    ADD CONSTRAINT employee_tabel_fk FOREIGN KEY ("TabelNumber") REFERENCES "bankDB"."Employee"("TabelNumber") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
+
+
+--
+-- TOC entry 4716 (class 2606 OID 16580)
+-- Name: LoanAgreement employee_tabel_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."LoanAgreement"
+    ADD CONSTRAINT employee_tabel_fk FOREIGN KEY ("TabelNumber") REFERENCES "bankDB"."Employee"("TabelNumber") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
+
+
+-- Completed on 2023-10-24 21:04:35
+
+--
+-- PostgreSQL database dump complete
+--
+
