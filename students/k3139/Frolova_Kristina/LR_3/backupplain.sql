@@ -5,7 +5,7 @@
 -- Dumped from database version 16.0
 -- Dumped by pg_dump version 16.0
 
--- Started on 2023-10-22 17:42:22 MSK
+-- Started on 2023-10-26 16:32:13 MSK
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -55,12 +55,9 @@ SET default_table_access_method = heap;
 
 CREATE TABLE "Session"."active student" (
     student_id integer NOT NULL,
-    education_year integer DEFAULT 1 NOT NULL,
-    "from" date NOT NULL,
-    "to" date NOT NULL,
+    date1 date NOT NULL,
+    date2 date NOT NULL,
     group_id integer NOT NULL,
-    syllabus_id integer NOT NULL,
-    education_program_id integer NOT NULL,
     record_book_id integer NOT NULL
 );
 
@@ -68,7 +65,7 @@ CREATE TABLE "Session"."active student" (
 ALTER TABLE "Session"."active student" OWNER TO postgres;
 
 --
--- TOC entry 227 (class 1259 OID 16620)
+-- TOC entry 226 (class 1259 OID 16620)
 -- Name: attestation pass; Type: TABLE; Schema: Session; Owner: postgres
 --
 
@@ -76,18 +73,17 @@ CREATE TABLE "Session"."attestation pass" (
     personal_id integer NOT NULL,
     student_id integer NOT NULL,
     discipline_id integer NOT NULL,
-    educational_program_id integer NOT NULL,
-    syllabus_id integer NOT NULL,
     date date NOT NULL,
     mark integer NOT NULL,
-    attempt integer
+    attempt integer,
+    attestation_id integer NOT NULL
 );
 
 
 ALTER TABLE "Session"."attestation pass" OWNER TO postgres;
 
 --
--- TOC entry 231 (class 1259 OID 16712)
+-- TOC entry 230 (class 1259 OID 16712)
 -- Name: classroom; Type: TABLE; Schema: Session; Owner: postgres
 --
 
@@ -96,6 +92,7 @@ CREATE TABLE "Session".classroom (
     department_id integer NOT NULL,
     classroom_type integer NOT NULL,
     capacity integer NOT NULL,
+    number character varying(5),
     CONSTRAINT capacity_chk CHECK ((capacity > 0)),
     CONSTRAINT classroom_type_chk CHECK ((classroom_type > 0))
 );
@@ -104,7 +101,7 @@ CREATE TABLE "Session".classroom (
 ALTER TABLE "Session".classroom OWNER TO postgres;
 
 --
--- TOC entry 228 (class 1259 OID 16650)
+-- TOC entry 227 (class 1259 OID 16650)
 -- Name: department; Type: TABLE; Schema: Session; Owner: postgres
 --
 
@@ -118,7 +115,7 @@ CREATE TABLE "Session".department (
 ALTER TABLE "Session".department OWNER TO postgres;
 
 --
--- TOC entry 220 (class 1259 OID 16487)
+-- TOC entry 219 (class 1259 OID 16487)
 -- Name: direction; Type: TABLE; Schema: Session; Owner: postgres
 --
 
@@ -133,7 +130,7 @@ CREATE TABLE "Session".direction (
 ALTER TABLE "Session".direction OWNER TO postgres;
 
 --
--- TOC entry 224 (class 1259 OID 16558)
+-- TOC entry 223 (class 1259 OID 16558)
 -- Name: discipline; Type: TABLE; Schema: Session; Owner: postgres
 --
 
@@ -150,7 +147,7 @@ CREATE TABLE "Session".discipline (
 ALTER TABLE "Session".discipline OWNER TO postgres;
 
 --
--- TOC entry 221 (class 1259 OID 16493)
+-- TOC entry 220 (class 1259 OID 16493)
 -- Name: educational program; Type: TABLE; Schema: Session; Owner: postgres
 --
 
@@ -166,35 +163,38 @@ CREATE TABLE "Session"."educational program" (
 ALTER TABLE "Session"."educational program" OWNER TO postgres;
 
 --
--- TOC entry 225 (class 1259 OID 16568)
+-- TOC entry 224 (class 1259 OID 16568)
 -- Name: educational program discipline; Type: TABLE; Schema: Session; Owner: postgres
 --
 
 CREATE TABLE "Session"."educational program discipline" (
     discipline_id integer NOT NULL,
     syllabus_id integer NOT NULL,
-    educational_program_id integer NOT NULL
+    ed_discipline_id integer NOT NULL,
+    semesters character varying
 );
 
 
 ALTER TABLE "Session"."educational program discipline" OWNER TO postgres;
 
 --
--- TOC entry 223 (class 1259 OID 16535)
+-- TOC entry 222 (class 1259 OID 16535)
 -- Name: group; Type: TABLE; Schema: Session; Owner: postgres
 --
 
 CREATE TABLE "Session"."group" (
     group_id integer NOT NULL,
     syllabus_id integer NOT NULL,
-    educational_program_id integer NOT NULL
+    start date DEFAULT '2022-09-01'::date NOT NULL,
+    finish date DEFAULT '2026-06-30'::date NOT NULL,
+    group_number character varying(10)
 );
 
 
 ALTER TABLE "Session"."group" OWNER TO postgres;
 
 --
--- TOC entry 229 (class 1259 OID 16655)
+-- TOC entry 228 (class 1259 OID 16655)
 -- Name: platform; Type: TABLE; Schema: Session; Owner: postgres
 --
 
@@ -207,20 +207,18 @@ CREATE TABLE "Session".platform (
 ALTER TABLE "Session".platform OWNER TO postgres;
 
 --
--- TOC entry 230 (class 1259 OID 16668)
+-- TOC entry 229 (class 1259 OID 16668)
 -- Name: schedule; Type: TABLE; Schema: Session; Owner: postgres
 --
 
 CREATE TABLE "Session".schedule (
     platform_id integer NOT NULL,
-    department_id integer NOT NULL,
     personal_id integer NOT NULL,
     group_id integer NOT NULL,
-    educational_program_id integer NOT NULL,
-    syllabus_id integer NOT NULL,
-    date date NOT NULL,
-    educational_program_discipline_id integer NOT NULL,
-    classroom_id integer NOT NULL
+    date timestamp with time zone NOT NULL,
+    classroom_id integer NOT NULL,
+    schedule_id integer NOT NULL,
+    ed_prog_disc_id integer
 );
 
 
@@ -241,11 +239,12 @@ CREATE TABLE "Session".scholarship (
 ALTER TABLE "Session".scholarship OWNER TO postgres;
 
 --
--- TOC entry 219 (class 1259 OID 16474)
+-- TOC entry 232 (class 1259 OID 16802)
 -- Name: scholarship appointment; Type: TABLE; Schema: Session; Owner: postgres
 --
 
 CREATE TABLE "Session"."scholarship appointment" (
+    appointment_id integer NOT NULL,
     student_id integer NOT NULL,
     scholarship_id integer NOT NULL,
     date date NOT NULL
@@ -272,13 +271,13 @@ CREATE TABLE "Session".student (
 ALTER TABLE "Session".student OWNER TO postgres;
 
 --
--- TOC entry 222 (class 1259 OID 16512)
+-- TOC entry 221 (class 1259 OID 16512)
 -- Name: syllabus; Type: TABLE; Schema: Session; Owner: postgres
 --
 
 CREATE TABLE "Session".syllabus (
     syllabus_id integer NOT NULL,
-    direction_id integer NOT NULL,
+    edu_program_id integer NOT NULL,
     status integer NOT NULL,
     kcp integer NOT NULL,
     admission_year integer NOT NULL,
@@ -292,7 +291,7 @@ CREATE TABLE "Session".syllabus (
 ALTER TABLE "Session".syllabus OWNER TO postgres;
 
 --
--- TOC entry 226 (class 1259 OID 16588)
+-- TOC entry 225 (class 1259 OID 16588)
 -- Name: teacher; Type: TABLE; Schema: Session; Owner: postgres
 --
 
@@ -307,7 +306,7 @@ CREATE TABLE "Session".teacher (
 ALTER TABLE "Session".teacher OWNER TO postgres;
 
 --
--- TOC entry 232 (class 1259 OID 16731)
+-- TOC entry 231 (class 1259 OID 16731)
 -- Name: teacher; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -322,150 +321,98 @@ CREATE TABLE public.teacher (
 ALTER TABLE public.teacher OWNER TO postgres;
 
 --
--- TOC entry 3748 (class 0 OID 16409)
+-- TOC entry 3752 (class 0 OID 16409)
 -- Dependencies: 217
 -- Data for Name: active student; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
-COPY "Session"."active student" (student_id, education_year, "from", "to", group_id, syllabus_id, education_program_id, record_book_id) FROM stdin;
-5085	4	2023-10-22	2023-10-22	860	958	9681	39784
-1101	5	2023-10-22	2023-10-22	807	571	293	2722
-8425	3	2023-10-22	2023-10-22	768	214	5535	55816
-2973	4	2023-10-22	2023-10-22	285	788	293	17671
-5701	3	2023-10-22	2023-10-22	732	958	5946	25641
-8202	1	2023-10-22	2023-10-22	807	424	7	25641
-7936	1	2023-10-22	2023-10-22	649	791	7	46678
-9078	1	2023-10-22	2023-10-22	176	958	6906	39784
-2059	4	2023-10-22	2023-10-22	982	788	5946	25641
-7330	4	2023-10-22	2023-10-22	860	135	8282	39784
-1795	1	2023-10-22	2023-10-22	228	701	9681	835
-3283	2	2023-10-22	2023-10-22	136	958	773	47171
-7606	3	2023-10-22	2023-10-22	228	214	3185	42590
-3514	4	2023-10-22	2023-10-22	441	302	5040	26163
-7470	5	2023-10-22	2023-10-22	982	791	746	42590
-6890	1	2023-10-22	2023-10-22	228	622	293	63110
-4027	2	2023-10-22	2023-10-22	747	571	3241	46678
-1895	1	2023-10-22	2023-10-22	335	892	8282	37086
-9105	5	2023-10-22	2023-10-22	443	892	3185	2722
-8819	4	2023-10-22	2023-10-22	583	285	746	26163
+COPY "Session"."active student" (student_id, date1, date2, group_id, record_book_id) FROM stdin;
+5085	2023-10-22	2023-10-22	860	39784
+1101	2023-10-22	2023-10-22	807	2722
+8425	2023-10-22	2023-10-22	768	55816
+2973	2023-10-22	2023-10-22	285	17671
+5701	2023-10-22	2023-10-22	732	25641
+8202	2023-10-22	2023-10-22	807	25641
+7936	2023-10-22	2023-10-22	649	46678
+9078	2023-10-22	2023-10-22	176	39784
+2059	2023-10-22	2023-10-22	982	25641
+7330	2023-10-22	2023-10-22	860	39784
+1795	2023-10-22	2023-10-22	228	835
+3283	2023-10-22	2023-10-22	136	47171
+7606	2023-10-22	2023-10-22	228	42590
+3514	2023-10-22	2023-10-22	441	26163
+7470	2023-10-22	2023-10-22	982	42590
+6890	2023-10-22	2023-10-22	228	63110
+4027	2023-10-22	2023-10-22	747	46678
+1895	2023-10-22	2023-10-22	335	37086
+9105	2023-10-22	2023-10-22	443	2722
+8819	2023-10-22	2023-10-22	583	26163
 \.
 
 
 --
--- TOC entry 3758 (class 0 OID 16620)
--- Dependencies: 227
+-- TOC entry 3761 (class 0 OID 16620)
+-- Dependencies: 226
 -- Data for Name: attestation pass; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
-COPY "Session"."attestation pass" (personal_id, student_id, discipline_id, educational_program_id, syllabus_id, date, mark, attempt) FROM stdin;
-36577	7330	68	3145	135	2023-10-22	32	3
-3758	8819	88	3241	107	2023-10-22	4	1
-69730	8819	92	5040	135	2023-10-22	38	3
-8201	9105	15	9662	168	2023-10-22	33	1
-36577	7936	92	7	892	2023-10-22	32	3
-1928	1101	22	5040	845	2023-10-22	12	2
-72547	9105	40	5535	302	2023-10-22	30	1
-75616	9105	68	773	201	2023-10-22	11	2
-81097	8202	40	8282	54	2023-10-22	6	2
-55944	9105	22	8282	214	2023-10-22	21	2
-72090	7470	92	9662	285	2023-10-22	5	2
-86439	1895	15	3145	107	2023-10-22	6	3
-86439	1101	10	9761	958	2023-10-22	37	1
-4146	8202	87	5535	201	2023-10-22	20	3
-75616	9105	22	6906	791	2023-10-22	13	1
-24436	4027	40	5631	214	2023-10-22	18	2
-72090	6890	15	5535	62	2023-10-22	8	1
-86439	9105	10	5535	502	2023-10-22	25	1
-72090	1101	40	3145	201	2023-10-22	33	1
-72090	5701	88	6044	201	2023-10-22	1	1
-8201	1101	4	9761	958	2023-10-22	21	3
-8201	1895	15	5040	788	2023-10-22	27	3
-81097	3514	15	5946	928	2023-10-22	27	1
-36577	2059	92	3185	302	2023-10-22	39	3
-24436	9105	10	9662	302	2023-10-22	7	2
-24436	5085	40	7	622	2023-10-22	18	2
-2413	8819	87	5040	791	2023-10-22	3	2
-7782	1895	92	6044	62	2023-10-22	5	3
-36577	7606	10	6044	214	2023-10-22	13	1
-36577	5701	88	746	788	2023-10-22	22	3
-72090	5701	40	7	845	2023-10-22	13	1
-8201	5701	40	8282	107	2023-10-22	24	3
-85500	2973	22	3185	791	2023-10-22	36	1
-45079	4027	40	5040	302	2023-10-22	17	3
-72090	7470	87	6906	788	2023-10-22	25	2
-86439	7936	22	293	845	2023-10-22	19	2
-86439	7470	40	9662	958	2023-10-22	17	1
-36577	2059	4	6044	214	2023-10-22	16	1
-75616	8819	15	773	201	2023-10-22	16	2
-36577	7606	88	293	302	2023-10-22	20	3
-24436	7330	22	6044	622	2023-10-22	35	2
-45079	7470	30	9681	168	2023-10-22	11	1
-4146	3514	15	6044	571	2023-10-22	27	3
-24436	5701	87	293	424	2023-10-22	14	3
-24436	8819	40	746	928	2023-10-22	2	1
-1928	9105	10	9662	622	2023-10-22	23	2
-27431	7936	40	5631	201	2023-10-22	1	3
-2413	3514	87	8282	168	2023-10-22	35	2
-24436	8425	10	5320	928	2023-10-22	6	2
-72547	6890	30	3185	791	2023-10-22	13	1
-69730	7330	22	5946	701	2023-10-22	11	1
-27431	9078	92	5535	214	2023-10-22	30	3
-4146	1795	30	3185	958	2023-10-22	9	2
-4146	1795	88	5631	285	2023-10-22	27	1
-7782	7936	87	1786	571	2023-10-22	14	2
-86439	7330	4	773	701	2023-10-22	9	3
-8201	9105	22	7	622	2023-10-22	37	3
-24436	4027	92	3241	107	2023-10-22	39	3
-73966	2973	4	293	788	2023-10-22	32	3
-72547	9105	88	3241	892	2023-10-22	23	2
-75616	7330	68	5535	285	2023-10-22	13	1
-85500	8425	22	5946	201	2023-10-22	20	3
-27431	2059	15	5040	424	2023-10-22	35	3
-2413	8202	68	9681	54	2023-10-22	6	3
-27431	2059	88	5535	424	2023-10-22	20	1
-45079	7936	92	9761	892	2023-10-22	6	1
-24436	3514	10	3145	958	2023-10-22	22	1
-69730	4027	40	5320	571	2023-10-22	35	1
-39413	5701	92	6044	791	2023-10-22	27	3
-8201	5085	15	3145	168	2023-10-22	37	3
-7782	9105	30	9761	502	2023-10-22	34	2
-8201	3514	30	6906	214	2023-10-22	29	1
+COPY "Session"."attestation pass" (personal_id, student_id, discipline_id, date, mark, attempt, attestation_id) FROM stdin;
+1928	1101	22	2023-10-22	12	2	1
+1928	9105	10	2023-10-22	23	2	2
+2413	3514	87	2023-10-22	35	2	3
+2413	8202	68	2023-10-22	6	3	4
+2413	8819	87	2023-10-22	3	2	5
+3758	8819	88	2023-10-22	4	1	6
+4146	1795	30	2023-10-22	9	2	7
+4146	1795	88	2023-10-22	27	1	8
+4146	3514	15	2023-10-22	27	3	9
+4146	8202	87	2023-10-22	20	3	10
+7782	1895	92	2023-10-22	5	3	11
+7782	7936	87	2023-10-22	14	2	12
+7782	9105	30	2023-10-22	34	2	13
+8201	1101	4	2023-10-22	21	3	14
+8201	1895	15	2023-10-22	27	3	15
+8201	3514	30	2023-10-22	29	1	16
+8201	5085	15	2023-10-22	37	3	17
+8201	5701	40	2023-10-22	24	3	18
+8201	9105	15	2023-10-22	33	1	19
+8201	9105	22	2023-10-22	37	3	20
 \.
 
 
 --
--- TOC entry 3762 (class 0 OID 16712)
--- Dependencies: 231
+-- TOC entry 3765 (class 0 OID 16712)
+-- Dependencies: 230
 -- Data for Name: classroom; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
-COPY "Session".classroom (classroom_id, department_id, classroom_type, capacity) FROM stdin;
-8980	397	1	416
-1311	969	9	145
-1198	9510	6	457
-3645	9599	1	377
-9743	6287	1	167
-3915	397	7	153
-9800	4295	1	13
-8298	969	9	323
-7238	5437	3	445
-6077	4295	6	368
-7047	4295	10	394
-1443	9510	6	349
-8748	2759	2	281
-6652	6287	1	174
-3235	5229	4	38
-2948	9599	6	426
-9294	6287	10	390
-1305	2759	7	108
-2772	9599	9	129
-1656	6287	6	21
+COPY "Session".classroom (classroom_id, department_id, classroom_type, capacity, number) FROM stdin;
+8980	397	1	416	\N
+1311	969	9	145	\N
+1198	9510	6	457	\N
+3645	9599	1	377	\N
+9743	6287	1	167	\N
+3915	397	7	153	\N
+9800	4295	1	13	\N
+8298	969	9	323	\N
+7238	5437	3	445	\N
+6077	4295	6	368	\N
+7047	4295	10	394	\N
+1443	9510	6	349	\N
+8748	2759	2	281	\N
+6652	6287	1	174	\N
+3235	5229	4	38	\N
+2948	9599	6	426	\N
+9294	6287	10	390	\N
+1305	2759	7	108	\N
+2772	9599	9	129	\N
+1656	6287	6	21	\N
 \.
 
 
 --
--- TOC entry 3759 (class 0 OID 16650)
--- Dependencies: 228
+-- TOC entry 3762 (class 0 OID 16650)
+-- Dependencies: 227
 -- Data for Name: department; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
@@ -494,8 +441,8 @@ COPY "Session".department (department_id, department_name, platform_id) FROM std
 
 
 --
--- TOC entry 3751 (class 0 OID 16487)
--- Dependencies: 220
+-- TOC entry 3754 (class 0 OID 16487)
+-- Dependencies: 219
 -- Data for Name: direction; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
@@ -524,8 +471,8 @@ COPY "Session".direction (direction_id, direction_name, study_level) FROM stdin;
 
 
 --
--- TOC entry 3755 (class 0 OID 16558)
--- Dependencies: 224
+-- TOC entry 3758 (class 0 OID 16558)
+-- Dependencies: 223
 -- Data for Name: discipline; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
@@ -544,8 +491,8 @@ COPY "Session".discipline (discipline_id, discipline_name, total_hours, lecture_
 
 
 --
--- TOC entry 3752 (class 0 OID 16493)
--- Dependencies: 221
+-- TOC entry 3755 (class 0 OID 16493)
+-- Dependencies: 220
 -- Data for Name: educational program; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
@@ -574,58 +521,58 @@ COPY "Session"."educational program" (educational_program_id, educational_progra
 
 
 --
--- TOC entry 3756 (class 0 OID 16568)
--- Dependencies: 225
+-- TOC entry 3759 (class 0 OID 16568)
+-- Dependencies: 224
 -- Data for Name: educational program discipline; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
-COPY "Session"."educational program discipline" (discipline_id, syllabus_id, educational_program_id) FROM stdin;
-68	928	3241
-87	622	5946
-30	622	7
-15	302	5946
-4	892	9662
-88	958	7
-10	788	3241
-22	928	6906
-40	845	9681
-92	928	9761
+COPY "Session"."educational program discipline" (discipline_id, syllabus_id, ed_discipline_id, semesters) FROM stdin;
+88	958	2	\N
+4	892	10	\N
+10	788	9	\N
+15	302	8	\N
+22	928	7	\N
+30	622	6	\N
+40	845	5	\N
+68	928	4	\N
+87	622	3	\N
+92	928	1	\N
 \.
 
 
 --
--- TOC entry 3754 (class 0 OID 16535)
--- Dependencies: 223
+-- TOC entry 3757 (class 0 OID 16535)
+-- Dependencies: 222
 -- Data for Name: group; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
-COPY "Session"."group" (group_id, syllabus_id, educational_program_id) FROM stdin;
-176	168	3145
-768	168	773
-126	62	5946
-136	502	5320
-259	135	8282
-807	135	3241
-860	788	746
-732	107	746
-747	285	3145
-443	571	9662
-285	958	7
-583	892	293
-649	135	746
-382	54	5946
-982	201	293
-441	791	1786
-265	892	746
-228	928	8282
-855	502	9662
-335	845	7
+COPY "Session"."group" (group_id, syllabus_id, start, finish, group_number) FROM stdin;
+176	168	2022-09-01	2026-06-30	\N
+768	168	2022-09-01	2026-06-30	\N
+126	62	2022-09-01	2026-06-30	\N
+136	502	2022-09-01	2026-06-30	\N
+259	135	2022-09-01	2026-06-30	\N
+807	135	2022-09-01	2026-06-30	\N
+860	788	2022-09-01	2026-06-30	\N
+732	107	2022-09-01	2026-06-30	\N
+747	285	2022-09-01	2026-06-30	\N
+443	571	2022-09-01	2026-06-30	\N
+285	958	2022-09-01	2026-06-30	\N
+583	892	2022-09-01	2026-06-30	\N
+649	135	2022-09-01	2026-06-30	\N
+382	54	2022-09-01	2026-06-30	\N
+982	201	2022-09-01	2026-06-30	\N
+441	791	2022-09-01	2026-06-30	\N
+265	892	2022-09-01	2026-06-30	\N
+228	928	2022-09-01	2026-06-30	\N
+855	502	2022-09-01	2026-06-30	\N
+335	845	2022-09-01	2026-06-30	\N
 \.
 
 
 --
--- TOC entry 3760 (class 0 OID 16655)
--- Dependencies: 229
+-- TOC entry 3763 (class 0 OID 16655)
+-- Dependencies: 228
 -- Data for Name: platform; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
@@ -654,37 +601,37 @@ COPY "Session".platform (platform_id, address) FROM stdin;
 
 
 --
--- TOC entry 3761 (class 0 OID 16668)
--- Dependencies: 230
+-- TOC entry 3764 (class 0 OID 16668)
+-- Dependencies: 229
 -- Data for Name: schedule; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
-COPY "Session".schedule (platform_id, department_id, personal_id, group_id, educational_program_id, syllabus_id, date, educational_program_discipline_id, classroom_id) FROM stdin;
-6906	9510	55944	443	5040	302	2023-10-22	22	1305
-6389	6287	1928	807	5946	701	2023-10-22	10	7238
-6389	397	55944	136	5040	107	2023-10-22	92	6652
-8177	9599	72090	768	746	285	2023-10-22	15	6652
-9561	9510	55944	228	9681	168	2023-10-22	88	3235
-8522	9510	1928	228	746	62	2023-10-22	15	8298
-9561	397	69730	768	7	502	2023-10-22	40	1656
-8522	397	1928	136	3145	54	2023-10-22	10	1311
-8578	969	85500	176	1786	701	2023-10-22	15	2772
-2294	9103	7782	768	3145	214	2023-10-22	4	8298
-8578	6287	27431	265	3241	302	2023-10-22	92	1443
-8442	1417	75616	768	7	958	2023-10-22	87	9294
-8990	969	73966	443	5946	285	2023-10-22	15	2772
-8990	8562	86439	649	3145	285	2023-10-22	68	1656
-6389	969	8201	335	3145	791	2023-10-22	30	8298
-8522	6520	86439	335	3241	62	2023-10-22	22	1656
-8967	3354	7782	265	3185	958	2023-10-22	88	7047
-2291	969	39413	228	6906	701	2023-10-22	4	1198
-588	2759	24436	807	6906	791	2023-10-22	92	3235
-8967	9205	1928	285	773	892	2023-10-22	4	6077
+COPY "Session".schedule (platform_id, personal_id, group_id, date, classroom_id, schedule_id, ed_prog_disc_id) FROM stdin;
+588	24436	807	2023-10-22 00:00:00+03	3235	1	\N
+2291	39413	228	2023-10-22 00:00:00+03	1198	2	\N
+2294	7782	768	2023-10-22 00:00:00+03	8298	3	\N
+6389	55944	136	2023-10-22 00:00:00+03	6652	4	\N
+6389	8201	335	2023-10-22 00:00:00+03	8298	5	\N
+6389	1928	807	2023-10-22 00:00:00+03	7238	6	\N
+6906	55944	443	2023-10-22 00:00:00+03	1305	7	\N
+8177	72090	768	2023-10-22 00:00:00+03	6652	8	\N
+8442	75616	768	2023-10-22 00:00:00+03	9294	9	\N
+8522	1928	136	2023-10-22 00:00:00+03	1311	10	\N
+8522	86439	335	2023-10-22 00:00:00+03	1656	11	\N
+8522	1928	228	2023-10-22 00:00:00+03	8298	12	\N
+8578	85500	176	2023-10-22 00:00:00+03	2772	14	\N
+8578	27431	265	2023-10-22 00:00:00+03	1443	13	\N
+8967	7782	265	2023-10-22 00:00:00+03	7047	15	\N
+8967	1928	285	2023-10-22 00:00:00+03	6077	16	\N
+8990	73966	443	2023-10-22 00:00:00+03	2772	17	\N
+8990	86439	649	2023-10-22 00:00:00+03	1656	18	\N
+9561	69730	768	2023-10-22 00:00:00+03	1656	19	\N
+9561	55944	228	2023-10-22 00:00:00+03	3235	20	\N
 \.
 
 
 --
--- TOC entry 3749 (class 0 OID 16429)
+-- TOC entry 3753 (class 0 OID 16429)
 -- Dependencies: 218
 -- Data for Name: scholarship; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
@@ -714,37 +661,17 @@ COPY "Session".scholarship (scholarship_id, scholarship_size, scholarship_type) 
 
 
 --
--- TOC entry 3750 (class 0 OID 16474)
--- Dependencies: 219
+-- TOC entry 3767 (class 0 OID 16802)
+-- Dependencies: 232
 -- Data for Name: scholarship appointment; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
-COPY "Session"."scholarship appointment" (student_id, scholarship_id, date) FROM stdin;
-4027	45	2023-10-22
-3283	62	2023-10-22
-2059	27	2023-10-22
-5085	75	2023-10-22
-3514	69	2023-10-22
-7330	56	2023-10-22
-2973	23	2023-10-22
-6890	65	2023-10-22
-9105	43	2023-10-22
-8819	1	2023-10-22
-7936	12	2023-10-22
-2973	69	2023-10-22
-8819	67	2023-10-22
-3283	11	2023-10-22
-7936	75	2023-10-22
-7606	13	2023-10-22
-8202	69	2023-10-22
-2973	93	2023-10-22
-9078	56	2023-10-22
-1101	46	2023-10-22
+COPY "Session"."scholarship appointment" (appointment_id, student_id, scholarship_id, date) FROM stdin;
 \.
 
 
 --
--- TOC entry 3747 (class 0 OID 16400)
+-- TOC entry 3751 (class 0 OID 16400)
 -- Dependencies: 216
 -- Data for Name: student; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
@@ -774,12 +701,12 @@ COPY "Session".student (record_book_id, status, education_form, surname, name, p
 
 
 --
--- TOC entry 3753 (class 0 OID 16512)
--- Dependencies: 222
+-- TOC entry 3756 (class 0 OID 16512)
+-- Dependencies: 221
 -- Data for Name: syllabus; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
-COPY "Session".syllabus (syllabus_id, direction_id, status, kcp, admission_year) FROM stdin;
+COPY "Session".syllabus (syllabus_id, edu_program_id, status, kcp, admission_year) FROM stdin;
 201	1541	5	863	2059
 54	6422	2	718	2048
 502	8883	4	560	1980
@@ -804,8 +731,8 @@ COPY "Session".syllabus (syllabus_id, direction_id, status, kcp, admission_year)
 
 
 --
--- TOC entry 3757 (class 0 OID 16588)
--- Dependencies: 226
+-- TOC entry 3760 (class 0 OID 16588)
+-- Dependencies: 225
 -- Data for Name: teacher; Type: TABLE DATA; Schema: Session; Owner: postgres
 --
 
@@ -834,8 +761,8 @@ COPY "Session".teacher (personal_id, surname, name, patronymic) FROM stdin;
 
 
 --
--- TOC entry 3763 (class 0 OID 16731)
--- Dependencies: 232
+-- TOC entry 3766 (class 0 OID 16731)
+-- Dependencies: 231
 -- Data for Name: teacher; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -925,7 +852,7 @@ COPY public.teacher (personal_id, surname, name, patronymic) FROM stdin;
 
 
 --
--- TOC entry 3533 (class 2606 OID 16413)
+-- TOC entry 3536 (class 2606 OID 16413)
 -- Name: active student active student_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -934,7 +861,16 @@ ALTER TABLE ONLY "Session"."active student"
 
 
 --
--- TOC entry 3523 (class 2606 OID 16748)
+-- TOC entry 3586 (class 2606 OID 16806)
+-- Name: scholarship appointment appointment_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."scholarship appointment"
+    ADD CONSTRAINT appointment_uid PRIMARY KEY (appointment_id);
+
+
+--
+-- TOC entry 3525 (class 2606 OID 16748)
 -- Name: attestation pass attempt_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -943,7 +879,7 @@ ALTER TABLE "Session"."attestation pass"
 
 
 --
--- TOC entry 3524 (class 2606 OID 16749)
+-- TOC entry 3526 (class 2606 OID 16749)
 -- Name: attestation pass attempt_chk1; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -952,25 +888,34 @@ ALTER TABLE "Session"."attestation pass"
 
 
 --
--- TOC entry 3565 (class 2606 OID 16624)
+-- TOC entry 3570 (class 2606 OID 16778)
 -- Name: attestation pass attestation pass_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
 ALTER TABLE ONLY "Session"."attestation pass"
-    ADD CONSTRAINT "attestation pass_pkey" PRIMARY KEY (personal_id, student_id, discipline_id, educational_program_id, syllabus_id);
+    ADD CONSTRAINT "attestation pass_pkey" PRIMARY KEY (attestation_id);
 
 
 --
--- TOC entry 3573 (class 2606 OID 16718)
+-- TOC entry 3572 (class 2606 OID 16780)
+-- Name: attestation pass attestation_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."attestation pass"
+    ADD CONSTRAINT attestation_uid UNIQUE (attestation_id);
+
+
+--
+-- TOC entry 3582 (class 2606 OID 16818)
 -- Name: classroom classroom_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
 ALTER TABLE ONLY "Session".classroom
-    ADD CONSTRAINT classroom_pkey PRIMARY KEY (classroom_id, department_id);
+    ADD CONSTRAINT classroom_pkey PRIMARY KEY (classroom_id);
 
 
 --
--- TOC entry 3575 (class 2606 OID 16720)
+-- TOC entry 3584 (class 2606 OID 16720)
 -- Name: classroom classroom_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -979,7 +924,25 @@ ALTER TABLE ONLY "Session".classroom
 
 
 --
--- TOC entry 3567 (class 2606 OID 16654)
+-- TOC entry 3514 (class 2606 OID 16752)
+-- Name: active student date_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session"."active student"
+    ADD CONSTRAINT date_chk CHECK ((date1 >= '1982-01-01'::date)) NOT VALID;
+
+
+--
+-- TOC entry 3515 (class 2606 OID 16751)
+-- Name: active student dates_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session"."active student"
+    ADD CONSTRAINT dates_chk CHECK ((date1 <= date2)) NOT VALID;
+
+
+--
+-- TOC entry 3574 (class 2606 OID 16654)
 -- Name: department department_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -988,7 +951,7 @@ ALTER TABLE ONLY "Session".department
 
 
 --
--- TOC entry 3543 (class 2606 OID 16492)
+-- TOC entry 3544 (class 2606 OID 16492)
 -- Name: direction direction_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -997,7 +960,7 @@ ALTER TABLE ONLY "Session".direction
 
 
 --
--- TOC entry 3557 (class 2606 OID 16562)
+-- TOC entry 3558 (class 2606 OID 16562)
 -- Name: discipline discipline_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1006,7 +969,7 @@ ALTER TABLE ONLY "Session".discipline
 
 
 --
--- TOC entry 3559 (class 2606 OID 16619)
+-- TOC entry 3560 (class 2606 OID 16619)
 -- Name: educational program discipline discipline_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1015,7 +978,25 @@ ALTER TABLE ONLY "Session"."educational program discipline"
 
 
 --
--- TOC entry 3518 (class 2606 OID 16505)
+-- TOC entry 3524 (class 2606 OID 16769)
+-- Name: educational program discipline ed_discipline_id_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session"."educational program discipline"
+    ADD CONSTRAINT ed_discipline_id_chk CHECK ((ed_discipline_id >= 1)) NOT VALID;
+
+
+--
+-- TOC entry 3562 (class 2606 OID 16767)
+-- Name: educational program discipline ed_discipline_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."educational program discipline"
+    ADD CONSTRAINT ed_discipline_uid UNIQUE (ed_discipline_id);
+
+
+--
+-- TOC entry 3519 (class 2606 OID 16505)
 -- Name: educational program education_form.chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1024,7 +1005,7 @@ ALTER TABLE "Session"."educational program"
 
 
 --
--- TOC entry 3511 (class 2606 OID 16473)
+-- TOC entry 3512 (class 2606 OID 16473)
 -- Name: student education_form_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1033,34 +1014,16 @@ ALTER TABLE "Session".student
 
 
 --
--- TOC entry 3513 (class 2606 OID 16427)
--- Name: active student education_year_chk1; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
---
-
-ALTER TABLE "Session"."active student"
-    ADD CONSTRAINT education_year_chk1 CHECK ((education_year <= 5)) NOT VALID;
-
-
---
--- TOC entry 3514 (class 2606 OID 16428)
--- Name: active student education_year_chk2; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
---
-
-ALTER TABLE "Session"."active student"
-    ADD CONSTRAINT education_year_chk2 CHECK ((education_year >= 1)) NOT VALID;
-
-
---
--- TOC entry 3561 (class 2606 OID 16572)
--- Name: educational program discipline educational program discipline_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+-- TOC entry 3564 (class 2606 OID 16782)
+-- Name: educational program discipline educational_program_discipline_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
 ALTER TABLE ONLY "Session"."educational program discipline"
-    ADD CONSTRAINT "educational program discipline_pkey" PRIMARY KEY (discipline_id, syllabus_id, educational_program_id);
+    ADD CONSTRAINT educational_program_discipline_pkey PRIMARY KEY (ed_discipline_id);
 
 
 --
--- TOC entry 3545 (class 2606 OID 16497)
+-- TOC entry 3546 (class 2606 OID 16497)
 -- Name: educational program educational_program_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1069,7 +1032,7 @@ ALTER TABLE ONLY "Session"."educational program"
 
 
 --
--- TOC entry 3547 (class 2606 OID 16499)
+-- TOC entry 3548 (class 2606 OID 16499)
 -- Name: educational program educational_program_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1078,16 +1041,16 @@ ALTER TABLE ONLY "Session"."educational program"
 
 
 --
--- TOC entry 3553 (class 2606 OID 16539)
+-- TOC entry 3554 (class 2606 OID 16784)
 -- Name: group group_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
 ALTER TABLE ONLY "Session"."group"
-    ADD CONSTRAINT group_pkey PRIMARY KEY (group_id, syllabus_id, educational_program_id);
+    ADD CONSTRAINT group_pkey PRIMARY KEY (group_id);
 
 
 --
--- TOC entry 3555 (class 2606 OID 16541)
+-- TOC entry 3556 (class 2606 OID 16541)
 -- Name: group group_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1096,7 +1059,7 @@ ALTER TABLE ONLY "Session"."group"
 
 
 --
--- TOC entry 3525 (class 2606 OID 16750)
+-- TOC entry 3527 (class 2606 OID 16750)
 -- Name: attestation pass mark_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1105,16 +1068,25 @@ ALTER TABLE "Session"."attestation pass"
 
 
 --
--- TOC entry 3563 (class 2606 OID 16592)
+-- TOC entry 3566 (class 2606 OID 16592)
+-- Name: teacher personal_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".teacher
+    ADD CONSTRAINT personal_pkey PRIMARY KEY (personal_id);
+
+
+--
+-- TOC entry 3568 (class 2606 OID 16820)
 -- Name: teacher personal_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
 ALTER TABLE ONLY "Session".teacher
-    ADD CONSTRAINT personal_uid PRIMARY KEY (personal_id);
+    ADD CONSTRAINT personal_uid UNIQUE (personal_id);
 
 
 --
--- TOC entry 3569 (class 2606 OID 16659)
+-- TOC entry 3576 (class 2606 OID 16659)
 -- Name: platform platform_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1123,7 +1095,7 @@ ALTER TABLE ONLY "Session".platform
 
 
 --
--- TOC entry 3529 (class 2606 OID 16426)
+-- TOC entry 3532 (class 2606 OID 16426)
 -- Name: student record_book_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1132,25 +1104,34 @@ ALTER TABLE ONLY "Session".student
 
 
 --
--- TOC entry 3571 (class 2606 OID 16691)
+-- TOC entry 3528 (class 2606 OID 16791)
+-- Name: schedule schedule_id_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session".schedule
+    ADD CONSTRAINT schedule_id_chk CHECK ((schedule_id > 0)) NOT VALID;
+
+
+--
+-- TOC entry 3578 (class 2606 OID 16788)
 -- Name: schedule schedule_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
 ALTER TABLE ONLY "Session".schedule
-    ADD CONSTRAINT schedule_pkey PRIMARY KEY (platform_id, department_id, personal_id, group_id, educational_program_id, syllabus_id, educational_program_discipline_id);
+    ADD CONSTRAINT schedule_pkey PRIMARY KEY (schedule_id);
 
 
 --
--- TOC entry 3541 (class 2606 OID 16527)
--- Name: scholarship appointment scholarship appointment_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+-- TOC entry 3580 (class 2606 OID 16790)
+-- Name: schedule schedule_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
-ALTER TABLE ONLY "Session"."scholarship appointment"
-    ADD CONSTRAINT "scholarship appointment_pkey" PRIMARY KEY (student_id, scholarship_id);
+ALTER TABLE ONLY "Session".schedule
+    ADD CONSTRAINT schedule_uid UNIQUE (schedule_id);
 
 
 --
--- TOC entry 3537 (class 2606 OID 16435)
+-- TOC entry 3540 (class 2606 OID 16435)
 -- Name: scholarship scholarship_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1159,7 +1140,7 @@ ALTER TABLE ONLY "Session".scholarship
 
 
 --
--- TOC entry 3515 (class 2606 OID 16452)
+-- TOC entry 3516 (class 2606 OID 16452)
 -- Name: scholarship scholarship_size_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1168,7 +1149,7 @@ ALTER TABLE "Session".scholarship
 
 
 --
--- TOC entry 3539 (class 2606 OID 16451)
+-- TOC entry 3542 (class 2606 OID 16451)
 -- Name: scholarship scholarship_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1177,7 +1158,7 @@ ALTER TABLE ONLY "Session".scholarship
 
 
 --
--- TOC entry 3512 (class 2606 OID 16472)
+-- TOC entry 3513 (class 2606 OID 16472)
 -- Name: student status_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1186,7 +1167,7 @@ ALTER TABLE "Session".student
 
 
 --
--- TOC entry 3531 (class 2606 OID 16408)
+-- TOC entry 3534 (class 2606 OID 16408)
 -- Name: student student_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1195,7 +1176,7 @@ ALTER TABLE ONLY "Session".student
 
 
 --
--- TOC entry 3535 (class 2606 OID 16424)
+-- TOC entry 3538 (class 2606 OID 16424)
 -- Name: active student student_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1204,7 +1185,7 @@ ALTER TABLE ONLY "Session"."active student"
 
 
 --
--- TOC entry 3517 (class 2606 OID 16736)
+-- TOC entry 3518 (class 2606 OID 16736)
 -- Name: direction study_level_chk1; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1213,16 +1194,16 @@ ALTER TABLE "Session".direction
 
 
 --
--- TOC entry 3549 (class 2606 OID 16520)
+-- TOC entry 3550 (class 2606 OID 16799)
 -- Name: syllabus syllabus_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
 ALTER TABLE ONLY "Session".syllabus
-    ADD CONSTRAINT syllabus_pkey PRIMARY KEY (syllabus_id, direction_id);
+    ADD CONSTRAINT syllabus_pkey PRIMARY KEY (syllabus_id);
 
 
 --
--- TOC entry 3551 (class 2606 OID 16534)
+-- TOC entry 3552 (class 2606 OID 16534)
 -- Name: syllabus syllabus_uid; Type: CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1231,7 +1212,7 @@ ALTER TABLE ONLY "Session".syllabus
 
 
 --
--- TOC entry 3603 (class 2620 OID 16567)
+-- TOC entry 3607 (class 2620 OID 16567)
 -- Name: discipline discipline_trigger; Type: TRIGGER; Schema: Session; Owner: postgres
 --
 
@@ -1239,7 +1220,7 @@ CREATE TRIGGER discipline_trigger BEFORE INSERT OR UPDATE OF total_hours, lectur
 
 
 --
--- TOC entry 3594 (class 2606 OID 16726)
+-- TOC entry 3599 (class 2606 OID 16726)
 -- Name: schedule classroom_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1248,16 +1229,7 @@ ALTER TABLE ONLY "Session".schedule
 
 
 --
--- TOC entry 3595 (class 2606 OID 16678)
--- Name: schedule department_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
---
-
-ALTER TABLE ONLY "Session".schedule
-    ADD CONSTRAINT department_id FOREIGN KEY (department_id) REFERENCES "Session".department(department_id);
-
-
---
--- TOC entry 3602 (class 2606 OID 16721)
+-- TOC entry 3604 (class 2606 OID 16721)
 -- Name: classroom department_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1266,7 +1238,16 @@ ALTER TABLE ONLY "Session".classroom
 
 
 --
--- TOC entry 3581 (class 2606 OID 16500)
+-- TOC entry 3589 (class 2606 OID 16821)
+-- Name: educational program department_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."educational program"
+    ADD CONSTRAINT department_id FOREIGN KEY (department_id) REFERENCES "Session".department(department_id) NOT VALID;
+
+
+--
+-- TOC entry 3590 (class 2606 OID 16500)
 -- Name: educational program direction_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1275,16 +1256,7 @@ ALTER TABLE ONLY "Session"."educational program"
 
 
 --
--- TOC entry 3582 (class 2606 OID 16521)
--- Name: syllabus direction_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
---
-
-ALTER TABLE ONLY "Session".syllabus
-    ADD CONSTRAINT direction_id FOREIGN KEY (direction_id) REFERENCES "Session".direction(direction_id);
-
-
---
--- TOC entry 3585 (class 2606 OID 16573)
+-- TOC entry 3593 (class 2606 OID 16573)
 -- Name: educational program discipline discipline_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1293,7 +1265,7 @@ ALTER TABLE ONLY "Session"."educational program discipline"
 
 
 --
--- TOC entry 3588 (class 2606 OID 16645)
+-- TOC entry 3595 (class 2606 OID 16645)
 -- Name: attestation pass discipline_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1302,61 +1274,25 @@ ALTER TABLE ONLY "Session"."attestation pass"
 
 
 --
--- TOC entry 3576 (class 2606 OID 16742)
--- Name: active student education_program_pkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
---
-
-ALTER TABLE ONLY "Session"."active student"
-    ADD CONSTRAINT education_program_pkey FOREIGN KEY (education_program_id) REFERENCES "Session"."educational program"(educational_program_id) NOT VALID;
-
-
---
--- TOC entry 3596 (class 2606 OID 16707)
--- Name: schedule educational_program_discipline_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+-- TOC entry 3600 (class 2606 OID 16841)
+-- Name: schedule ed_prog_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
 ALTER TABLE ONLY "Session".schedule
-    ADD CONSTRAINT educational_program_discipline_id FOREIGN KEY (educational_program_discipline_id) REFERENCES "Session"."educational program discipline"(discipline_id) NOT VALID;
+    ADD CONSTRAINT ed_prog_fkey FOREIGN KEY (ed_prog_disc_id) REFERENCES "Session"."educational program discipline"(ed_discipline_id) NOT VALID;
 
 
 --
--- TOC entry 3583 (class 2606 OID 16547)
--- Name: group educational_program_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+-- TOC entry 3591 (class 2606 OID 16826)
+-- Name: syllabus edu_program_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
-ALTER TABLE ONLY "Session"."group"
-    ADD CONSTRAINT educational_program_id FOREIGN KEY (educational_program_id) REFERENCES "Session"."educational program"(educational_program_id);
-
-
---
--- TOC entry 3586 (class 2606 OID 16583)
--- Name: educational program discipline educational_program_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
---
-
-ALTER TABLE ONLY "Session"."educational program discipline"
-    ADD CONSTRAINT educational_program_id FOREIGN KEY (educational_program_id) REFERENCES "Session"."educational program"(educational_program_id);
+ALTER TABLE ONLY "Session".syllabus
+    ADD CONSTRAINT edu_program_fkey FOREIGN KEY (edu_program_id) REFERENCES "Session"."educational program"(educational_program_id) NOT VALID;
 
 
 --
--- TOC entry 3589 (class 2606 OID 16640)
--- Name: attestation pass educational_program_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
---
-
-ALTER TABLE ONLY "Session"."attestation pass"
-    ADD CONSTRAINT educational_program_id FOREIGN KEY (educational_program_id) REFERENCES "Session"."educational program"(educational_program_id);
-
-
---
--- TOC entry 3597 (class 2606 OID 16702)
--- Name: schedule educational_program_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
---
-
-ALTER TABLE ONLY "Session".schedule
-    ADD CONSTRAINT educational_program_id FOREIGN KEY (educational_program_id) REFERENCES "Session"."educational program"(educational_program_id) NOT VALID;
-
-
---
--- TOC entry 3598 (class 2606 OID 16692)
+-- TOC entry 3601 (class 2606 OID 16692)
 -- Name: schedule group_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1365,7 +1301,16 @@ ALTER TABLE ONLY "Session".schedule
 
 
 --
--- TOC entry 3590 (class 2606 OID 16625)
+-- TOC entry 3587 (class 2606 OID 16831)
+-- Name: active student group_pkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."active student"
+    ADD CONSTRAINT group_pkey FOREIGN KEY (group_id) REFERENCES "Session"."group"(group_id) NOT VALID;
+
+
+--
+-- TOC entry 3596 (class 2606 OID 16625)
 -- Name: attestation pass personal_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1374,7 +1319,7 @@ ALTER TABLE ONLY "Session"."attestation pass"
 
 
 --
--- TOC entry 3599 (class 2606 OID 16683)
+-- TOC entry 3602 (class 2606 OID 16683)
 -- Name: schedule personal_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1383,7 +1328,7 @@ ALTER TABLE ONLY "Session".schedule
 
 
 --
--- TOC entry 3593 (class 2606 OID 16663)
+-- TOC entry 3598 (class 2606 OID 16663)
 -- Name: department platform_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1392,7 +1337,7 @@ ALTER TABLE ONLY "Session".department
 
 
 --
--- TOC entry 3600 (class 2606 OID 16673)
+-- TOC entry 3603 (class 2606 OID 16673)
 -- Name: schedule platform_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1401,7 +1346,7 @@ ALTER TABLE ONLY "Session".schedule
 
 
 --
--- TOC entry 3577 (class 2606 OID 16418)
+-- TOC entry 3588 (class 2606 OID 16418)
 -- Name: active student record_book_pkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1410,25 +1355,25 @@ ALTER TABLE ONLY "Session"."active student"
 
 
 --
--- TOC entry 3579 (class 2606 OID 16482)
--- Name: scholarship appointment scholarship_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+-- TOC entry 3605 (class 2606 OID 16812)
+-- Name: scholarship appointment scholarship_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
 ALTER TABLE ONLY "Session"."scholarship appointment"
-    ADD CONSTRAINT scholarship_id FOREIGN KEY (scholarship_id) REFERENCES "Session".scholarship(scholarship_id);
+    ADD CONSTRAINT scholarship_fkey FOREIGN KEY (scholarship_id) REFERENCES "Session".scholarship(scholarship_id);
 
 
 --
--- TOC entry 3580 (class 2606 OID 16477)
--- Name: scholarship appointment student_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+-- TOC entry 3606 (class 2606 OID 16807)
+-- Name: scholarship appointment student_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
 ALTER TABLE ONLY "Session"."scholarship appointment"
-    ADD CONSTRAINT student_id FOREIGN KEY (student_id) REFERENCES "Session"."active student"(student_id);
+    ADD CONSTRAINT student_fkey FOREIGN KEY (student_id) REFERENCES "Session".student(record_book_id);
 
 
 --
--- TOC entry 3591 (class 2606 OID 16630)
+-- TOC entry 3597 (class 2606 OID 16630)
 -- Name: attestation pass student_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1437,7 +1382,7 @@ ALTER TABLE ONLY "Session"."attestation pass"
 
 
 --
--- TOC entry 3584 (class 2606 OID 16542)
+-- TOC entry 3592 (class 2606 OID 16542)
 -- Name: group syllabus_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1446,7 +1391,7 @@ ALTER TABLE ONLY "Session"."group"
 
 
 --
--- TOC entry 3587 (class 2606 OID 16578)
+-- TOC entry 3594 (class 2606 OID 16578)
 -- Name: educational program discipline syllabus_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
 --
 
@@ -1454,34 +1399,7 @@ ALTER TABLE ONLY "Session"."educational program discipline"
     ADD CONSTRAINT syllabus_id FOREIGN KEY (syllabus_id) REFERENCES "Session".syllabus(syllabus_id);
 
 
---
--- TOC entry 3592 (class 2606 OID 16635)
--- Name: attestation pass syllabus_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
---
-
-ALTER TABLE ONLY "Session"."attestation pass"
-    ADD CONSTRAINT syllabus_id FOREIGN KEY (syllabus_id) REFERENCES "Session".syllabus(syllabus_id);
-
-
---
--- TOC entry 3601 (class 2606 OID 16697)
--- Name: schedule syllabus_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
---
-
-ALTER TABLE ONLY "Session".schedule
-    ADD CONSTRAINT syllabus_id FOREIGN KEY (syllabus_id) REFERENCES "Session".syllabus(syllabus_id) NOT VALID;
-
-
---
--- TOC entry 3578 (class 2606 OID 16737)
--- Name: active student syllabus_pkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
---
-
-ALTER TABLE ONLY "Session"."active student"
-    ADD CONSTRAINT syllabus_pkey FOREIGN KEY (syllabus_id) REFERENCES "Session".syllabus(syllabus_id) NOT VALID;
-
-
--- Completed on 2023-10-22 17:42:22 MSK
+-- Completed on 2023-10-26 16:32:13 MSK
 
 --
 -- PostgreSQL database dump complete
