@@ -5,7 +5,7 @@
 -- Dumped from database version 16.0
 -- Dumped by pg_dump version 16.0
 
--- Started on 2023-10-25 15:25:48
+-- Started on 2023-10-26 13:48:42
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -63,7 +63,7 @@ CREATE SEQUENCE "Bus_station".adding_crew_adding_id_seq
 ALTER SEQUENCE "Bus_station".adding_crew_adding_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4920 (class 0 OID 0)
+-- TOC entry 4934 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: adding_crew_adding_id_seq; Type: SEQUENCE OWNED BY; Schema: Bus_station; Owner: postgres
 --
@@ -105,7 +105,7 @@ CREATE SEQUENCE "Bus_station".bus_model_model_id_seq
 ALTER SEQUENCE "Bus_station".bus_model_model_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4921 (class 0 OID 0)
+-- TOC entry 4935 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: bus_model_model_id_seq; Type: SEQUENCE OWNED BY; Schema: Bus_station; Owner: postgres
 --
@@ -119,10 +119,8 @@ ALTER SEQUENCE "Bus_station".bus_model_model_id_seq OWNED BY "Bus_station".bus_m
 --
 
 CREATE TABLE "Bus_station".bus_stops (
-    stop_time interval NOT NULL,
-    settlement text,
-    stop_id bigint NOT NULL,
-    CONSTRAINT bus_stops_stop_time_check CHECK ((stop_time < '01:00:00'::interval))
+    address text,
+    stop_id bigint NOT NULL
 );
 
 
@@ -144,7 +142,7 @@ CREATE SEQUENCE "Bus_station".bus_stops_stop_id_seq
 ALTER SEQUENCE "Bus_station".bus_stops_stop_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4922 (class 0 OID 0)
+-- TOC entry 4936 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: bus_stops_stop_id_seq; Type: SEQUENCE OWNED BY; Schema: Bus_station; Owner: postgres
 --
@@ -183,7 +181,7 @@ CREATE SEQUENCE "Bus_station".buses_bus_id_seq
 ALTER SEQUENCE "Bus_station".buses_bus_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4923 (class 0 OID 0)
+-- TOC entry 4937 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: buses_bus_id_seq; Type: SEQUENCE OWNED BY; Schema: Bus_station; Owner: postgres
 --
@@ -223,7 +221,7 @@ CREATE SEQUENCE "Bus_station".drivers_driver_id_seq
 ALTER SEQUENCE "Bus_station".drivers_driver_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4924 (class 0 OID 0)
+-- TOC entry 4938 (class 0 OID 0)
 -- Dependencies: 235
 -- Name: drivers_driver_id_seq; Type: SEQUENCE OWNED BY; Schema: Bus_station; Owner: postgres
 --
@@ -240,7 +238,8 @@ CREATE TABLE "Bus_station".passengers (
     email text,
     passport_number character(10) NOT NULL,
     full_name character varying(128) NOT NULL,
-    passenger_id bigint NOT NULL
+    passenger_id bigint NOT NULL,
+    phone_number character(12)
 );
 
 
@@ -262,7 +261,7 @@ CREATE SEQUENCE "Bus_station".passengers_passenger_id_seq
 ALTER SEQUENCE "Bus_station".passengers_passenger_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4925 (class 0 OID 0)
+-- TOC entry 4939 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: passengers_passenger_id_seq; Type: SEQUENCE OWNED BY; Schema: Bus_station; Owner: postgres
 --
@@ -279,7 +278,9 @@ CREATE TABLE "Bus_station".route_stops (
     arrival_time time without time zone DEFAULT '00:00:00'::time without time zone NOT NULL,
     stop_id bigint NOT NULL,
     route_id bigint NOT NULL,
-    route_stop_id bigint NOT NULL
+    route_stop_id bigint NOT NULL,
+    stop_time interval NOT NULL,
+    stop_index bigint
 );
 
 
@@ -301,7 +302,7 @@ CREATE SEQUENCE "Bus_station".route_stops_route_stop_id_seq
 ALTER SEQUENCE "Bus_station".route_stops_route_stop_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4926 (class 0 OID 0)
+-- TOC entry 4940 (class 0 OID 0)
 -- Dependencies: 237
 -- Name: route_stops_route_stop_id_seq; Type: SEQUENCE OWNED BY; Schema: Bus_station; Owner: postgres
 --
@@ -316,10 +317,12 @@ ALTER SEQUENCE "Bus_station".route_stops_route_stop_id_seq OWNED BY "Bus_station
 
 CREATE TABLE "Bus_station".schedule (
     path_length bigint DEFAULT 0 NOT NULL,
-    departure_point text NOT NULL,
-    destination_point text NOT NULL,
     route_type character varying(128),
-    route_id bigint NOT NULL
+    route_id bigint NOT NULL,
+    departure_point bigint NOT NULL,
+    destination_point bigint NOT NULL,
+    departure_time time without time zone NOT NULL,
+    destination_time time without time zone NOT NULL
 );
 
 
@@ -341,7 +344,7 @@ CREATE SEQUENCE "Bus_station".schedule_route_id_seq
 ALTER SEQUENCE "Bus_station".schedule_route_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4927 (class 0 OID 0)
+-- TOC entry 4941 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: schedule_route_id_seq; Type: SEQUENCE OWNED BY; Schema: Bus_station; Owner: postgres
 --
@@ -355,10 +358,11 @@ ALTER SEQUENCE "Bus_station".schedule_route_id_seq OWNED BY "Bus_station".schedu
 --
 
 CREATE TABLE "Bus_station".tickets (
-    "price " bigint DEFAULT 0 NOT NULL,
+    price bigint DEFAULT 0 NOT NULL,
     ticket_id bigint NOT NULL,
     passenger_id bigint NOT NULL,
-    trip_id bigint NOT NULL
+    trip_id bigint NOT NULL,
+    buying_date date NOT NULL
 );
 
 
@@ -380,7 +384,7 @@ CREATE SEQUENCE "Bus_station".tickets_ticket_id_seq
 ALTER SEQUENCE "Bus_station".tickets_ticket_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4928 (class 0 OID 0)
+-- TOC entry 4942 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: tickets_ticket_id_seq; Type: SEQUENCE OWNED BY; Schema: Bus_station; Owner: postgres
 --
@@ -421,7 +425,7 @@ CREATE SEQUENCE "Bus_station".trips_trip_id_seq
 ALTER SEQUENCE "Bus_station".trips_trip_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4929 (class 0 OID 0)
+-- TOC entry 4943 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: trips_trip_id_seq; Type: SEQUENCE OWNED BY; Schema: Bus_station; Owner: postgres
 --
@@ -439,6 +443,7 @@ CREATE TABLE "Bus_station".work_timesheet (
     work_hours interval DEFAULT '00:00:00'::interval NOT NULL,
     record_id bigint NOT NULL,
     driver_id bigint NOT NULL,
+    status text,
     CONSTRAINT work_timesheet_work_hours_check CHECK ((work_hours < '12:00:00'::interval))
 );
 
@@ -461,7 +466,7 @@ CREATE SEQUENCE "Bus_station".work_timesheet_record_id_seq
 ALTER SEQUENCE "Bus_station".work_timesheet_record_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4930 (class 0 OID 0)
+-- TOC entry 4944 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: work_timesheet_record_id_seq; Type: SEQUENCE OWNED BY; Schema: Bus_station; Owner: postgres
 --
@@ -558,7 +563,7 @@ ALTER TABLE ONLY "Bus_station".work_timesheet ALTER COLUMN record_id SET DEFAULT
 
 
 --
--- TOC entry 4902 (class 0 OID 16517)
+-- TOC entry 4916 (class 0 OID 16517)
 -- Dependencies: 225
 -- Data for Name: adding_crew; Type: TABLE DATA; Schema: Bus_station; Owner: postgres
 --
@@ -568,7 +573,7 @@ COPY "Bus_station".adding_crew (med_data, adding_id, driver_id, trip_id) FROM st
 
 
 --
--- TOC entry 4895 (class 0 OID 16428)
+-- TOC entry 4909 (class 0 OID 16428)
 -- Dependencies: 218
 -- Data for Name: bus_model; Type: TABLE DATA; Schema: Bus_station; Owner: postgres
 --
@@ -588,27 +593,27 @@ COPY "Bus_station".bus_model (release_date, seat_count, producer, model_name, co
 
 
 --
--- TOC entry 4897 (class 0 OID 16447)
+-- TOC entry 4911 (class 0 OID 16447)
 -- Dependencies: 220
 -- Data for Name: bus_stops; Type: TABLE DATA; Schema: Bus_station; Owner: postgres
 --
 
-COPY "Bus_station".bus_stops (stop_time, settlement, stop_id) FROM stdin;
-00:25:00	Town0	1
-00:15:00	Town1	2
-00:12:00	Town2	3
-00:45:00	Town3	4
-00:31:00	Town4	5
-00:44:00	Town5	6
-00:22:00	Town6	7
-00:31:00	Town7	8
-00:14:00	Town8	9
-00:11:00	Town9	10
+COPY "Bus_station".bus_stops (address, stop_id) FROM stdin;
+Town0	1
+Town1	2
+Town2	3
+Town3	4
+Town4	5
+Town5	6
+Town6	7
+Town7	8
+Town8	9
+Town9	10
 \.
 
 
 --
--- TOC entry 4898 (class 0 OID 16455)
+-- TOC entry 4912 (class 0 OID 16455)
 -- Dependencies: 221
 -- Data for Name: buses; Type: TABLE DATA; Schema: Bus_station; Owner: postgres
 --
@@ -638,7 +643,7 @@ working	100020	8	20
 
 
 --
--- TOC entry 4894 (class 0 OID 16413)
+-- TOC entry 4908 (class 0 OID 16413)
 -- Dependencies: 217
 -- Data for Name: drivers; Type: TABLE DATA; Schema: Bus_station; Owner: postgres
 --
@@ -668,215 +673,186 @@ driverJeff3@mail.ru	1000020	2000000020	Jeff	20
 
 
 --
--- TOC entry 4893 (class 0 OID 16400)
+-- TOC entry 4907 (class 0 OID 16400)
 -- Dependencies: 216
 -- Data for Name: passengers; Type: TABLE DATA; Schema: Bus_station; Owner: postgres
 --
 
-COPY "Bus_station".passengers (email, passport_number, full_name, passenger_id) FROM stdin;
-testpass123@yandex.ru	4040200200	test_passenger	1
-test-pass123@yandex.ru	4040200201	test_passenger_2	8
-Gary92@yandex.ru	1000000001	Gary	13
-Raul86@yandex.ru	1000000005	Raul	109
-Joe68@yandex.ru	1000000006	Joe	110
-Gabriel33@yandex.ru	1000000007	Gabriel	111
-Mark38@yandex.ru	1000000008	Mark	112
-Joseph39@yandex.ru	1000000009	Joseph	113
-Patrick27@yandex.ru	1000000010	Patrick	114
-Luis58@yandex.ru	1000000011	Luis	115
-Steven55@yandex.ru	1000000012	Steven	116
-Rafael73@yandex.ru	1000000013	Rafael	117
-Alex47@yandex.ru	1000000014	Alex	118
-Joshua39@yandex.ru	1000000015	Joshua	119
-Dan98@yandex.ru	1000000016	Dan	120
-Sergio26@yandex.ru	1000000017	Sergio	121
-David49@yandex.ru	1000000018	David	122
-Peter52@yandex.ru	1000000019	Peter	123
-Mike47@yandex.ru	1000000020	Mike	124
-Mark49@yandex.ru	1000000021	Mark	125
-Brian0@yandex.ru	1000000022	Brian	126
-Chris96@yandex.ru	1000000023	Chris	127
-Carlos18@yandex.ru	1000000024	Carlos	128
-Adam64@yandex.ru	1000000025	Adam	129
-Julio56@yandex.ru	1000000026	Julio	130
-Danny17@yandex.ru	1000000027	Danny	131
-Javier38@yandex.ru	1000000028	Javier	132
-Chris50@yandex.ru	1000000029	Chris	133
-Jay70@yandex.ru	1000000030	Jay	134
-Gabriel19@yandex.ru	1000000031	Gabriel	135
-Jorge54@yandex.ru	1000000032	Jorge	136
-Joshua41@yandex.ru	1000000033	Joshua	137
-Juan51@yandex.ru	1000000034	Juan	138
-Jason22@yandex.ru	1000000035	Jason	139
-Sean21@yandex.ru	1000000036	Sean	140
-Julio50@yandex.ru	1000000037	Julio	141
-Tyler4@yandex.ru	1000000038	Tyler	142
-Jack34@yandex.ru	1000000039	Jack	143
-Ryan96@yandex.ru	1000000040	Ryan	144
-Brian62@yandex.ru	1000000041	Brian	145
-Kyle89@yandex.ru	1000000042	Kyle	146
-Patrick42@yandex.ru	1000000043	Patrick	147
-Michael83@yandex.ru	1000000044	Michael	148
-Jaime90@yandex.ru	1000000045	Jaime	149
-Alex66@yandex.ru	1000000046	Alex	150
-Adam34@yandex.ru	1000000047	Adam	151
-Joe61@yandex.ru	1000000048	Joe	152
-Joel20@yandex.ru	1000000049	Joel	153
-Jim53@yandex.ru	1000000050	Jim	154
-Joel64@yandex.ru	1000000051	Joel	155
-Andrew78@yandex.ru	1000000052	Andrew	156
-Jay47@yandex.ru	1000000053	Jay	157
-Greg41@yandex.ru	1000000054	Greg	158
-Steven1@yandex.ru	1000000055	Steven	159
-Jacob45@yandex.ru	1000000056	Jacob	160
-Kyle72@yandex.ru	1000000057	Kyle	161
-Jay75@yandex.ru	1000000058	Jay	162
-Chris36@yandex.ru	1000000059	Chris	163
-Cesar66@yandex.ru	1000000060	Cesar	164
-Alex52@yandex.ru	1000000061	Alex	165
-Bryan65@yandex.ru	1000000062	Bryan	166
-Charles24@yandex.ru	1000000063	Charles	167
-Andrea53@yandex.ru	1000000064	Andrea	168
-Bryan24@yandex.ru	1000000065	Bryan	169
-Jaime29@yandex.ru	1000000066	Jaime	170
-Alex71@yandex.ru	1000000067	Alex	171
-Chris28@yandex.ru	1000000068	Chris	172
-Mario9@yandex.ru	1000000069	Mario	173
-Gabriel73@yandex.ru	1000000070	Gabriel	174
-Christian87@yandex.ru	1000000071	Christian	175
-Jay38@yandex.ru	1000000072	Jay	176
-Tyler42@yandex.ru	1000000073	Tyler	177
-Jim96@yandex.ru	1000000074	Jim	178
-Ben61@yandex.ru	1000000075	Ben	179
-Victor13@yandex.ru	1000000076	Victor	180
-Paul26@yandex.ru	1000000077	Paul	181
-Raul20@yandex.ru	1000000078	Raul	182
-Mark94@yandex.ru	1000000079	Mark	183
-Matt39@yandex.ru	1000000080	Matt	184
-Alex97@yandex.ru	1000000081	Alex	185
-Jaime57@yandex.ru	1000000082	Jaime	186
-Tom48@yandex.ru	1000000083	Tom	187
-Adrian88@yandex.ru	1000000084	Adrian	188
-Sergio92@yandex.ru	1000000085	Sergio	189
-Jonathan10@yandex.ru	1000000086	Jonathan	190
-Gary26@yandex.ru	1000000087	Gary	191
-Kyle79@yandex.ru	1000000088	Kyle	192
-George3@yandex.ru	1000000089	George	193
-John39@yandex.ru	1000000090	John	194
-William18@yandex.ru	1000000091	William	195
-Jacob93@yandex.ru	1000000092	Jacob	196
-Mario88@yandex.ru	1000000093	Mario	197
-Scott36@yandex.ru	1000000094	Scott	198
-Bob100@yandex.ru	1000000095	Bob	199
-Manuel21@yandex.ru	1000000002	Manuel	9
-Robert76@yandex.ru	1000000096	Robert	200
-James57@yandex.ru	1000000097	James	201
-Jack21@yandex.ru	1000000098	Jack	202
-Matthew1@yandex.ru	1000000099	Matthew	203
-Jonathan19@yandex.ru	1000000100	Jonathan	204
-Danny56@yandex.ru	1000000101	Danny	205
-David6@yandex.ru	1000000102	David	206
-Robert30@yandex.ru	1000000003	Robert	10
-Jose22@yandex.ru	1000000004	Jose	11
-George33@yandex.ru	1000000103	George	207
-David63@yandex.ru	1000000104	David	208
+COPY "Bus_station".passengers (email, passport_number, full_name, passenger_id, phone_number) FROM stdin;
+testpass123@yandex.ru	4040200200	test_passenger	1	\N
+test-pass123@yandex.ru	4040200201	test_passenger_2	8	\N
+Gary92@yandex.ru	1000000001	Gary	13	\N
+Raul86@yandex.ru	1000000005	Raul	109	\N
+Joe68@yandex.ru	1000000006	Joe	110	\N
+Gabriel33@yandex.ru	1000000007	Gabriel	111	\N
+Mark38@yandex.ru	1000000008	Mark	112	\N
+Joseph39@yandex.ru	1000000009	Joseph	113	\N
+Patrick27@yandex.ru	1000000010	Patrick	114	\N
+Luis58@yandex.ru	1000000011	Luis	115	\N
+Steven55@yandex.ru	1000000012	Steven	116	\N
+Rafael73@yandex.ru	1000000013	Rafael	117	\N
+Alex47@yandex.ru	1000000014	Alex	118	\N
+Joshua39@yandex.ru	1000000015	Joshua	119	\N
+Dan98@yandex.ru	1000000016	Dan	120	\N
+Sergio26@yandex.ru	1000000017	Sergio	121	\N
+David49@yandex.ru	1000000018	David	122	\N
+Peter52@yandex.ru	1000000019	Peter	123	\N
+Mike47@yandex.ru	1000000020	Mike	124	\N
+Mark49@yandex.ru	1000000021	Mark	125	\N
+Brian0@yandex.ru	1000000022	Brian	126	\N
+Chris96@yandex.ru	1000000023	Chris	127	\N
+Carlos18@yandex.ru	1000000024	Carlos	128	\N
+Adam64@yandex.ru	1000000025	Adam	129	\N
+Julio56@yandex.ru	1000000026	Julio	130	\N
+Danny17@yandex.ru	1000000027	Danny	131	\N
+Javier38@yandex.ru	1000000028	Javier	132	\N
+Chris50@yandex.ru	1000000029	Chris	133	\N
+Jay70@yandex.ru	1000000030	Jay	134	\N
+Gabriel19@yandex.ru	1000000031	Gabriel	135	\N
+Jorge54@yandex.ru	1000000032	Jorge	136	\N
+Joshua41@yandex.ru	1000000033	Joshua	137	\N
+Juan51@yandex.ru	1000000034	Juan	138	\N
+Jason22@yandex.ru	1000000035	Jason	139	\N
+Sean21@yandex.ru	1000000036	Sean	140	\N
+Julio50@yandex.ru	1000000037	Julio	141	\N
+Tyler4@yandex.ru	1000000038	Tyler	142	\N
+Jack34@yandex.ru	1000000039	Jack	143	\N
+Ryan96@yandex.ru	1000000040	Ryan	144	\N
+Brian62@yandex.ru	1000000041	Brian	145	\N
+Kyle89@yandex.ru	1000000042	Kyle	146	\N
+Patrick42@yandex.ru	1000000043	Patrick	147	\N
+Michael83@yandex.ru	1000000044	Michael	148	\N
+Jaime90@yandex.ru	1000000045	Jaime	149	\N
+Alex66@yandex.ru	1000000046	Alex	150	\N
+Adam34@yandex.ru	1000000047	Adam	151	\N
+Joe61@yandex.ru	1000000048	Joe	152	\N
+Joel20@yandex.ru	1000000049	Joel	153	\N
+Jim53@yandex.ru	1000000050	Jim	154	\N
+Joel64@yandex.ru	1000000051	Joel	155	\N
+Andrew78@yandex.ru	1000000052	Andrew	156	\N
+Jay47@yandex.ru	1000000053	Jay	157	\N
+Greg41@yandex.ru	1000000054	Greg	158	\N
+Steven1@yandex.ru	1000000055	Steven	159	\N
+Jacob45@yandex.ru	1000000056	Jacob	160	\N
+Kyle72@yandex.ru	1000000057	Kyle	161	\N
+Jay75@yandex.ru	1000000058	Jay	162	\N
+Chris36@yandex.ru	1000000059	Chris	163	\N
+Cesar66@yandex.ru	1000000060	Cesar	164	\N
+Alex52@yandex.ru	1000000061	Alex	165	\N
+Bryan65@yandex.ru	1000000062	Bryan	166	\N
+Charles24@yandex.ru	1000000063	Charles	167	\N
+Andrea53@yandex.ru	1000000064	Andrea	168	\N
+Bryan24@yandex.ru	1000000065	Bryan	169	\N
+Jaime29@yandex.ru	1000000066	Jaime	170	\N
+Alex71@yandex.ru	1000000067	Alex	171	\N
+Chris28@yandex.ru	1000000068	Chris	172	\N
+Mario9@yandex.ru	1000000069	Mario	173	\N
+Gabriel73@yandex.ru	1000000070	Gabriel	174	\N
+Christian87@yandex.ru	1000000071	Christian	175	\N
+Jay38@yandex.ru	1000000072	Jay	176	\N
+Tyler42@yandex.ru	1000000073	Tyler	177	\N
+Jim96@yandex.ru	1000000074	Jim	178	\N
+Ben61@yandex.ru	1000000075	Ben	179	\N
+Victor13@yandex.ru	1000000076	Victor	180	\N
+Paul26@yandex.ru	1000000077	Paul	181	\N
+Raul20@yandex.ru	1000000078	Raul	182	\N
+Mark94@yandex.ru	1000000079	Mark	183	\N
+Matt39@yandex.ru	1000000080	Matt	184	\N
+Alex97@yandex.ru	1000000081	Alex	185	\N
+Jaime57@yandex.ru	1000000082	Jaime	186	\N
+Tom48@yandex.ru	1000000083	Tom	187	\N
+Adrian88@yandex.ru	1000000084	Adrian	188	\N
+Sergio92@yandex.ru	1000000085	Sergio	189	\N
+Jonathan10@yandex.ru	1000000086	Jonathan	190	\N
+Gary26@yandex.ru	1000000087	Gary	191	\N
+Kyle79@yandex.ru	1000000088	Kyle	192	\N
+George3@yandex.ru	1000000089	George	193	\N
+John39@yandex.ru	1000000090	John	194	\N
+William18@yandex.ru	1000000091	William	195	\N
+Jacob93@yandex.ru	1000000092	Jacob	196	\N
+Mario88@yandex.ru	1000000093	Mario	197	\N
+Scott36@yandex.ru	1000000094	Scott	198	\N
+Bob100@yandex.ru	1000000095	Bob	199	\N
+Manuel21@yandex.ru	1000000002	Manuel	9	\N
+Robert76@yandex.ru	1000000096	Robert	200	\N
+James57@yandex.ru	1000000097	James	201	\N
+Jack21@yandex.ru	1000000098	Jack	202	\N
+Matthew1@yandex.ru	1000000099	Matthew	203	\N
+Jonathan19@yandex.ru	1000000100	Jonathan	204	\N
+Danny56@yandex.ru	1000000101	Danny	205	\N
+David6@yandex.ru	1000000102	David	206	\N
+Robert30@yandex.ru	1000000003	Robert	10	\N
+Jose22@yandex.ru	1000000004	Jose	11	\N
+George33@yandex.ru	1000000103	George	207	\N
+David63@yandex.ru	1000000104	David	208	\N
 \.
 
 
 --
--- TOC entry 4903 (class 0 OID 16534)
+-- TOC entry 4917 (class 0 OID 16534)
 -- Dependencies: 226
 -- Data for Name: route_stops; Type: TABLE DATA; Schema: Bus_station; Owner: postgres
 --
 
-COPY "Bus_station".route_stops (arrival_time, stop_id, route_id, route_stop_id) FROM stdin;
+COPY "Bus_station".route_stops (arrival_time, stop_id, route_id, route_stop_id, stop_time, stop_index) FROM stdin;
 \.
 
 
 --
--- TOC entry 4896 (class 0 OID 16439)
+-- TOC entry 4910 (class 0 OID 16439)
 -- Dependencies: 219
 -- Data for Name: schedule; Type: TABLE DATA; Schema: Bus_station; Owner: postgres
 --
 
-COPY "Bus_station".schedule (path_length, departure_point, destination_point, route_type, route_id) FROM stdin;
-70	Town1	Town8	direct	2
-167	Town2	Town9	direct	3
-105	Town3	Town10	direct	4
-196	Town5	Town1	direct	6
-194	Town6	Town2	direct	7
-34	Town7	Town3	direct	8
-64	Town8	Town4	direct	9
-126	Town9	Town5	direct	10
-71	Town10	Town6	direct	11
-150	Town1	Town8	direct	13
-84	Town2	Town9	direct	14
-126	Town3	Town10	direct	15
-39	Town4	Town0	direct	16
-86	Town5	Town1	direct	17
-156	Town6	Town2	direct	18
-109	Town7	Town3	direct	19
-119	Town8	Town4	direct	20
-190	Town9	Town5	direct	21
-122	Town10	Town6	direct	22
-47	Town1	Town8	direct	24
-29	Town2	Town9	direct	25
-116	Town3	Town10	direct	26
-183	Town5	Town1	direct	28
-57	Town6	Town2	direct	29
-118	Town7	Town3	direct	30
-89	Town1	Town7	direct	1
-97	Town4	Town9	direct	5
-190	Town2	Town7	direct	12
-196	Town3	Town7	direct	23
-151	Town4	Town10	direct	27
+COPY "Bus_station".schedule (path_length, route_type, route_id, departure_point, destination_point, departure_time, destination_time) FROM stdin;
 \.
 
 
 --
--- TOC entry 4901 (class 0 OID 16501)
+-- TOC entry 4915 (class 0 OID 16501)
 -- Dependencies: 224
 -- Data for Name: tickets; Type: TABLE DATA; Schema: Bus_station; Owner: postgres
 --
 
-COPY "Bus_station".tickets ("price ", ticket_id, passenger_id, trip_id) FROM stdin;
+COPY "Bus_station".tickets (price, ticket_id, passenger_id, trip_id, buying_date) FROM stdin;
 \.
 
 
 --
--- TOC entry 4900 (class 0 OID 16482)
+-- TOC entry 4914 (class 0 OID 16482)
 -- Dependencies: 223
 -- Data for Name: trips; Type: TABLE DATA; Schema: Bus_station; Owner: postgres
 --
 
 COPY "Bus_station".trips (actual_departure_time, actual_destination_time, status, bus_id, route_id, trip_id) FROM stdin;
-2023-10-22 12:01:00	2023-10-22 13:05:00	over	3	10	1
-2023-09-03 09:21:00	2023-09-03 10:05:00	over	7	13	2
-2023-09-11 07:18:00	2023-09-11 08:35:00	over	19	2	3
 \.
 
 
 --
--- TOC entry 4899 (class 0 OID 16470)
+-- TOC entry 4913 (class 0 OID 16470)
 -- Dependencies: 222
 -- Data for Name: work_timesheet; Type: TABLE DATA; Schema: Bus_station; Owner: postgres
 --
 
-COPY "Bus_station".work_timesheet (work_date, work_hours, record_id, driver_id) FROM stdin;
+COPY "Bus_station".work_timesheet (work_date, work_hours, record_id, driver_id, status) FROM stdin;
+2023-10-22	08:00:00	1	1	\N
+2023-10-20	10:00:00	5	4	\N
+2023-10-21	08:00:00	6	2	\N
+2023-10-22	08:00:00	7	3	\N
 \.
 
 
 --
--- TOC entry 4931 (class 0 OID 0)
+-- TOC entry 4945 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: adding_crew_adding_id_seq; Type: SEQUENCE SET; Schema: Bus_station; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Bus_station".adding_crew_adding_id_seq', 1, false);
+SELECT pg_catalog.setval('"Bus_station".adding_crew_adding_id_seq', 3, true);
 
 
 --
--- TOC entry 4932 (class 0 OID 0)
+-- TOC entry 4946 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: bus_model_model_id_seq; Type: SEQUENCE SET; Schema: Bus_station; Owner: postgres
 --
@@ -885,7 +861,7 @@ SELECT pg_catalog.setval('"Bus_station".bus_model_model_id_seq', 10, true);
 
 
 --
--- TOC entry 4933 (class 0 OID 0)
+-- TOC entry 4947 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: bus_stops_stop_id_seq; Type: SEQUENCE SET; Schema: Bus_station; Owner: postgres
 --
@@ -894,7 +870,7 @@ SELECT pg_catalog.setval('"Bus_station".bus_stops_stop_id_seq', 10, true);
 
 
 --
--- TOC entry 4934 (class 0 OID 0)
+-- TOC entry 4948 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: buses_bus_id_seq; Type: SEQUENCE SET; Schema: Bus_station; Owner: postgres
 --
@@ -903,7 +879,7 @@ SELECT pg_catalog.setval('"Bus_station".buses_bus_id_seq', 20, true);
 
 
 --
--- TOC entry 4935 (class 0 OID 0)
+-- TOC entry 4949 (class 0 OID 0)
 -- Dependencies: 235
 -- Name: drivers_driver_id_seq; Type: SEQUENCE SET; Schema: Bus_station; Owner: postgres
 --
@@ -912,7 +888,7 @@ SELECT pg_catalog.setval('"Bus_station".drivers_driver_id_seq', 20, true);
 
 
 --
--- TOC entry 4936 (class 0 OID 0)
+-- TOC entry 4950 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: passengers_passenger_id_seq; Type: SEQUENCE SET; Schema: Bus_station; Owner: postgres
 --
@@ -921,7 +897,7 @@ SELECT pg_catalog.setval('"Bus_station".passengers_passenger_id_seq', 208, true)
 
 
 --
--- TOC entry 4937 (class 0 OID 0)
+-- TOC entry 4951 (class 0 OID 0)
 -- Dependencies: 237
 -- Name: route_stops_route_stop_id_seq; Type: SEQUENCE SET; Schema: Bus_station; Owner: postgres
 --
@@ -930,7 +906,7 @@ SELECT pg_catalog.setval('"Bus_station".route_stops_route_stop_id_seq', 1, false
 
 
 --
--- TOC entry 4938 (class 0 OID 0)
+-- TOC entry 4952 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: schedule_route_id_seq; Type: SEQUENCE SET; Schema: Bus_station; Owner: postgres
 --
@@ -939,16 +915,16 @@ SELECT pg_catalog.setval('"Bus_station".schedule_route_id_seq', 30, true);
 
 
 --
--- TOC entry 4939 (class 0 OID 0)
+-- TOC entry 4953 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: tickets_ticket_id_seq; Type: SEQUENCE SET; Schema: Bus_station; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Bus_station".tickets_ticket_id_seq', 1, false);
+SELECT pg_catalog.setval('"Bus_station".tickets_ticket_id_seq', 11, true);
 
 
 --
--- TOC entry 4940 (class 0 OID 0)
+-- TOC entry 4954 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: trips_trip_id_seq; Type: SEQUENCE SET; Schema: Bus_station; Owner: postgres
 --
@@ -957,16 +933,16 @@ SELECT pg_catalog.setval('"Bus_station".trips_trip_id_seq', 3, true);
 
 
 --
--- TOC entry 4941 (class 0 OID 0)
+-- TOC entry 4955 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: work_timesheet_record_id_seq; Type: SEQUENCE SET; Schema: Bus_station; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Bus_station".work_timesheet_record_id_seq', 1, false);
+SELECT pg_catalog.setval('"Bus_station".work_timesheet_record_id_seq', 7, true);
 
 
 --
--- TOC entry 4737 (class 2606 OID 16567)
+-- TOC entry 4749 (class 2606 OID 16567)
 -- Name: adding_crew adding_crew_pkey; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -975,7 +951,16 @@ ALTER TABLE ONLY "Bus_station".adding_crew
 
 
 --
--- TOC entry 4721 (class 2606 OID 16500)
+-- TOC entry 4706 (class 2606 OID 16732)
+-- Name: bus_model bus_model_country_check; Type: CHECK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE "Bus_station".bus_model
+    ADD CONSTRAINT bus_model_country_check CHECK (((country)::text ~~ '[a-zA-Z]'::text)) NOT VALID;
+
+
+--
+-- TOC entry 4733 (class 2606 OID 16500)
 -- Name: bus_model bus_model_model_name_key; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -984,7 +969,7 @@ ALTER TABLE ONLY "Bus_station".bus_model
 
 
 --
--- TOC entry 4723 (class 2606 OID 16576)
+-- TOC entry 4735 (class 2606 OID 16576)
 -- Name: bus_model bus_model_pkey; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -993,7 +978,7 @@ ALTER TABLE ONLY "Bus_station".bus_model
 
 
 --
--- TOC entry 4727 (class 2606 OID 16604)
+-- TOC entry 4739 (class 2606 OID 16604)
 -- Name: bus_stops bus_stops_pkey; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1002,7 +987,16 @@ ALTER TABLE ONLY "Bus_station".bus_stops
 
 
 --
--- TOC entry 4729 (class 2606 OID 16590)
+-- TOC entry 4709 (class 2606 OID 16730)
+-- Name: buses buses_bus_number_check; Type: CHECK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE "Bus_station".buses
+    ADD CONSTRAINT buses_bus_number_check CHECK ((bus_number ~~ '^[A-Z]{1}[0-9]{3}[A-Z]{2}$'::text)) NOT VALID;
+
+
+--
+-- TOC entry 4741 (class 2606 OID 16590)
 -- Name: buses buses_pkey; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1011,7 +1005,25 @@ ALTER TABLE ONLY "Bus_station".buses
 
 
 --
--- TOC entry 4713 (class 2606 OID 16719)
+-- TOC entry 4710 (class 2606 OID 16752)
+-- Name: buses buses_status_check; Type: CHECK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE "Bus_station".buses
+    ADD CONSTRAINT buses_status_check CHECK ((status = ANY (ARRAY['working'::text, 'under repair'::text, 'not working'::text]))) NOT VALID;
+
+
+--
+-- TOC entry 4705 (class 2606 OID 16734)
+-- Name: drivers drivers_email_check; Type: CHECK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE "Bus_station".drivers
+    ADD CONSTRAINT drivers_email_check CHECK ((email ~~ '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}'::text)) NOT VALID;
+
+
+--
+-- TOC entry 4725 (class 2606 OID 16719)
 -- Name: drivers drivers_email_key; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1020,7 +1032,7 @@ ALTER TABLE ONLY "Bus_station".drivers
 
 
 --
--- TOC entry 4715 (class 2606 OID 16717)
+-- TOC entry 4727 (class 2606 OID 16717)
 -- Name: drivers drivers_license_id_key; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1029,7 +1041,7 @@ ALTER TABLE ONLY "Bus_station".drivers
 
 
 --
--- TOC entry 4717 (class 2606 OID 16721)
+-- TOC entry 4729 (class 2606 OID 16721)
 -- Name: drivers drivers_passport_number_key; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1038,7 +1050,7 @@ ALTER TABLE ONLY "Bus_station".drivers
 
 
 --
--- TOC entry 4719 (class 2606 OID 16676)
+-- TOC entry 4731 (class 2606 OID 16676)
 -- Name: drivers drivers_pkey; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1047,7 +1059,16 @@ ALTER TABLE ONLY "Bus_station".drivers
 
 
 --
--- TOC entry 4707 (class 2606 OID 16715)
+-- TOC entry 4703 (class 2606 OID 16733)
+-- Name: passengers passengers_email_check; Type: CHECK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE "Bus_station".passengers
+    ADD CONSTRAINT passengers_email_check CHECK ((email ~~ '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}'::text)) NOT VALID;
+
+
+--
+-- TOC entry 4719 (class 2606 OID 16715)
 -- Name: passengers passengers_email_key; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1056,7 +1077,7 @@ ALTER TABLE ONLY "Bus_station".passengers
 
 
 --
--- TOC entry 4709 (class 2606 OID 16713)
+-- TOC entry 4721 (class 2606 OID 16713)
 -- Name: passengers passengers_passport_number_key; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1065,7 +1086,16 @@ ALTER TABLE ONLY "Bus_station".passengers
 
 
 --
--- TOC entry 4711 (class 2606 OID 16656)
+-- TOC entry 4704 (class 2606 OID 16750)
+-- Name: passengers passengers_phone_number_check; Type: CHECK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE "Bus_station".passengers
+    ADD CONSTRAINT passengers_phone_number_check CHECK ((phone_number ~~ '^\+[1-9][0-9]{7, 14}$'::text)) NOT VALID;
+
+
+--
+-- TOC entry 4723 (class 2606 OID 16656)
 -- Name: passengers passengers_pkey; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1074,7 +1104,7 @@ ALTER TABLE ONLY "Bus_station".passengers
 
 
 --
--- TOC entry 4739 (class 2606 OID 16710)
+-- TOC entry 4751 (class 2606 OID 16710)
 -- Name: route_stops route_stops_pkey; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1083,7 +1113,34 @@ ALTER TABLE ONLY "Bus_station".route_stops
 
 
 --
--- TOC entry 4725 (class 2606 OID 16618)
+-- TOC entry 4716 (class 2606 OID 16751)
+-- Name: route_stops route_stops_stop_index_check; Type: CHECK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE "Bus_station".route_stops
+    ADD CONSTRAINT route_stops_stop_index_check CHECK ((stop_index > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4717 (class 2606 OID 16749)
+-- Name: route_stops route_stops_stop_time_check; Type: CHECK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE "Bus_station".route_stops
+    ADD CONSTRAINT route_stops_stop_time_check CHECK ((stop_time < '01:00:00'::interval)) NOT VALID;
+
+
+--
+-- TOC entry 4708 (class 2606 OID 16735)
+-- Name: schedule schedule_path_length_check; Type: CHECK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE "Bus_station".schedule
+    ADD CONSTRAINT schedule_path_length_check CHECK ((path_length > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4737 (class 2606 OID 16618)
 -- Name: schedule schedule_pkey; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1092,7 +1149,7 @@ ALTER TABLE ONLY "Bus_station".schedule
 
 
 --
--- TOC entry 4735 (class 2606 OID 16640)
+-- TOC entry 4747 (class 2606 OID 16640)
 -- Name: tickets tickets_pkey; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1101,7 +1158,25 @@ ALTER TABLE ONLY "Bus_station".tickets
 
 
 --
--- TOC entry 4733 (class 2606 OID 16693)
+-- TOC entry 4715 (class 2606 OID 16731)
+-- Name: tickets tickets_price_check; Type: CHECK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE "Bus_station".tickets
+    ADD CONSTRAINT tickets_price_check CHECK ((price > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4713 (class 2606 OID 16736)
+-- Name: trips trips_check; Type: CHECK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE "Bus_station".trips
+    ADD CONSTRAINT trips_check CHECK ((actual_departure_time < actual_destination_time)) NOT VALID;
+
+
+--
+-- TOC entry 4745 (class 2606 OID 16693)
 -- Name: trips trips_pkey; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1110,7 +1185,16 @@ ALTER TABLE ONLY "Bus_station".trips
 
 
 --
--- TOC entry 4731 (class 2606 OID 16647)
+-- TOC entry 4714 (class 2606 OID 16754)
+-- Name: trips trips_status_check; Type: CHECK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE "Bus_station".trips
+    ADD CONSTRAINT trips_status_check CHECK (((status)::text = ANY ((ARRAY['estimated'::character varying, 'delayed'::character varying, 'arrived'::character varying])::text[]))) NOT VALID;
+
+
+--
+-- TOC entry 4743 (class 2606 OID 16647)
 -- Name: work_timesheet work_timesheet_pkey; Type: CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1119,7 +1203,16 @@ ALTER TABLE ONLY "Bus_station".work_timesheet
 
 
 --
--- TOC entry 4746 (class 2606 OID 16677)
+-- TOC entry 4711 (class 2606 OID 16753)
+-- Name: work_timesheet work_timesheet_status_check; Type: CHECK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE "Bus_station".work_timesheet
+    ADD CONSTRAINT work_timesheet_status_check CHECK ((status = ANY (ARRAY['ok'::text, 'sick leave'::text, 'vacation'::text]))) NOT VALID;
+
+
+--
+-- TOC entry 4760 (class 2606 OID 16677)
 -- Name: adding_crew adding_crew_driver_id_fkey; Type: FK CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1128,7 +1221,7 @@ ALTER TABLE ONLY "Bus_station".adding_crew
 
 
 --
--- TOC entry 4747 (class 2606 OID 16699)
+-- TOC entry 4761 (class 2606 OID 16699)
 -- Name: adding_crew adding_crew_trip_id_fkey; Type: FK CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1137,7 +1230,7 @@ ALTER TABLE ONLY "Bus_station".adding_crew
 
 
 --
--- TOC entry 4740 (class 2606 OID 16577)
+-- TOC entry 4754 (class 2606 OID 16577)
 -- Name: buses buses_model_id_fkey; Type: FK CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1146,7 +1239,7 @@ ALTER TABLE ONLY "Bus_station".buses
 
 
 --
--- TOC entry 4748 (class 2606 OID 16624)
+-- TOC entry 4762 (class 2606 OID 16624)
 -- Name: route_stops route_stops_route_id_fkey; Type: FK CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1155,7 +1248,7 @@ ALTER TABLE ONLY "Bus_station".route_stops
 
 
 --
--- TOC entry 4749 (class 2606 OID 16619)
+-- TOC entry 4763 (class 2606 OID 16619)
 -- Name: route_stops route_stops_stop_id_fkey; Type: FK CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1164,7 +1257,25 @@ ALTER TABLE ONLY "Bus_station".route_stops
 
 
 --
--- TOC entry 4744 (class 2606 OID 16658)
+-- TOC entry 4752 (class 2606 OID 16737)
+-- Name: schedule schedule_departure_point_fkey; Type: FK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE ONLY "Bus_station".schedule
+    ADD CONSTRAINT schedule_departure_point_fkey FOREIGN KEY (departure_point) REFERENCES "Bus_station".bus_stops(stop_id) NOT VALID;
+
+
+--
+-- TOC entry 4753 (class 2606 OID 16742)
+-- Name: schedule schedule_destination_point_fkey; Type: FK CONSTRAINT; Schema: Bus_station; Owner: postgres
+--
+
+ALTER TABLE ONLY "Bus_station".schedule
+    ADD CONSTRAINT schedule_destination_point_fkey FOREIGN KEY (destination_point) REFERENCES "Bus_station".bus_stops(stop_id) NOT VALID;
+
+
+--
+-- TOC entry 4758 (class 2606 OID 16658)
 -- Name: tickets tickets_passenger_id_fkey; Type: FK CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1173,7 +1284,7 @@ ALTER TABLE ONLY "Bus_station".tickets
 
 
 --
--- TOC entry 4745 (class 2606 OID 16694)
+-- TOC entry 4759 (class 2606 OID 16694)
 -- Name: tickets tickets_trip_id_fkey; Type: FK CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1182,7 +1293,7 @@ ALTER TABLE ONLY "Bus_station".tickets
 
 
 --
--- TOC entry 4742 (class 2606 OID 16591)
+-- TOC entry 4756 (class 2606 OID 16591)
 -- Name: trips trips_bus_id_fkey; Type: FK CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1191,7 +1302,7 @@ ALTER TABLE ONLY "Bus_station".trips
 
 
 --
--- TOC entry 4743 (class 2606 OID 16629)
+-- TOC entry 4757 (class 2606 OID 16629)
 -- Name: trips trips_route_id_fkey; Type: FK CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1200,7 +1311,7 @@ ALTER TABLE ONLY "Bus_station".trips
 
 
 --
--- TOC entry 4741 (class 2606 OID 16682)
+-- TOC entry 4755 (class 2606 OID 16682)
 -- Name: work_timesheet work_timesheet_driver_id_fkey; Type: FK CONSTRAINT; Schema: Bus_station; Owner: postgres
 --
 
@@ -1208,7 +1319,7 @@ ALTER TABLE ONLY "Bus_station".work_timesheet
     ADD CONSTRAINT work_timesheet_driver_id_fkey FOREIGN KEY (driver_id) REFERENCES "Bus_station".drivers(driver_id) NOT VALID;
 
 
--- Completed on 2023-10-25 15:25:48
+-- Completed on 2023-10-26 13:48:42
 
 --
 -- PostgreSQL database dump complete
