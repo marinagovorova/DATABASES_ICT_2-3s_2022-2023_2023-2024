@@ -5,7 +5,7 @@
 -- Dumped from database version 16.0
 -- Dumped by pg_dump version 16.0
 
--- Started on 2023-10-26 14:19:29
+-- Started on 2023-10-26 15:54:58
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -29,7 +29,7 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.alien (
     id_alien integer NOT NULL,
-    humanoid integer
+    humanoid integer NOT NULL
 );
 
 
@@ -68,7 +68,7 @@ ALTER SEQUENCE public.alien_id_alien_seq OWNED BY public.alien.id_alien;
 CREATE TABLE public.arms (
     id_arms integer NOT NULL,
     quantity integer,
-    fingers integer,
+    fingers integer NOT NULL,
     CONSTRAINT quantity CHECK ((quantity >= 0))
 );
 
@@ -223,8 +223,8 @@ ALTER SEQUENCE public.hair_id_hair_seq OWNED BY public.hair.id_hair;
 CREATE TABLE public.human (
     id_human integer NOT NULL,
     having_belief boolean,
-    humanoid integer,
-    pasport integer
+    humanoid integer NOT NULL,
+    pasport integer NOT NULL
 );
 
 
@@ -261,8 +261,8 @@ ALTER SEQUENCE public.human_id_human_seq OWNED BY public.human.id_human;
 --
 
 CREATE TABLE public.human_theory (
-    id_theory integer,
-    id_human integer
+    id_theory integer NOT NULL,
+    id_human integer NOT NULL
 );
 
 
@@ -275,11 +275,11 @@ ALTER TABLE public.human_theory OWNER TO postgres;
 
 CREATE TABLE public.humanoid (
     id_humanoid integer NOT NULL,
-    legs integer,
-    arms integer,
-    hair integer,
-    bodies integer,
-    skin integer
+    legs integer NOT NULL,
+    arms integer NOT NULL,
+    hair integer NOT NULL,
+    bodies integer NOT NULL,
+    skin integer NOT NULL
 );
 
 
@@ -318,7 +318,7 @@ ALTER SEQUENCE public.humanoid_id_humanoid_seq OWNED BY public.humanoid.id_human
 CREATE TABLE public.legs (
     id_legs integer NOT NULL,
     quantity integer,
-    fingers integer,
+    fingers integer NOT NULL,
     CONSTRAINT quantity CHECK ((quantity >= 0))
 );
 
@@ -1119,7 +1119,7 @@ ALTER TABLE ONLY public.humanoid
     ADD CONSTRAINT skin_fkey FOREIGN KEY (skin) REFERENCES public.skin(id_skin);
 
 
--- Completed on 2023-10-26 14:19:29
+-- Completed on 2023-10-26 15:54:59
 
 --
 -- PostgreSQL database dump complete
