@@ -1,0 +1,1111 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 16.0
+-- Dumped by pg_dump version 16.0
+
+-- Started on 2023-10-26 14:10:34
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 216 (class 1259 OID 16404)
+-- Name: Automobile; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Automobile" (
+    "Engine_number" character(10) NOT NULL,
+    "Year_of_vehicle" smallint NOT NULL,
+    "Colour" character(10) NOT NULL,
+    "State_number" character(10) NOT NULL,
+    "ID_client" bigint NOT NULL,
+    "ID_auto" bigint NOT NULL,
+    "ID_model" bigint NOT NULL
+);
+
+
+ALTER TABLE public."Automobile" OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 16532)
+-- Name: Automobile_ID_auto_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Automobile_ID_auto_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public."Automobile_ID_auto_seq" OWNER TO postgres;
+
+--
+-- TOC entry 4899 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: Automobile_ID_auto_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Automobile_ID_auto_seq" OWNED BY public."Automobile"."ID_auto";
+
+
+--
+-- TOC entry 218 (class 1259 OID 16424)
+-- Name: Car_workshop; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Car_workshop" (
+    "Address" character(50) NOT NULL,
+    "City" character(20) NOT NULL,
+    "ID_car_workshop" bigint NOT NULL
+);
+
+
+ALTER TABLE public."Car_workshop" OWNER TO postgres;
+
+--
+-- TOC entry 230 (class 1259 OID 16568)
+-- Name: Car_workshop_ID_car_workshop_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Car_workshop_ID_car_workshop_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public."Car_workshop_ID_car_workshop_seq" OWNER TO postgres;
+
+--
+-- TOC entry 4900 (class 0 OID 0)
+-- Dependencies: 230
+-- Name: Car_workshop_ID_car_workshop_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Car_workshop_ID_car_workshop_seq" OWNED BY public."Car_workshop"."ID_car_workshop";
+
+
+--
+-- TOC entry 215 (class 1259 OID 16399)
+-- Name: Client; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Client" (
+    "Full_name" character(50) NOT NULL,
+    "Phone" character(20) NOT NULL,
+    "Email" character(30),
+    "ID_client" bigint NOT NULL
+);
+
+
+ALTER TABLE public."Client" OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 16515)
+-- Name: Client_ID_client_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Client_ID_client_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public."Client_ID_client_seq" OWNER TO postgres;
+
+--
+-- TOC entry 4901 (class 0 OID 0)
+-- Dependencies: 226
+-- Name: Client_ID_client_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Client_ID_client_seq" OWNED BY public."Client"."ID_client";
+
+
+--
+-- TOC entry 222 (class 1259 OID 16459)
+-- Name: Contract; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Contract" (
+    "Order_date" date NOT NULL,
+    "Order_status" character(10) NOT NULL,
+    "Payment_status" character(10) NOT NULL,
+    "Date_of_acceptance_for_repair" date NOT NULL,
+    "Scheduled_date_end_of_repair" date,
+    "ID_client" bigint NOT NULL,
+    "ID_auto" bigint NOT NULL,
+    "ID_car_workshop" bigint NOT NULL,
+    "ID_contract" bigint NOT NULL,
+    "Actual_date_end_of_repair" date
+);
+
+
+ALTER TABLE public."Contract" OWNER TO postgres;
+
+--
+-- TOC entry 234 (class 1259 OID 16622)
+-- Name: Contract_ID_contract_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Contract_ID_contract_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public."Contract_ID_contract_seq" OWNER TO postgres;
+
+--
+-- TOC entry 4902 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: Contract_ID_contract_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Contract_ID_contract_seq" OWNED BY public."Contract"."ID_contract";
+
+
+--
+-- TOC entry 225 (class 1259 OID 16505)
+-- Name: Detail; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Detail" (
+    "Name" character(20) NOT NULL,
+    "Price" integer,
+    "Country_of_manufacturer" character(20) NOT NULL,
+    "ID_detail" bigint NOT NULL
+);
+
+
+ALTER TABLE public."Detail" OWNER TO postgres;
+
+--
+-- TOC entry 232 (class 1259 OID 16593)
+-- Name: Detail_ID_detail_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Detail_ID_detail_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public."Detail_ID_detail_seq" OWNER TO postgres;
+
+--
+-- TOC entry 4903 (class 0 OID 0)
+-- Dependencies: 232
+-- Name: Detail_ID_detail_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Detail_ID_detail_seq" OWNED BY public."Detail"."ID_detail";
+
+
+--
+-- TOC entry 224 (class 1259 OID 16492)
+-- Name: Detail_in_service; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Detail_in_service" (
+    "Number_of_details" integer NOT NULL,
+    "Supplier_of_details" character(15),
+    "ID_detail" bigint NOT NULL,
+    "ID_service" bigint,
+    "ID_contract" bigint NOT NULL,
+    "ID_detail_in_service" bigint NOT NULL
+);
+
+
+ALTER TABLE public."Detail_in_service" OWNER TO postgres;
+
+--
+-- TOC entry 235 (class 1259 OID 16658)
+-- Name: Detail_in_service_ID_detail_in_service_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Detail_in_service_ID_detail_in_service_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public."Detail_in_service_ID_detail_in_service_seq" OWNER TO postgres;
+
+--
+-- TOC entry 4904 (class 0 OID 0)
+-- Dependencies: 235
+-- Name: Detail_in_service_ID_detail_in_service_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Detail_in_service_ID_detail_in_service_seq" OWNED BY public."Detail_in_service"."ID_detail_in_service";
+
+
+--
+-- TOC entry 223 (class 1259 OID 16479)
+-- Name: Distribution_of_work; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Distribution_of_work" (
+    "Status" character(20) NOT NULL,
+    "Start_date" date NOT NULL,
+    "Scheduled_end_date" date,
+    "Actual_end_date" date,
+    "ID_service" bigint NOT NULL,
+    "ID_contract" bigint NOT NULL,
+    "ID_destribution_of_work" bigint NOT NULL
+);
+
+
+ALTER TABLE public."Distribution_of_work" OWNER TO postgres;
+
+--
+-- TOC entry 236 (class 1259 OID 16665)
+-- Name: Distribution_of_work_ID_destribution_of_work_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Distribution_of_work_ID_destribution_of_work_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public."Distribution_of_work_ID_destribution_of_work_seq" OWNER TO postgres;
+
+--
+-- TOC entry 4905 (class 0 OID 0)
+-- Dependencies: 236
+-- Name: Distribution_of_work_ID_destribution_of_work_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Distribution_of_work_ID_destribution_of_work_seq" OWNED BY public."Distribution_of_work"."ID_destribution_of_work";
+
+
+--
+-- TOC entry 219 (class 1259 OID 16429)
+-- Name: Employee; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Employee" (
+    "Full_name" character(50) NOT NULL,
+    "Phone" character(11) NOT NULL,
+    "Email" character(20),
+    "ID_job_position" bigint NOT NULL,
+    "ID_car_workshop" bigint NOT NULL,
+    "ID_employee" bigint NOT NULL
+);
+
+
+ALTER TABLE public."Employee" OWNER TO postgres;
+
+--
+-- TOC entry 231 (class 1259 OID 16586)
+-- Name: Employee_ID_employee_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Employee_ID_employee_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public."Employee_ID_employee_seq" OWNER TO postgres;
+
+--
+-- TOC entry 4906 (class 0 OID 0)
+-- Dependencies: 231
+-- Name: Employee_ID_employee_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Employee_ID_employee_seq" OWNED BY public."Employee"."ID_employee";
+
+
+--
+-- TOC entry 217 (class 1259 OID 16419)
+-- Name: Job_position; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Job_position" (
+    "Name" character(20) NOT NULL,
+    "Specialisation" character(20) NOT NULL,
+    "Employee_discharge" integer NOT NULL,
+    "Salary" integer,
+    "ID_job_position" bigint NOT NULL
+);
+
+
+ALTER TABLE public."Job_position" OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 16556)
+-- Name: Job_position_ID_job_position_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Job_position_ID_job_position_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public."Job_position_ID_job_position_seq" OWNER TO postgres;
+
+--
+-- TOC entry 4907 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: Job_position_ID_job_position_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Job_position_ID_job_position_seq" OWNED BY public."Job_position"."ID_job_position";
+
+
+--
+-- TOC entry 220 (class 1259 OID 16444)
+-- Name: Model; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Model" (
+    "Car_brand" character(15) NOT NULL,
+    "Country_of_production" character(15) NOT NULL,
+    "Model" character(15) NOT NULL,
+    "Car_power" integer NOT NULL,
+    "ID_model" bigint NOT NULL
+);
+
+
+ALTER TABLE public."Model" OWNER TO postgres;
+
+--
+-- TOC entry 228 (class 1259 OID 16544)
+-- Name: Model_ID_model_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Model_ID_model_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public."Model_ID_model_seq" OWNER TO postgres;
+
+--
+-- TOC entry 4908 (class 0 OID 0)
+-- Dependencies: 228
+-- Name: Model_ID_model_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Model_ID_model_seq" OWNED BY public."Model"."ID_model";
+
+
+--
+-- TOC entry 221 (class 1259 OID 16454)
+-- Name: Service; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Service" (
+    "Type_of_repair" character(50) NOT NULL,
+    "Category_repair" character(50) NOT NULL,
+    price integer,
+    "ID_service" bigint NOT NULL
+);
+
+
+ALTER TABLE public."Service" OWNER TO postgres;
+
+--
+-- TOC entry 233 (class 1259 OID 16605)
+-- Name: Service_ID_service_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Service_ID_service_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public."Service_ID_service_seq" OWNER TO postgres;
+
+--
+-- TOC entry 4909 (class 0 OID 0)
+-- Dependencies: 233
+-- Name: Service_ID_service_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Service_ID_service_seq" OWNED BY public."Service"."ID_service";
+
+
+--
+-- TOC entry 4685 (class 2604 OID 16533)
+-- Name: Automobile ID_auto; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Automobile" ALTER COLUMN "ID_auto" SET DEFAULT nextval('public."Automobile_ID_auto_seq"'::regclass);
+
+
+--
+-- TOC entry 4687 (class 2604 OID 16569)
+-- Name: Car_workshop ID_car_workshop; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Car_workshop" ALTER COLUMN "ID_car_workshop" SET DEFAULT nextval('public."Car_workshop_ID_car_workshop_seq"'::regclass);
+
+
+--
+-- TOC entry 4684 (class 2604 OID 16516)
+-- Name: Client ID_client; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Client" ALTER COLUMN "ID_client" SET DEFAULT nextval('public."Client_ID_client_seq"'::regclass);
+
+
+--
+-- TOC entry 4691 (class 2604 OID 16623)
+-- Name: Contract ID_contract; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Contract" ALTER COLUMN "ID_contract" SET DEFAULT nextval('public."Contract_ID_contract_seq"'::regclass);
+
+
+--
+-- TOC entry 4694 (class 2604 OID 16594)
+-- Name: Detail ID_detail; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Detail" ALTER COLUMN "ID_detail" SET DEFAULT nextval('public."Detail_ID_detail_seq"'::regclass);
+
+
+--
+-- TOC entry 4693 (class 2604 OID 16659)
+-- Name: Detail_in_service ID_detail_in_service; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Detail_in_service" ALTER COLUMN "ID_detail_in_service" SET DEFAULT nextval('public."Detail_in_service_ID_detail_in_service_seq"'::regclass);
+
+
+--
+-- TOC entry 4692 (class 2604 OID 16666)
+-- Name: Distribution_of_work ID_destribution_of_work; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Distribution_of_work" ALTER COLUMN "ID_destribution_of_work" SET DEFAULT nextval('public."Distribution_of_work_ID_destribution_of_work_seq"'::regclass);
+
+
+--
+-- TOC entry 4688 (class 2604 OID 16587)
+-- Name: Employee ID_employee; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Employee" ALTER COLUMN "ID_employee" SET DEFAULT nextval('public."Employee_ID_employee_seq"'::regclass);
+
+
+--
+-- TOC entry 4686 (class 2604 OID 16557)
+-- Name: Job_position ID_job_position; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Job_position" ALTER COLUMN "ID_job_position" SET DEFAULT nextval('public."Job_position_ID_job_position_seq"'::regclass);
+
+
+--
+-- TOC entry 4689 (class 2604 OID 16545)
+-- Name: Model ID_model; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Model" ALTER COLUMN "ID_model" SET DEFAULT nextval('public."Model_ID_model_seq"'::regclass);
+
+
+--
+-- TOC entry 4690 (class 2604 OID 16606)
+-- Name: Service ID_service; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Service" ALTER COLUMN "ID_service" SET DEFAULT nextval('public."Service_ID_service_seq"'::regclass);
+
+
+--
+-- TOC entry 4873 (class 0 OID 16404)
+-- Dependencies: 216
+-- Data for Name: Automobile; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Automobile" ("Engine_number", "Year_of_vehicle", "Colour", "State_number", "ID_client", "ID_auto", "ID_model") FROM stdin;
+12345     	2022	Red       	ABC123    	2	2	2
+67890     	2021	Blue      	XYZ789    	3	3	3
+54321     	2023	Black     	DEF456    	4	4	4
+98765     	2020	White     	LMN789    	5	5	5
+11111     	2022	Silver    	OPQ123    	6	6	6
+22222     	2020	Green     	RST456    	7	7	7
+33333     	2023	Yellow    	UVW789    	8	8	8
+44444     	2021	Gray      	XYZ123    	9	9	9
+55555     	2022	Orange    	ABC789    	10	10	10
+66666     	2020	Purple    	DEF123    	11	11	11
+1234      	2022	Blue\n     	МЩ999Н    	1	1	1
+\.
+
+
+--
+-- TOC entry 4875 (class 0 OID 16424)
+-- Dependencies: 218
+-- Data for Name: Car_workshop; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Car_workshop" ("Address", "City", "ID_car_workshop") FROM stdin;
+Lomonosova, 9                                     	Saint-Petersburg\n   	1
+123 Главная улица                                 	Москва              	2
+456 Пушкина улица                                 	Санкт-Петербург     	3
+789 Ленина улица                                  	Екатеринбург        	4
+101 Гагарина улица                                	Новосибирск         	5
+222 Волгоградская улица                           	Волгоград           	6
+333 Кирова улица                                  	Казань              	7
+444 Ленинградская улица                           	Самара              	8
+555 Пролетарская улица                            	Ростов-на-Дону      	9
+666 Труда улица                                   	Пермь               	10
+777 Комсомольская улица                           	Омск                	11
+\.
+
+
+--
+-- TOC entry 4872 (class 0 OID 16399)
+-- Dependencies: 215
+-- Data for Name: Client; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Client" ("Full_name", "Phone", "Email", "ID_client") FROM stdin;
+Ananiev Nikita                                    	89218975555         	nikita@gmail.com\n             	1
+Ospelnikov Alexey                                 	89215674444         	alexey@gmail.com              	2
+Иван Петров                                       	12345678901         	ivan@email.com                	3
+Мария Сидорова                                    	55555555555         	maria@email.com               	4
+Андрей Иванов                                     	99999999999         	andrey@email.com              	5
+Наталья Козлова                                   	77777777777         	\N	6
+Анна Краснова                                     	88888888888         	anna@email.com                	8
+Павел Морозов                                     	77788899900         	pavel@email.com               	9
+Елена Попова                                      	44455566677         	elena@email.com               	10
+Ольга Григорьева                                  	11122233344         	olga@email.com                	12
+Нина Игнатьева                                    	33366699911         	nina@email.com                	13
+Katherine Jenkins                                 	+1-799-216-3601x0789	charles80@example.org         	14
+Martin Robinson                                   	928-263-4386        	apoole@example.net            	15
+Jenna Allen                                       	+1-711-814-9816     	grahamhayden@example.org      	16
+Tammy Cook                                        	(517)692-5346x19846 	jonathan21@example.com        	17
+Antonio May                                       	2572421579          	sara19@example.net            	18
+Ryan Weaver                                       	298.341.5725x0714   	zharmon@example.com           	19
+Renee Woods                                       	+1-208-845-0991x429 	michael06@example.org         	20
+Денис Смирнов                                     	89218975555         	denis@email.com               	7
+Сергей Васильев                                   	89218975555         	sergey@email.com              	11
+\.
+
+
+--
+-- TOC entry 4879 (class 0 OID 16459)
+-- Dependencies: 222
+-- Data for Name: Contract; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Contract" ("Order_date", "Order_status", "Payment_status", "Date_of_acceptance_for_repair", "Scheduled_date_end_of_repair", "ID_client", "ID_auto", "ID_car_workshop", "ID_contract", "Actual_date_end_of_repair") FROM stdin;
+2023-10-10	Заказан   	Оплачен   	2023-10-12	2023-10-15	2	2	2	2	2023-10-16
+2023-10-11	Заказан   	Не оплачен	2023-10-13	2023-10-16	3	3	3	3	\N
+2023-10-12	В процессе	Оплачен   	2023-10-14	2023-10-17	4	4	2	4	\N
+2023-10-13	Заказан   	Оплачен   	2023-10-15	2023-10-18	5	5	3	5	\N
+2023-10-14	В процессе	Оплачен   	2023-10-16	2023-10-19	6	6	2	6	\N
+2023-10-15	Заказан   	Не оплачен	2023-10-17	2023-10-20	7	7	3	7	\N
+2023-10-16	В процессе	Оплачен   	2023-10-18	2023-10-21	8	8	2	8	\N
+2023-10-17	Завершен  	Оплачен   	2023-10-19	2023-10-22	9	9	3	9	2023-10-23
+2023-10-18	В процессе	Не оплачен	2023-10-20	2023-10-23	10	10	2	10	\N
+2023-10-19	Заказан   	Оплачен   	2023-10-21	2023-10-24	11	11	3	11	\N
+2023-10-24	Заказан   	Не оплачен	2023-10-24	2023-11-24	1	1	1	1	\N
+\.
+
+
+--
+-- TOC entry 4882 (class 0 OID 16505)
+-- Dependencies: 225
+-- Data for Name: Detail; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Detail" ("Name", "Price", "Country_of_manufacturer", "ID_detail") FROM stdin;
+Wheel Mercedes      	25000	Germany             	1
+Запасное колесо     	45613	Россия              	2
+Тормозные колодки   	17289	Германия            	3
+Масляный фильтр     	13993	Китай               	4
+Свеча зажигания     	40027	США                 	5
+Воздушный фильтр    	12493	Германия            	6
+Моторное масло      	46395	Россия              	7
+Антифриз            	17957	Китай               	8
+Топливный фильтр    	20618	Германия            	9
+Ремень ГРМ          	28848	Россия              	10
+Передний фонарь     	19397	Германия            	11
+\.
+
+
+--
+-- TOC entry 4881 (class 0 OID 16492)
+-- Dependencies: 224
+-- Data for Name: Detail_in_service; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Detail_in_service" ("Number_of_details", "Supplier_of_details", "ID_detail", "ID_service", "ID_contract", "ID_detail_in_service") FROM stdin;
+2	Client         	1	1	1	1
+2	Бош            	3	3	2	2
+1	Mann           	4	5	3	3
+1	Bosch          	5	5	3	4
+1	Mann           	6	5	3	5
+5	Castrol        	7	5	3	6
+1	Valvoline      	8	8	4	7
+1	Bosch          	9	9	5	8
+1	Gates          	10	7	6	9
+1	Hella          	11	6	7	10
+1	Bosch          	5	5	8	11
+\.
+
+
+--
+-- TOC entry 4880 (class 0 OID 16479)
+-- Dependencies: 223
+-- Data for Name: Distribution_of_work; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Distribution_of_work" ("Status", "Start_date", "Scheduled_end_date", "Actual_end_date", "ID_service", "ID_contract", "ID_destribution_of_work") FROM stdin;
+Pending             	2023-10-24	2023-11-24	\N	1	1	1
+Scheduled           	2023-10-25	2023-10-26	\N	5	5	2
+Scheduled           	2023-10-27	2023-10-28	\N	6	6	3
+In Progress         	2023-10-29	2023-10-30	\N	5	7	4
+Scheduled           	2023-10-30	2023-10-31	\N	6	8	5
+In Progress         	2023-11-01	2023-11-02	\N	7	9	6
+In Progress         	2023-11-03	2023-11-04	\N	8	10	7
+Scheduled           	2023-11-05	2023-11-06	\N	9	11	8
+In Progress         	2023-11-06	2023-11-07	\N	10	4	9
+In Progress         	2023-11-08	2023-11-09	\N	11	3	10
+In Progress         	2023-11-10	2023-11-11	\N	5	2	11
+\.
+
+
+--
+-- TOC entry 4876 (class 0 OID 16429)
+-- Dependencies: 219
+-- Data for Name: Employee; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Employee" ("Full_name", "Phone", "Email", "ID_job_position", "ID_car_workshop", "ID_employee") FROM stdin;
+Yaroslav Sahno                                    	89991238866	sahno@gmail.com     	1	1	1
+Иван Петров                                       	12345678901	ivan@example.com    	2	2	2
+Елена Смирнова                                    	98765432101	elena@example.com   	3	3	3
+Алексей Иванов                                    	11122233344	alex@example.com    	4	2	4
+Ольга Козлова                                     	55566677788	olga@example.com    	5	3	5
+Максим Соколов                                    	99900011122	max@example.com     	6	2	6
+Анна Павлова                                      	33344455566	anna@example.com    	7	3	7
+Петр Михайлов                                     	77788899911	peter@example.com   	8	2	8
+Евгения Никитина                                  	12312312312	evgenia@example.com 	9	3	9
+Дмитрий Андреев                                   	45645645678	dmitry@example.com  	10	2	10
+Наталья Кузнецова                                 	78978978900	natalia@example.com 	11	3	11
+\.
+
+
+--
+-- TOC entry 4874 (class 0 OID 16419)
+-- Dependencies: 217
+-- Data for Name: Job_position; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Job_position" ("Name", "Specialisation", "Employee_discharge", "Salary", "ID_job_position") FROM stdin;
+Manager             	Communication       	2	33000	1
+Мастер-механик      	Автомеханика        	10	60000	2
+Слесарь-сантехник   	Автоэлектрика       	5	55000	3
+Мастер-краскопульт  	Кузовной ремонт     	7	62000	4
+Автоинспектор       	Диагностика         	8	58000	5
+Мастер-шиномонтажник	Шиномонтаж          	3	54000	6
+Автослесарь         	Общий ремонт        	6	58000	7
+Диагност-техник     	Диагностика         	5	62000	8
+Кузовщик            	Кузовной ремонт     	7	60000	9
+Шиномонтажник       	Шиномонтаж          	6	54000	10
+Автомаляр           	Кузовной ремонт     	4	62000	11
+\.
+
+
+--
+-- TOC entry 4877 (class 0 OID 16444)
+-- Dependencies: 220
+-- Data for Name: Model; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Model" ("Car_brand", "Country_of_production", "Model", "Car_power", "ID_model") FROM stdin;
+Mercedes       	Germany        	S-class        	500	1
+Toyota         	Japan          	Camry          	200	2
+Honda          	Japan          	Civic          	150	3
+Ford           	USA            	Mustang        	350	4
+Volkswagen     	Germany        	Golf           	120	5
+Hyundai        	South Korea    	Elantra        	140	6
+Chevrolet      	USA            	Cruze          	130	7
+Nissan         	Japan          	Altima         	180	8
+Mercedes-Benz  	Germany        	E-Class        	250	9
+BMW            	Germany        	3 Series       	220	10
+Lexus          	Japan          	RX             	260	11
+Audi           	Germany        	A4             	200	12
+\.
+
+
+--
+-- TOC entry 4878 (class 0 OID 16454)
+-- Dependencies: 221
+-- Data for Name: Service; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Service" ("Type_of_repair", "Category_repair", price, "ID_service") FROM stdin;
+Wheel reapir                                      	Замена суппортов                                  	8000	1
+Замена масла                                      	Техническое обслуживание                          	50	2
+Ремонт тормозной системы                          	Ремонт                                            	150	3
+Замена сцепления                                  	Ремонт                                            	200	4
+Диагностика двигателя                             	Техническое обслуживание                          	80	5
+Замена глушителя                                  	Ремонт                                            	120	6
+Замена ремня ГРМ                                  	Техническое обслуживание                          	100	7
+Ремонт электрики                                  	Ремонт                                            	90	8
+Замена аккумулятора                               	Техническое обслуживание                          	60	9
+Ремонт подвески                                   	Ремонт                                            	180	10
+Замена фильтра воздушного очистителя              	Техническое обслуживание                          	40	11
+\.
+
+
+--
+-- TOC entry 4910 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: Automobile_ID_auto_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Automobile_ID_auto_seq"', 1, false);
+
+
+--
+-- TOC entry 4911 (class 0 OID 0)
+-- Dependencies: 230
+-- Name: Car_workshop_ID_car_workshop_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Car_workshop_ID_car_workshop_seq"', 1, true);
+
+
+--
+-- TOC entry 4912 (class 0 OID 0)
+-- Dependencies: 226
+-- Name: Client_ID_client_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Client_ID_client_seq"', 2, true);
+
+
+--
+-- TOC entry 4913 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: Contract_ID_contract_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Contract_ID_contract_seq"', 1, true);
+
+
+--
+-- TOC entry 4914 (class 0 OID 0)
+-- Dependencies: 232
+-- Name: Detail_ID_detail_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Detail_ID_detail_seq"', 1, true);
+
+
+--
+-- TOC entry 4915 (class 0 OID 0)
+-- Dependencies: 235
+-- Name: Detail_in_service_ID_detail_in_service_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Detail_in_service_ID_detail_in_service_seq"', 1, true);
+
+
+--
+-- TOC entry 4916 (class 0 OID 0)
+-- Dependencies: 236
+-- Name: Distribution_of_work_ID_destribution_of_work_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Distribution_of_work_ID_destribution_of_work_seq"', 1, true);
+
+
+--
+-- TOC entry 4917 (class 0 OID 0)
+-- Dependencies: 231
+-- Name: Employee_ID_employee_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Employee_ID_employee_seq"', 2, true);
+
+
+--
+-- TOC entry 4918 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: Job_position_ID_job_position_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Job_position_ID_job_position_seq"', 1, true);
+
+
+--
+-- TOC entry 4919 (class 0 OID 0)
+-- Dependencies: 228
+-- Name: Model_ID_model_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Model_ID_model_seq"', 1, false);
+
+
+--
+-- TOC entry 4920 (class 0 OID 0)
+-- Dependencies: 233
+-- Name: Service_ID_service_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Service_ID_service_seq"', 1, true);
+
+
+--
+-- TOC entry 4698 (class 2606 OID 16538)
+-- Name: Automobile Automobile_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Automobile"
+    ADD CONSTRAINT "Automobile_pkey" PRIMARY KEY ("ID_auto");
+
+
+--
+-- TOC entry 4702 (class 2606 OID 16574)
+-- Name: Car_workshop Car_workshop_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Car_workshop"
+    ADD CONSTRAINT "Car_workshop_pkey" PRIMARY KEY ("ID_car_workshop");
+
+
+--
+-- TOC entry 4696 (class 2606 OID 16521)
+-- Name: Client Client_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Client"
+    ADD CONSTRAINT "Client_pkey" PRIMARY KEY ("ID_client");
+
+
+--
+-- TOC entry 4710 (class 2606 OID 16628)
+-- Name: Contract Contract_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Contract"
+    ADD CONSTRAINT "Contract_pkey" PRIMARY KEY ("ID_contract");
+
+
+--
+-- TOC entry 4714 (class 2606 OID 16664)
+-- Name: Detail_in_service Detail_in_service_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Detail_in_service"
+    ADD CONSTRAINT "Detail_in_service_pkey" PRIMARY KEY ("ID_detail_in_service");
+
+
+--
+-- TOC entry 4716 (class 2606 OID 16599)
+-- Name: Detail Detail_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Detail"
+    ADD CONSTRAINT "Detail_pkey" PRIMARY KEY ("ID_detail");
+
+
+--
+-- TOC entry 4712 (class 2606 OID 16672)
+-- Name: Distribution_of_work Distribution_of_work_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Distribution_of_work"
+    ADD CONSTRAINT "Distribution_of_work_pkey" PRIMARY KEY ("ID_destribution_of_work");
+
+
+--
+-- TOC entry 4704 (class 2606 OID 16592)
+-- Name: Employee Employee_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Employee"
+    ADD CONSTRAINT "Employee_pkey" PRIMARY KEY ("ID_employee");
+
+
+--
+-- TOC entry 4700 (class 2606 OID 16562)
+-- Name: Job_position Job_position_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Job_position"
+    ADD CONSTRAINT "Job_position_pkey" PRIMARY KEY ("ID_job_position");
+
+
+--
+-- TOC entry 4706 (class 2606 OID 16550)
+-- Name: Model Model_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Model"
+    ADD CONSTRAINT "Model_pkey" PRIMARY KEY ("ID_model");
+
+
+--
+-- TOC entry 4708 (class 2606 OID 16611)
+-- Name: Service Service_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Service"
+    ADD CONSTRAINT "Service_pkey" PRIMARY KEY ("ID_service");
+
+
+--
+-- TOC entry 4721 (class 2606 OID 16539)
+-- Name: Contract ID_auto; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Contract"
+    ADD CONSTRAINT "ID_auto" FOREIGN KEY ("ID_auto") REFERENCES public."Automobile"("ID_auto") NOT VALID;
+
+
+--
+-- TOC entry 4722 (class 2606 OID 16576)
+-- Name: Contract ID_car_workshop; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Contract"
+    ADD CONSTRAINT "ID_car_workshop" FOREIGN KEY ("ID_car_workshop") REFERENCES public."Car_workshop"("ID_car_workshop") NOT VALID;
+
+
+--
+-- TOC entry 4719 (class 2606 OID 16581)
+-- Name: Employee ID_car_workshop; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Employee"
+    ADD CONSTRAINT "ID_car_workshop" FOREIGN KEY ("ID_car_workshop") REFERENCES public."Car_workshop"("ID_car_workshop") NOT VALID;
+
+
+--
+-- TOC entry 4717 (class 2606 OID 16522)
+-- Name: Automobile ID_client; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Automobile"
+    ADD CONSTRAINT "ID_client" FOREIGN KEY ("ID_client") REFERENCES public."Client"("ID_client") NOT VALID;
+
+
+--
+-- TOC entry 4723 (class 2606 OID 16527)
+-- Name: Contract ID_client; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Contract"
+    ADD CONSTRAINT "ID_client" FOREIGN KEY ("ID_client") REFERENCES public."Client"("ID_client") NOT VALID;
+
+
+--
+-- TOC entry 4726 (class 2606 OID 16629)
+-- Name: Detail_in_service ID_contract; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Detail_in_service"
+    ADD CONSTRAINT "ID_contract" FOREIGN KEY ("ID_contract") REFERENCES public."Contract"("ID_contract") NOT VALID;
+
+
+--
+-- TOC entry 4724 (class 2606 OID 16634)
+-- Name: Distribution_of_work ID_contract; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Distribution_of_work"
+    ADD CONSTRAINT "ID_contract" FOREIGN KEY ("ID_contract") REFERENCES public."Contract"("ID_contract") NOT VALID;
+
+
+--
+-- TOC entry 4727 (class 2606 OID 16600)
+-- Name: Detail_in_service ID_detail; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Detail_in_service"
+    ADD CONSTRAINT "ID_detail" FOREIGN KEY ("ID_detail") REFERENCES public."Detail"("ID_detail") NOT VALID;
+
+
+--
+-- TOC entry 4720 (class 2606 OID 16563)
+-- Name: Employee ID_job_position; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Employee"
+    ADD CONSTRAINT "ID_job_position" FOREIGN KEY ("ID_job_position") REFERENCES public."Job_position"("ID_job_position") NOT VALID;
+
+
+--
+-- TOC entry 4718 (class 2606 OID 16551)
+-- Name: Automobile ID_model; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Automobile"
+    ADD CONSTRAINT "ID_model" FOREIGN KEY ("ID_model") REFERENCES public."Model"("ID_model") NOT VALID;
+
+
+--
+-- TOC entry 4728 (class 2606 OID 16612)
+-- Name: Detail_in_service ID_service; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Detail_in_service"
+    ADD CONSTRAINT "ID_service" FOREIGN KEY ("ID_service") REFERENCES public."Service"("ID_service") NOT VALID;
+
+
+--
+-- TOC entry 4725 (class 2606 OID 16617)
+-- Name: Distribution_of_work ID_service; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Distribution_of_work"
+    ADD CONSTRAINT "ID_service" FOREIGN KEY ("ID_service") REFERENCES public."Service"("ID_service") NOT VALID;
+
+
+-- Completed on 2023-10-26 14:10:34
+
+--
+-- PostgreSQL database dump complete
+--
+
