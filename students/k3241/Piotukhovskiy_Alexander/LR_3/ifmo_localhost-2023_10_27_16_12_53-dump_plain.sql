@@ -17,15 +17,15 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: itmo; Type: DATABASE; Schema: -; Owner: postgres
+-- Name: ifmo; Type: DATABASE; Schema: -; Owner: postgres
 --
 
-CREATE DATABASE itmo WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'Russian_Russia.1251';
+CREATE DATABASE ifmo WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'Russian_Russia.1251';
 
 
-ALTER DATABASE itmo OWNER TO postgres;
+ALTER DATABASE ifmo OWNER TO postgres;
 
-\connect itmo
+\connect ifmo
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -52,7 +52,6 @@ ALTER SCHEMA lab3 OWNER TO pg_database_owner;
 --
 
 COMMENT ON SCHEMA lab3 IS 'standard lab3 schema';
-
 
 --
 -- Name: bus_repair_status; Type: TYPE; Schema: lab3; Owner: postgres
@@ -81,6 +80,33 @@ CREATE TYPE lab3.office_status AS ENUM (
 
 
 ALTER TYPE lab3.office_status OWNER TO postgres;
+
+--
+-- Name: ticket_status; Type: TYPE; Schema: lab3; Owner: postgres
+--
+
+CREATE TYPE lab3.ticket_status AS ENUM (
+    'pending',
+    'paid',
+    'canceled'
+);
+
+
+ALTER TYPE lab3.ticket_status OWNER TO postgres;
+
+--
+-- Name: trip_status; Type: TYPE; Schema: lab3; Owner: postgres
+--
+
+CREATE TYPE lab3.trip_status AS ENUM (
+    'on schedule',
+    'delayed',
+    'canceled',
+    'rescheduled'
+);
+
+
+ALTER TYPE lab3.trip_status OWNER TO postgres;
 
 --
 -- Name: user_sex; Type: TYPE; Schema: lab3; Owner: postgres
@@ -339,6 +365,7 @@ CREATE TABLE lab3.ticket (
     trip_id bigint NOT NULL,
     departure_destination bigint NOT NULL,
     arrival_destination bigint NOT NULL,
+    ticket_status lab3.ticket_status DEFAULT 'pending'::lab3.ticket_status NOT NULL,
     CONSTRAINT check_discount CHECK ((discount >= 0)),
     CONSTRAINT check_price CHECK ((price > 0))
 );
@@ -393,9 +420,12 @@ ALTER TABLE lab3.ticket ALTER COLUMN ticket_id ADD GENERATED ALWAYS AS IDENTITY 
 
 CREATE TABLE lab3.trip (
     trip_id bigint NOT NULL,
-    date_of_trip date NOT NULL,
+    date_of_departure timestamp without time zone NOT NULL,
     schedule_id bigint NOT NULL,
-    bus_number character varying(10) NOT NULL
+    bus_number character varying(10) NOT NULL,
+    trip_status lab3.trip_status NOT NULL,
+    date_of_arrival timestamp without time zone,
+    CONSTRAINT check_departure_and_arrival CHECK ((date_of_departure >= date_of_arrival))
 );
 
 
@@ -535,11 +565,11 @@ COPY lab3.station_in_trip (id, station_id, "order", departure_time, arrival_time
 -- Data for Name: ticket; Type: TABLE DATA; Schema: lab3; Owner: postgres
 --
 
-COPY lab3.ticket (ticket_id, seat, price, discount, passenger_id, office_id, trip_id, departure_destination, arrival_destination) FROM stdin;
-1	1	13	0	7	0	1	1	2
-2	-1	8	0	8	0	1	1	3
-3	2	13	0	9	0	1	1	2
-4	-1	10	0	10	2	1	3	2
+COPY lab3.ticket (ticket_id, seat, price, discount, passenger_id, office_id, trip_id, departure_destination, arrival_destination, ticket_status) FROM stdin;
+4	-1	10	0	10	2	1	3	2	pending
+1	1	13	0	7	0	1	1	2	paid
+2	-1	8	0	8	0	1	1	3	canceled
+3	2	13	0	9	0	1	1	2	paid
 \.
 
 
@@ -559,10 +589,10 @@ COPY lab3.ticket_office (office_id, status, address) FROM stdin;
 -- Data for Name: trip; Type: TABLE DATA; Schema: lab3; Owner: postgres
 --
 
-COPY lab3.trip (trip_id, date_of_trip, schedule_id, bus_number) FROM stdin;
-1	2023-10-22	1	e947at147
-2	2023-10-22	2	e947at147
-3	2023-10-23	3	t665at12
+COPY lab3.trip (trip_id, date_of_departure, schedule_id, bus_number, trip_status, date_of_arrival) FROM stdin;
+1	2023-10-22 03:00:00	1	e947at147	delayed	2023-10-22 01:00:00
+2	2023-10-22 01:00:00	2	e947at147	canceled	2023-10-22 00:00:00
+3	2023-10-23 02:00:00	3	t665at12	on schedule	2023-10-22 02:00:00
 \.
 
 
