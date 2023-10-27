@@ -5,7 +5,7 @@
 -- Dumped from database version 16.0
 -- Dumped by pg_dump version 16.0
 
--- Started on 2023-10-25 00:45:25
+-- Started on 2023-10-27 17:09:26
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -18,6 +18,7 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+DROP DATABASE IF EXISTS "Sport_club";
 --
 -- TOC entry 4987 (class 1262 OID 16561)
 -- Name: Sport_club; Type: DATABASE; Schema: -; Owner: postgres
@@ -153,9 +154,7 @@ CREATE TABLE competition.competition (
     category character varying(20) NOT NULL,
     type_competition character varying(20) NOT NULL,
     status character varying(10) NOT NULL,
-    prize_place numeric NOT NULL,
     CONSTRAINT " check_date_time" CHECK ((date_time >= CURRENT_TIMESTAMP)),
-    CONSTRAINT check_prize_place CHECK (((prize_place >= (1)::numeric) AND ((3)::numeric >= prize_place))),
     CONSTRAINT check_status CHECK (((status)::text = ANY (ARRAY[('passed'::character varying)::text, ('not_passed'::character varying)::text, ('in_progress'::character varying)::text])))
 );
 
@@ -176,6 +175,8 @@ CREATE TABLE competition.competition_conducting (
     status character varying(10) NOT NULL,
     coachs_points integer NOT NULL,
     sportsmans_points integer NOT NULL,
+    date_time timestamp without time zone NOT NULL,
+    prize_place numeric,
     CONSTRAINT check_coachs_points CHECK ((coachs_points >= 0)),
     CONSTRAINT check_sportsmans_points CHECK ((sportsmans_points >= 0)),
     CONSTRAINT check_status CHECK (((status)::text = ANY (ARRAY[('passed'::character varying)::text, ('not_passed'::character varying)::text, ('in_progress'::character varying)::text])))
@@ -196,6 +197,7 @@ CREATE TABLE competition.qualifying (
     coach_code integer NOT NULL,
     sport_code integer NOT NULL,
     status character varying(10) NOT NULL,
+    date_time timestamp without time zone NOT NULL,
     CONSTRAINT check_status CHECK (((status)::text = ANY (ARRAY[('passed'::character varying)::text, ('not_passed'::character varying)::text, ('in_progress'::character varying)::text])))
 );
 
@@ -440,29 +442,29 @@ INSERT INTO coach.coach_rating VALUES (43840, '2029-03-01', '2029-03-16', 32250,
 -- Data for Name: competition; Type: TABLE DATA; Schema: competition; Owner: postgres
 --
 
-INSERT INTO competition.competition VALUES (273, 'Donald', '2024-11-01 00:00:01', 'Corey', 'Ashley', 'Timothy', 'passed', 3);
-INSERT INTO competition.competition VALUES (12273, 'James', '2024-11-02 00:00:01', 'Stephanie', 'Faith', 'Rachel', 'passed', 2);
-INSERT INTO competition.competition VALUES (14145, 'Scott', '2024-11-03 00:00:01', 'Cheryl', 'Maxwell', 'Brittany', 'passed', 1);
-INSERT INTO competition.competition VALUES (19818, 'David', '2024-11-04 00:00:01', 'Julie', 'Jerry', 'Dawn', 'passed', 1);
-INSERT INTO competition.competition VALUES (28225, 'Rebecca', '2024-11-05 00:00:01', 'Angel', 'Lisa', 'Kyle', 'passed', 3);
-INSERT INTO competition.competition VALUES (30216, 'Kevin', '2024-11-06 00:00:01', 'Kevin', 'Tyler', 'Joseph', 'passed', 2);
-INSERT INTO competition.competition VALUES (30259, 'Richard', '2024-11-07 00:00:01', 'Joseph', 'Rodney', 'Frank', 'passed', 2);
-INSERT INTO competition.competition VALUES (30775, 'Amber', '2024-11-08 00:00:01', 'Jane', 'Tyler', 'Megan', 'passed', 3);
-INSERT INTO competition.competition VALUES (41591, 'Joseph', '2024-11-09 00:00:01', 'William', 'Courtney', 'Stephanie', 'passed', 1);
-INSERT INTO competition.competition VALUES (42472, 'Tracy', '2024-11-10 00:00:01', 'Barbara', 'Benjamin', 'Daniel', 'passed', 3);
-INSERT INTO competition.competition VALUES (45408, 'Zachary', '2024-11-11 00:00:01', 'Daniel', 'Michael', 'Marissa', 'passed', 2);
-INSERT INTO competition.competition VALUES (51498, 'Sara', '2024-11-12 00:00:01', 'Daniel', 'Timothy', 'Jade', 'passed', 3);
-INSERT INTO competition.competition VALUES (57734, 'Katherine', '2024-11-13 00:00:01', 'Michelle', 'Gabriel', 'Henry', 'passed', 1);
-INSERT INTO competition.competition VALUES (69037, 'Susan', '2024-11-14 00:00:01', 'Taylor', 'Dawn', 'Kelly', 'passed', 1);
-INSERT INTO competition.competition VALUES (73378, 'Dennis', '2024-11-15 00:00:01', 'Bobby', 'Adam', 'Erika', 'passed', 2);
-INSERT INTO competition.competition VALUES (74354, 'Rebecca', '2024-11-16 00:00:01', 'Brittany', 'Heather', 'William', 'passed', 2);
-INSERT INTO competition.competition VALUES (74463, 'Lorraine', '2024-11-17 00:00:01', 'Shawn', 'Rachel', 'Alexandra', 'passed', 2);
-INSERT INTO competition.competition VALUES (77755, 'Ian', '2024-11-18 00:00:01', 'Daniel', 'Douglas', 'Mario', 'passed', 1);
-INSERT INTO competition.competition VALUES (78537, 'Fernando', '2024-11-19 00:00:01', 'Martha', 'Tanya', 'Desiree', 'passed', 1);
-INSERT INTO competition.competition VALUES (79088, 'Zachary', '2024-11-20 00:00:01', 'Thomas', 'Melissa', 'Christopher', 'passed', 2);
-INSERT INTO competition.competition VALUES (81656, 'Julia', '2024-11-21 00:00:01', 'Denise', 'Lisa', 'Brian', 'passed', 3);
-INSERT INTO competition.competition VALUES (85398, 'Leslie', '2024-11-22 00:00:01', 'Adrienne', 'Christopher', 'Matthew', 'passed', 1);
-INSERT INTO competition.competition VALUES (92843, 'Jacob', '2024-11-23 00:00:01', 'Lonnie', 'Michael', 'Lance', 'passed', 3);
+INSERT INTO competition.competition VALUES (273, 'Donald', '2024-11-01 00:00:01', 'Corey', 'Ashley', 'Timothy', 'passed');
+INSERT INTO competition.competition VALUES (12273, 'James', '2024-11-02 00:00:01', 'Stephanie', 'Faith', 'Rachel', 'passed');
+INSERT INTO competition.competition VALUES (14145, 'Scott', '2024-11-03 00:00:01', 'Cheryl', 'Maxwell', 'Brittany', 'passed');
+INSERT INTO competition.competition VALUES (19818, 'David', '2024-11-04 00:00:01', 'Julie', 'Jerry', 'Dawn', 'passed');
+INSERT INTO competition.competition VALUES (28225, 'Rebecca', '2024-11-05 00:00:01', 'Angel', 'Lisa', 'Kyle', 'passed');
+INSERT INTO competition.competition VALUES (30216, 'Kevin', '2024-11-06 00:00:01', 'Kevin', 'Tyler', 'Joseph', 'passed');
+INSERT INTO competition.competition VALUES (30259, 'Richard', '2024-11-07 00:00:01', 'Joseph', 'Rodney', 'Frank', 'passed');
+INSERT INTO competition.competition VALUES (30775, 'Amber', '2024-11-08 00:00:01', 'Jane', 'Tyler', 'Megan', 'passed');
+INSERT INTO competition.competition VALUES (41591, 'Joseph', '2024-11-09 00:00:01', 'William', 'Courtney', 'Stephanie', 'passed');
+INSERT INTO competition.competition VALUES (42472, 'Tracy', '2024-11-10 00:00:01', 'Barbara', 'Benjamin', 'Daniel', 'passed');
+INSERT INTO competition.competition VALUES (45408, 'Zachary', '2024-11-11 00:00:01', 'Daniel', 'Michael', 'Marissa', 'passed');
+INSERT INTO competition.competition VALUES (51498, 'Sara', '2024-11-12 00:00:01', 'Daniel', 'Timothy', 'Jade', 'passed');
+INSERT INTO competition.competition VALUES (57734, 'Katherine', '2024-11-13 00:00:01', 'Michelle', 'Gabriel', 'Henry', 'passed');
+INSERT INTO competition.competition VALUES (69037, 'Susan', '2024-11-14 00:00:01', 'Taylor', 'Dawn', 'Kelly', 'passed');
+INSERT INTO competition.competition VALUES (73378, 'Dennis', '2024-11-15 00:00:01', 'Bobby', 'Adam', 'Erika', 'passed');
+INSERT INTO competition.competition VALUES (74354, 'Rebecca', '2024-11-16 00:00:01', 'Brittany', 'Heather', 'William', 'passed');
+INSERT INTO competition.competition VALUES (74463, 'Lorraine', '2024-11-17 00:00:01', 'Shawn', 'Rachel', 'Alexandra', 'passed');
+INSERT INTO competition.competition VALUES (77755, 'Ian', '2024-11-18 00:00:01', 'Daniel', 'Douglas', 'Mario', 'passed');
+INSERT INTO competition.competition VALUES (78537, 'Fernando', '2024-11-19 00:00:01', 'Martha', 'Tanya', 'Desiree', 'passed');
+INSERT INTO competition.competition VALUES (79088, 'Zachary', '2024-11-20 00:00:01', 'Thomas', 'Melissa', 'Christopher', 'passed');
+INSERT INTO competition.competition VALUES (81656, 'Julia', '2024-11-21 00:00:01', 'Denise', 'Lisa', 'Brian', 'passed');
+INSERT INTO competition.competition VALUES (85398, 'Leslie', '2024-11-22 00:00:01', 'Adrienne', 'Christopher', 'Matthew', 'passed');
+INSERT INTO competition.competition VALUES (92843, 'Jacob', '2024-11-23 00:00:01', 'Lonnie', 'Michael', 'Lance', 'passed');
 
 
 --
@@ -471,29 +473,29 @@ INSERT INTO competition.competition VALUES (92843, 'Jacob', '2024-11-23 00:00:01
 -- Data for Name: competition_conducting; Type: TABLE DATA; Schema: competition; Owner: postgres
 --
 
-INSERT INTO competition.competition_conducting VALUES (61227, 273, 94897, 67914, 11254, 'passed', 62265, 58016);
-INSERT INTO competition.competition_conducting VALUES (31426, 12273, 89506, 40948, 90021, 'passed', 79788, 21722);
-INSERT INTO competition.competition_conducting VALUES (22705, 14145, 28770, 87217, 26001, 'passed', 56754, 25344);
-INSERT INTO competition.competition_conducting VALUES (13425, 19818, 29165, 33555, 28799, 'passed', 43544, 27583);
-INSERT INTO competition.competition_conducting VALUES (40010, 28225, 6609, 47034, 42995, 'passed', 18079, 45115);
-INSERT INTO competition.competition_conducting VALUES (74699, 30216, 1013, 44882, 83957, 'passed', 75145, 12238);
-INSERT INTO competition.competition_conducting VALUES (89076, 30259, 5411, 17760, 33879, 'passed', 87095, 45463);
-INSERT INTO competition.competition_conducting VALUES (69090, 30775, 8652, 64670, 89965, 'passed', 15109, 97472);
-INSERT INTO competition.competition_conducting VALUES (59975, 41591, 3128, 76196, 2627, 'passed', 56683, 23132);
-INSERT INTO competition.competition_conducting VALUES (73675, 42472, 68731, 46511, 10380, 'passed', 3231, 77561);
-INSERT INTO competition.competition_conducting VALUES (63228, 45408, 34978, 24866, 34869, 'passed', 20853, 33916);
-INSERT INTO competition.competition_conducting VALUES (80741, 51498, 80315, 39524, 38644, 'passed', 35372, 81620);
-INSERT INTO competition.competition_conducting VALUES (69499, 57734, 44220, 86978, 35655, 'passed', 47858, 37273);
-INSERT INTO competition.competition_conducting VALUES (16623, 69037, 66895, 70473, 49496, 'passed', 68526, 68522);
-INSERT INTO competition.competition_conducting VALUES (98023, 73378, 75890, 33851, 62674, 'passed', 36224, 47487);
-INSERT INTO competition.competition_conducting VALUES (63055, 74354, 39263, 5199, 34894, 'passed', 92305, 75774);
-INSERT INTO competition.competition_conducting VALUES (74972, 74463, 39395, 21678, 15475, 'passed', 74484, 62134);
-INSERT INTO competition.competition_conducting VALUES (58330, 77755, 85896, 37053, 40164, 'passed', 31289, 82280);
-INSERT INTO competition.competition_conducting VALUES (71236, 78537, 91008, 64427, 68509, 'passed', 89278, 8276);
-INSERT INTO competition.competition_conducting VALUES (54006, 79088, 63004, 15643, 81102, 'passed', 51079, 56622);
-INSERT INTO competition.competition_conducting VALUES (88192, 81656, 21045, 56776, 21805, 'passed', 66072, 12950);
-INSERT INTO competition.competition_conducting VALUES (10064, 85398, 79500, 20413, 96165, 'passed', 41568, 97423);
-INSERT INTO competition.competition_conducting VALUES (12362, 92843, 4286, 32250, 50345, 'passed', 90764, 90904);
+INSERT INTO competition.competition_conducting VALUES (10064, 85398, 79500, 20413, 96165, 'passed', 41568, 97423, '2024-01-01 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (12362, 92843, 4286, 32250, 50345, 'passed', 90764, 90904, '2024-01-02 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (13425, 19818, 29165, 33555, 28799, 'passed', 43544, 27583, '2024-01-03 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (16623, 69037, 66895, 70473, 49496, 'passed', 68526, 68522, '2024-01-04 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (22705, 14145, 28770, 87217, 26001, 'passed', 56754, 25344, '2024-01-05 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (31426, 12273, 89506, 40948, 90021, 'passed', 79788, 21722, '2024-01-06 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (40010, 28225, 6609, 47034, 42995, 'passed', 18079, 45115, '2024-01-07 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (54006, 79088, 63004, 15643, 81102, 'passed', 51079, 56622, '2024-01-08 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (58330, 77755, 85896, 37053, 40164, 'passed', 31289, 82280, '2024-01-09 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (59975, 41591, 3128, 76196, 2627, 'passed', 56683, 23132, '2024-01-10 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (61227, 273, 94897, 67914, 11254, 'passed', 62265, 58016, '2024-01-11 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (63055, 74354, 39263, 5199, 34894, 'passed', 92305, 75774, '2024-01-12 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (63228, 45408, 34978, 24866, 34869, 'passed', 20853, 33916, '2024-01-13 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (69090, 30775, 8652, 64670, 89965, 'passed', 15109, 97472, '2024-01-14 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (69499, 57734, 44220, 86978, 35655, 'passed', 47858, 37273, '2024-01-15 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (71236, 78537, 91008, 64427, 68509, 'passed', 89278, 8276, '2024-01-16 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (73675, 42472, 68731, 46511, 10380, 'passed', 3231, 77561, '2024-01-17 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (74699, 30216, 1013, 44882, 83957, 'passed', 75145, 12238, '2024-01-12 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (74972, 74463, 39395, 21678, 15475, 'passed', 74484, 62134, '2024-01-12 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (80741, 51498, 80315, 39524, 38644, 'passed', 35372, 81620, '2024-01-12 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (88192, 81656, 21045, 56776, 21805, 'passed', 66072, 12950, '2024-01-12 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (89076, 30259, 5411, 17760, 33879, 'passed', 87095, 45463, '2024-01-12 00:00:01', 1);
+INSERT INTO competition.competition_conducting VALUES (98023, 73378, 75890, 33851, 62674, 'passed', 36224, 47487, '2024-01-12 00:00:01', 1);
 
 
 --
@@ -502,29 +504,29 @@ INSERT INTO competition.competition_conducting VALUES (12362, 92843, 4286, 32250
 -- Data for Name: qualifying; Type: TABLE DATA; Schema: competition; Owner: postgres
 --
 
-INSERT INTO competition.qualifying VALUES (86360, 94897, 273, 67914, 11254, 'passed');
-INSERT INTO competition.qualifying VALUES (30581, 89506, 12273, 40948, 90021, 'passed');
-INSERT INTO competition.qualifying VALUES (92379, 28770, 14145, 87217, 26001, 'passed');
-INSERT INTO competition.qualifying VALUES (5085, 29165, 19818, 33555, 28799, 'passed');
-INSERT INTO competition.qualifying VALUES (65325, 6609, 28225, 47034, 42995, 'passed');
-INSERT INTO competition.qualifying VALUES (32910, 1013, 30216, 44882, 83957, 'passed');
-INSERT INTO competition.qualifying VALUES (63526, 5411, 30259, 17760, 33879, 'passed');
-INSERT INTO competition.qualifying VALUES (99999, 8652, 30775, 64670, 89965, 'passed');
-INSERT INTO competition.qualifying VALUES (75793, 3128, 41591, 76196, 2627, 'passed');
-INSERT INTO competition.qualifying VALUES (25793, 68731, 42472, 46511, 10380, 'passed');
-INSERT INTO competition.qualifying VALUES (40523, 34978, 45408, 24866, 34869, 'passed');
-INSERT INTO competition.qualifying VALUES (77167, 80315, 51498, 39524, 38644, 'passed');
-INSERT INTO competition.qualifying VALUES (79827, 44220, 57734, 86978, 35655, 'passed');
-INSERT INTO competition.qualifying VALUES (79691, 66895, 69037, 70473, 49496, 'passed');
-INSERT INTO competition.qualifying VALUES (97345, 75890, 73378, 33851, 62674, 'passed');
-INSERT INTO competition.qualifying VALUES (9562, 39263, 74354, 5199, 34894, 'passed');
-INSERT INTO competition.qualifying VALUES (64671, 39395, 74463, 21678, 15475, 'passed');
-INSERT INTO competition.qualifying VALUES (48357, 85896, 77755, 37053, 40164, 'passed');
-INSERT INTO competition.qualifying VALUES (43535, 91008, 78537, 64427, 68509, 'passed');
-INSERT INTO competition.qualifying VALUES (66208, 63004, 79088, 15643, 81102, 'passed');
-INSERT INTO competition.qualifying VALUES (82373, 21045, 81656, 56776, 21805, 'passed');
-INSERT INTO competition.qualifying VALUES (21138, 79500, 85398, 20413, 96165, 'passed');
-INSERT INTO competition.qualifying VALUES (6863, 4286, 92843, 32250, 50345, 'passed');
+INSERT INTO competition.qualifying VALUES (5085, 29165, 19818, 33555, 28799, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (6863, 4286, 92843, 32250, 50345, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (9562, 39263, 74354, 5199, 34894, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (21138, 79500, 85398, 20413, 96165, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (25793, 68731, 42472, 46511, 10380, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (30581, 89506, 12273, 40948, 90021, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (32910, 1013, 30216, 44882, 83957, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (40523, 34978, 45408, 24866, 34869, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (43535, 91008, 78537, 64427, 68509, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (48357, 85896, 77755, 37053, 40164, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (63526, 5411, 30259, 17760, 33879, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (64671, 39395, 74463, 21678, 15475, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (65325, 6609, 28225, 47034, 42995, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (66208, 63004, 79088, 15643, 81102, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (75793, 3128, 41591, 76196, 2627, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (77167, 80315, 51498, 39524, 38644, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (79691, 66895, 69037, 70473, 49496, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (79827, 44220, 57734, 86978, 35655, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (82373, 21045, 81656, 56776, 21805, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (86360, 94897, 273, 67914, 11254, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (92379, 28770, 14145, 87217, 26001, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (97345, 75890, 73378, 33851, 62674, 'passed', '2024-01-12 00:00:01');
+INSERT INTO competition.qualifying VALUES (99999, 8652, 30775, 64670, 89965, 'passed', '2024-01-12 00:00:01');
 
 
 --
@@ -833,7 +835,385 @@ INSERT INTO training_information.training VALUES (97011, '2024-11-22 00:00:01', 
 INSERT INTO training_information.training VALUES (98495, '2024-11-23 00:00:01', 'passed', 89506, 40948, 90021);
 
 
--- Completed on 2023-10-25 00:45:26
+--
+-- TOC entry 4789 (class 2606 OID 16722)
+-- Name: coach_category category_pkey; Type: CONSTRAINT; Schema: coach; Owner: postgres
+--
+
+ALTER TABLE ONLY coach.coach_category
+    ADD CONSTRAINT category_pkey PRIMARY KEY (category_code);
+
+
+--
+-- TOC entry 4791 (class 2606 OID 16734)
+-- Name: coach_rating coach_rating_pkey; Type: CONSTRAINT; Schema: coach; Owner: postgres
+--
+
+ALTER TABLE ONLY coach.coach_rating
+    ADD CONSTRAINT coach_rating_pkey PRIMARY KEY (rating_code);
+
+
+--
+-- TOC entry 4767 (class 2606 OID 16642)
+-- Name: coach pk_coach_code; Type: CONSTRAINT; Schema: coach; Owner: postgres
+--
+
+ALTER TABLE ONLY coach.coach
+    ADD CONSTRAINT pk_coach_code PRIMARY KEY (coach_code);
+
+
+--
+-- TOC entry 4793 (class 2606 OID 16736)
+-- Name: coach_rating unique_coach_code; Type: CONSTRAINT; Schema: coach; Owner: postgres
+--
+
+ALTER TABLE ONLY coach.coach_rating
+    ADD CONSTRAINT unique_coach_code UNIQUE (coach_code);
+
+
+--
+-- TOC entry 4769 (class 2606 OID 16644)
+-- Name: coach unique_coaches_passport_number; Type: CONSTRAINT; Schema: coach; Owner: postgres
+--
+
+ALTER TABLE ONLY coach.coach
+    ADD CONSTRAINT unique_coaches_passport_number UNIQUE (passport_number);
+
+
+--
+-- TOC entry 4771 (class 2606 OID 16646)
+-- Name: coach unique_coaches_phone_number; Type: CONSTRAINT; Schema: coach; Owner: postgres
+--
+
+ALTER TABLE ONLY coach.coach
+    ADD CONSTRAINT unique_coaches_phone_number UNIQUE (phone_number);
+
+
+--
+-- TOC entry 4761 (class 2606 OID 24585)
+-- Name: competition_conducting check_prize_place; Type: CHECK CONSTRAINT; Schema: competition; Owner: postgres
+--
+
+ALTER TABLE competition.competition_conducting
+    ADD CONSTRAINT check_prize_place CHECK (((prize_place >= (1)::numeric) AND (prize_place <= (3)::numeric))) NOT VALID;
+
+
+--
+-- TOC entry 4803 (class 2606 OID 16823)
+-- Name: competition_conducting competition_conducting_pkey; Type: CONSTRAINT; Schema: competition; Owner: postgres
+--
+
+ALTER TABLE ONLY competition.competition_conducting
+    ADD CONSTRAINT competition_conducting_pkey PRIMARY KEY (competition_conducting_code);
+
+
+--
+-- TOC entry 4799 (class 2606 OID 16789)
+-- Name: competition competition_pkey; Type: CONSTRAINT; Schema: competition; Owner: postgres
+--
+
+ALTER TABLE ONLY competition.competition
+    ADD CONSTRAINT competition_pkey PRIMARY KEY (competition_code);
+
+
+--
+-- TOC entry 4801 (class 2606 OID 16795)
+-- Name: qualifying qualifying_pkey; Type: CONSTRAINT; Schema: competition; Owner: postgres
+--
+
+ALTER TABLE ONLY competition.qualifying
+    ADD CONSTRAINT qualifying_pkey PRIMARY KEY (qualifying_code);
+
+
+--
+-- TOC entry 4779 (class 2606 OID 16672)
+-- Name: medical_life medical_life_pkey; Type: CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.medical_life
+    ADD CONSTRAINT medical_life_pkey PRIMARY KEY (medical_life_code);
+
+
+--
+-- TOC entry 4777 (class 2606 OID 16666)
+-- Name: type_of_injury pk_injury_code; Type: CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.type_of_injury
+    ADD CONSTRAINT pk_injury_code PRIMARY KEY (injury_code);
+
+
+--
+-- TOC entry 4773 (class 2606 OID 16652)
+-- Name: sportsman sportsman_pkey; Type: CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.sportsman
+    ADD CONSTRAINT sportsman_pkey PRIMARY KEY (sportsman_code);
+
+
+--
+-- TOC entry 4783 (class 2606 OID 16691)
+-- Name: sportsman_qualification sportsman_qualification_pkey; Type: CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.sportsman_qualification
+    ADD CONSTRAINT sportsman_qualification_pkey PRIMARY KEY (qualification_code);
+
+
+--
+-- TOC entry 4785 (class 2606 OID 16708)
+-- Name: sportsman_rating sportsman_rating_pkey; Type: CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.sportsman_rating
+    ADD CONSTRAINT sportsman_rating_pkey PRIMARY KEY (rating_code);
+
+
+--
+-- TOC entry 4787 (class 2606 OID 16710)
+-- Name: sportsman_rating unique_sportsman_code; Type: CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.sportsman_rating
+    ADD CONSTRAINT unique_sportsman_code UNIQUE (sportsman_code);
+
+
+--
+-- TOC entry 4781 (class 2606 OID 16674)
+-- Name: medical_life unique_sportsman_code_medical; Type: CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.medical_life
+    ADD CONSTRAINT unique_sportsman_code_medical UNIQUE (sportsman_code);
+
+
+--
+-- TOC entry 4775 (class 2606 OID 16654)
+-- Name: sportsman unique_sportsmans_passport_number; Type: CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.sportsman
+    ADD CONSTRAINT unique_sportsmans_passport_number UNIQUE (passport_number);
+
+
+--
+-- TOC entry 4795 (class 2606 OID 16747)
+-- Name: leadership leadership_pkey; Type: CONSTRAINT; Schema: training_information; Owner: postgres
+--
+
+ALTER TABLE ONLY training_information.leadership
+    ADD CONSTRAINT leadership_pkey PRIMARY KEY (leadership_code);
+
+
+--
+-- TOC entry 4765 (class 2606 OID 16634)
+-- Name: sport_type pk_sport_code; Type: CONSTRAINT; Schema: training_information; Owner: postgres
+--
+
+ALTER TABLE ONLY training_information.sport_type
+    ADD CONSTRAINT pk_sport_code PRIMARY KEY (sport_code);
+
+
+--
+-- TOC entry 4797 (class 2606 OID 16764)
+-- Name: training training_pkey; Type: CONSTRAINT; Schema: training_information; Owner: postgres
+--
+
+ALTER TABLE ONLY training_information.training
+    ADD CONSTRAINT training_pkey PRIMARY KEY (training_code);
+
+
+--
+-- TOC entry 4810 (class 2606 OID 16723)
+-- Name: coach_category fk_coach_code; Type: FK CONSTRAINT; Schema: coach; Owner: postgres
+--
+
+ALTER TABLE ONLY coach.coach_category
+    ADD CONSTRAINT fk_coach_code FOREIGN KEY (coach_code) REFERENCES coach.coach(coach_code);
+
+
+--
+-- TOC entry 4811 (class 2606 OID 16737)
+-- Name: coach_rating fk_coach_code; Type: FK CONSTRAINT; Schema: coach; Owner: postgres
+--
+
+ALTER TABLE ONLY coach.coach_rating
+    ADD CONSTRAINT fk_coach_code FOREIGN KEY (coach_code) REFERENCES coach.coach(coach_code);
+
+
+--
+-- TOC entry 4817 (class 2606 OID 16796)
+-- Name: qualifying fk_coach_code; Type: FK CONSTRAINT; Schema: competition; Owner: postgres
+--
+
+ALTER TABLE ONLY competition.qualifying
+    ADD CONSTRAINT fk_coach_code FOREIGN KEY (coach_code) REFERENCES coach.coach(coach_code);
+
+
+--
+-- TOC entry 4821 (class 2606 OID 16824)
+-- Name: competition_conducting fk_coach_code; Type: FK CONSTRAINT; Schema: competition; Owner: postgres
+--
+
+ALTER TABLE ONLY competition.competition_conducting
+    ADD CONSTRAINT fk_coach_code FOREIGN KEY (coach_code) REFERENCES coach.coach(coach_code);
+
+
+--
+-- TOC entry 4818 (class 2606 OID 16801)
+-- Name: qualifying fk_competition_code; Type: FK CONSTRAINT; Schema: competition; Owner: postgres
+--
+
+ALTER TABLE ONLY competition.qualifying
+    ADD CONSTRAINT fk_competition_code FOREIGN KEY (competition_code) REFERENCES competition.competition(competition_code);
+
+
+--
+-- TOC entry 4822 (class 2606 OID 16829)
+-- Name: competition_conducting fk_competition_code; Type: FK CONSTRAINT; Schema: competition; Owner: postgres
+--
+
+ALTER TABLE ONLY competition.competition_conducting
+    ADD CONSTRAINT fk_competition_code FOREIGN KEY (competition_code) REFERENCES competition.competition(competition_code);
+
+
+--
+-- TOC entry 4819 (class 2606 OID 16806)
+-- Name: qualifying fk_sport_code; Type: FK CONSTRAINT; Schema: competition; Owner: postgres
+--
+
+ALTER TABLE ONLY competition.qualifying
+    ADD CONSTRAINT fk_sport_code FOREIGN KEY (sport_code) REFERENCES training_information.sport_type(sport_code);
+
+
+--
+-- TOC entry 4823 (class 2606 OID 16834)
+-- Name: competition_conducting fk_sport_code; Type: FK CONSTRAINT; Schema: competition; Owner: postgres
+--
+
+ALTER TABLE ONLY competition.competition_conducting
+    ADD CONSTRAINT fk_sport_code FOREIGN KEY (sport_code) REFERENCES training_information.sport_type(sport_code);
+
+
+--
+-- TOC entry 4820 (class 2606 OID 16811)
+-- Name: qualifying fk_sportsman_code; Type: FK CONSTRAINT; Schema: competition; Owner: postgres
+--
+
+ALTER TABLE ONLY competition.qualifying
+    ADD CONSTRAINT fk_sportsman_code FOREIGN KEY (sportsman_code) REFERENCES sportsman.sportsman(sportsman_code);
+
+
+--
+-- TOC entry 4824 (class 2606 OID 16839)
+-- Name: competition_conducting fk_sportsman_code; Type: FK CONSTRAINT; Schema: competition; Owner: postgres
+--
+
+ALTER TABLE ONLY competition.competition_conducting
+    ADD CONSTRAINT fk_sportsman_code FOREIGN KEY (sportsman_code) REFERENCES sportsman.sportsman(sportsman_code);
+
+
+--
+-- TOC entry 4805 (class 2606 OID 16675)
+-- Name: medical_life fk_injury_code; Type: FK CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.medical_life
+    ADD CONSTRAINT fk_injury_code FOREIGN KEY (injury_code) REFERENCES sportsman.type_of_injury(injury_code);
+
+
+--
+-- TOC entry 4804 (class 2606 OID 16655)
+-- Name: sportsman fk_sport_code; Type: FK CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.sportsman
+    ADD CONSTRAINT fk_sport_code FOREIGN KEY (sport_code) REFERENCES training_information.sport_type(sport_code);
+
+
+--
+-- TOC entry 4807 (class 2606 OID 16692)
+-- Name: sportsman_qualification fk_sport_code; Type: FK CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.sportsman_qualification
+    ADD CONSTRAINT fk_sport_code FOREIGN KEY (sport_code) REFERENCES training_information.sport_type(sport_code);
+
+
+--
+-- TOC entry 4806 (class 2606 OID 16680)
+-- Name: medical_life fk_sportsman_code; Type: FK CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.medical_life
+    ADD CONSTRAINT fk_sportsman_code FOREIGN KEY (sportsman_code) REFERENCES sportsman.sportsman(sportsman_code);
+
+
+--
+-- TOC entry 4808 (class 2606 OID 16697)
+-- Name: sportsman_qualification fk_sportsman_code; Type: FK CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.sportsman_qualification
+    ADD CONSTRAINT fk_sportsman_code FOREIGN KEY (sportsman_code) REFERENCES sportsman.sportsman(sportsman_code);
+
+
+--
+-- TOC entry 4809 (class 2606 OID 16711)
+-- Name: sportsman_rating fk_sportsman_code; Type: FK CONSTRAINT; Schema: sportsman; Owner: postgres
+--
+
+ALTER TABLE ONLY sportsman.sportsman_rating
+    ADD CONSTRAINT fk_sportsman_code FOREIGN KEY (sportsman_code) REFERENCES sportsman.sportsman(sportsman_code);
+
+
+--
+-- TOC entry 4812 (class 2606 OID 16748)
+-- Name: leadership fk_coach_code; Type: FK CONSTRAINT; Schema: training_information; Owner: postgres
+--
+
+ALTER TABLE ONLY training_information.leadership
+    ADD CONSTRAINT fk_coach_code FOREIGN KEY (coach_code) REFERENCES coach.coach(coach_code);
+
+
+--
+-- TOC entry 4814 (class 2606 OID 16765)
+-- Name: training fk_coach_code; Type: FK CONSTRAINT; Schema: training_information; Owner: postgres
+--
+
+ALTER TABLE ONLY training_information.training
+    ADD CONSTRAINT fk_coach_code FOREIGN KEY (coach_code) REFERENCES coach.coach(coach_code);
+
+
+--
+-- TOC entry 4815 (class 2606 OID 16770)
+-- Name: training fk_sport_code; Type: FK CONSTRAINT; Schema: training_information; Owner: postgres
+--
+
+ALTER TABLE ONLY training_information.training
+    ADD CONSTRAINT fk_sport_code FOREIGN KEY (sport_code) REFERENCES training_information.sport_type(sport_code);
+
+
+--
+-- TOC entry 4813 (class 2606 OID 16753)
+-- Name: leadership fk_sportsman_code; Type: FK CONSTRAINT; Schema: training_information; Owner: postgres
+--
+
+ALTER TABLE ONLY training_information.leadership
+    ADD CONSTRAINT fk_sportsman_code FOREIGN KEY (sportsman_code) REFERENCES sportsman.sportsman(sportsman_code);
+
+
+--
+-- TOC entry 4816 (class 2606 OID 16775)
+-- Name: training fk_sportsman_code; Type: FK CONSTRAINT; Schema: training_information; Owner: postgres
+--
+
+ALTER TABLE ONLY training_information.training
+    ADD CONSTRAINT fk_sportsman_code FOREIGN KEY (sportsman_code) REFERENCES sportsman.sportsman(sportsman_code);
+
+
+-- Completed on 2023-10-27 17:09:26
 
 --
 -- PostgreSQL database dump complete
