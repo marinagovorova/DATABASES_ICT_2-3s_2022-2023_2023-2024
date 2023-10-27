@@ -5,7 +5,7 @@
 -- Dumped from database version 16.0
 -- Dumped by pg_dump version 16.0
 
--- Started on 2023-10-24 21:04:34
+-- Started on 2023-10-27 21:22:42
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -17,6 +17,39 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
+
+DROP DATABASE IF EXISTS "Bank";
+--
+-- TOC entry 4913 (class 1262 OID 16397)
+-- Name: Bank; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE "Bank" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'Russian_Russia.1251';
+
+
+ALTER DATABASE "Bank" OWNER TO postgres;
+
+\connect "Bank"
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 4914 (class 0 OID 0)
+-- Dependencies: 4913
+-- Name: DATABASE "Bank"; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON DATABASE "Bank" IS 'DB_itmo2023 lab';
+
 
 --
 -- TOC entry 6 (class 2615 OID 16398)
@@ -36,6 +69,7 @@ SET default_table_access_method = heap;
 -- TOC entry 218 (class 1259 OID 16409)
 -- Name: Client; Type: TABLE; Schema: bankDB; Owner: postgres
 --
+
 
 CREATE TABLE "bankDB"."Client" (
     "PassportNumber" bigint NOT NULL,
@@ -63,7 +97,7 @@ CREATE TABLE "bankDB"."Currency" (
 ALTER TABLE "bankDB"."Currency" OWNER TO postgres;
 
 --
--- TOC entry 227 (class 1259 OID 16668)
+-- TOC entry 225 (class 1259 OID 16668)
 -- Name: Currency_IdCurrency_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
 --
 
@@ -78,32 +112,61 @@ ALTER TABLE "bankDB"."Currency" ALTER COLUMN "IdCurrency" ADD GENERATED ALWAYS A
 
 
 --
+-- TOC entry 227 (class 1259 OID 16820)
+-- Name: DepositPaySchedule; Type: TABLE; Schema: bankDB; Owner: postgres
+--
+
+CREATE TABLE "bankDB"."DepositPaySchedule" (
+    "Id" bigint NOT NULL,
+    "AgreementNumber" integer NOT NULL,
+    "PlanPaymentDate" date NOT NULL,
+    "Payment" real NOT NULL,
+    "FactPaymentDate" date
+);
+
+
+ALTER TABLE "bankDB"."DepositPaySchedule" OWNER TO postgres;
+
+--
+-- TOC entry 228 (class 1259 OID 16830)
+-- Name: DeposinPaySchedule_Id_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."DepositPaySchedule" ALTER COLUMN "Id" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "bankDB"."DeposinPaySchedule_Id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 99999999999
+    CACHE 1
+);
+
+
+--
 -- TOC entry 221 (class 1259 OID 16442)
 -- Name: DepositAgreement; Type: TABLE; Schema: bankDB; Owner: postgres
 --
 
 CREATE TABLE "bankDB"."DepositAgreement" (
     "AgreementNumber" integer NOT NULL,
-    "Name" character varying(30) NOT NULL,
-    "Description" character varying(200) NOT NULL,
     "DepositDate" date NOT NULL,
     "PaymentDay" integer NOT NULL,
     "FactCloseDate" date,
     "PlanCloseDate" date NOT NULL,
     "Status" character varying(10) DEFAULT 'Open'::character varying NOT NULL,
-    "DepositRate" integer NOT NULL,
-    "StartSum" integer NOT NULL,
-    "SummaryPayment" integer DEFAULT 0 NOT NULL,
+    "StartSum" real NOT NULL,
+    "SummaryPayment" real DEFAULT 0 NOT NULL,
     "TabelNumber" integer NOT NULL,
     "PassportNumber" integer NOT NULL,
-    "IdCurrency" integer NOT NULL
+    "IdCurrency" integer NOT NULL,
+    "IdType" integer DEFAULT 0 NOT NULL
 );
 
 
 ALTER TABLE "bankDB"."DepositAgreement" OWNER TO postgres;
 
 --
--- TOC entry 225 (class 1259 OID 16643)
+-- TOC entry 223 (class 1259 OID 16643)
 -- Name: DepositAgreement_AgreementNumber_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
 --
 
@@ -119,19 +182,37 @@ ALTER TABLE "bankDB"."DepositAgreement" ALTER COLUMN "AgreementNumber" ADD GENER
 
 
 --
--- TOC entry 223 (class 1259 OID 16457)
--- Name: DepositPaySchedule; Type: TABLE; Schema: bankDB; Owner: postgres
+-- TOC entry 232 (class 1259 OID 16856)
+-- Name: DepositType; Type: TABLE; Schema: bankDB; Owner: postgres
 --
 
-CREATE TABLE "bankDB"."DepositPaySchedule" (
-    "AgreementNumber" integer NOT NULL,
-    "PlanPaymentDate" date NOT NULL,
-    "Payment" integer NOT NULL,
-    "FactPaymentDate" date
+CREATE TABLE "bankDB"."DepositType" (
+    "Id" integer NOT NULL,
+    "Name" character varying(30) NOT NULL,
+    "Description" character varying(200) NOT NULL,
+    "Rate" real NOT NULL,
+    "MinStartSum" real NOT NULL,
+    "MaxStartSum" real NOT NULL,
+    "Term" integer NOT NULL
 );
 
 
-ALTER TABLE "bankDB"."DepositPaySchedule" OWNER TO postgres;
+ALTER TABLE "bankDB"."DepositType" OWNER TO postgres;
+
+--
+-- TOC entry 233 (class 1259 OID 16910)
+-- Name: DepositType_Id_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."DepositType" ALTER COLUMN "Id" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "bankDB"."DepositType_Id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 99999
+    CACHE 1
+);
+
 
 --
 -- TOC entry 216 (class 1259 OID 16399)
@@ -167,7 +248,7 @@ CREATE TABLE "bankDB"."EmployeeCategory" (
 ALTER TABLE "bankDB"."EmployeeCategory" OWNER TO postgres;
 
 --
--- TOC entry 228 (class 1259 OID 16684)
+-- TOC entry 226 (class 1259 OID 16684)
 -- Name: EmployeeCategory_IdCategory_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
 --
 
@@ -182,7 +263,7 @@ ALTER TABLE "bankDB"."EmployeeCategory" ALTER COLUMN "IdCategory" ADD GENERATED 
 
 
 --
--- TOC entry 224 (class 1259 OID 16642)
+-- TOC entry 222 (class 1259 OID 16642)
 -- Name: Employee_TabelNumber_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
 --
 
@@ -203,26 +284,24 @@ ALTER TABLE "bankDB"."Employee" ALTER COLUMN "TabelNumber" ADD GENERATED ALWAYS 
 
 CREATE TABLE "bankDB"."LoanAgreement" (
     "AgreementNumber" integer NOT NULL,
-    "Name" character varying(30) NOT NULL,
-    "Description" character varying(200) NOT NULL,
     "LoanDate" date NOT NULL,
     "PaymentDay" integer NOT NULL,
     "FactCloseDate" date,
     "PlanCloseDate" date NOT NULL,
     "Status" character varying(10) DEFAULT 'Open'::character varying NOT NULL,
-    "InterestRate" integer NOT NULL,
-    "StartSum" integer NOT NULL,
-    "Debt" integer NOT NULL,
+    "StartSum" real NOT NULL,
+    "Debt" real NOT NULL,
     "TabelNumber" integer NOT NULL,
     "PassportNumber" integer NOT NULL,
-    "IdCurrency" integer NOT NULL
+    "IdCurrency" integer NOT NULL,
+    "TypeId" integer DEFAULT 0 NOT NULL
 );
 
 
 ALTER TABLE "bankDB"."LoanAgreement" OWNER TO postgres;
 
 --
--- TOC entry 226 (class 1259 OID 16644)
+-- TOC entry 224 (class 1259 OID 16644)
 -- Name: LoanAgreeement_AgreementNumber_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
 --
 
@@ -237,401 +316,456 @@ ALTER TABLE "bankDB"."LoanAgreement" ALTER COLUMN "AgreementNumber" ADD GENERATE
 
 
 --
--- TOC entry 222 (class 1259 OID 16452)
+-- TOC entry 229 (class 1259 OID 16834)
 -- Name: LoanPaySchedule; Type: TABLE; Schema: bankDB; Owner: postgres
 --
 
 CREATE TABLE "bankDB"."LoanPaySchedule" (
+    "Id" bigint NOT NULL,
     "AgreementNumber" integer NOT NULL,
     "PlanPaymentDate" date NOT NULL,
-    "DebtPayment" integer NOT NULL,
-    "InterestPayment" integer NOT NULL,
-    "FactPaymentDate" date
+    "DebtPayment" real NOT NULL,
+    "InterestPayment" real NOT NULL,
+    "FactPaymentDay" date
 );
 
 
 ALTER TABLE "bankDB"."LoanPaySchedule" OWNER TO postgres;
 
 --
--- TOC entry 4867 (class 0 OID 16409)
+-- TOC entry 230 (class 1259 OID 16844)
+-- Name: LoanPaySchedule_Id_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."LoanPaySchedule" ALTER COLUMN "Id" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "bankDB"."LoanPaySchedule_Id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 9999999999
+    CACHE 1
+);
+
+
+--
+-- TOC entry 231 (class 1259 OID 16845)
+-- Name: LoanType; Type: TABLE; Schema: bankDB; Owner: postgres
+--
+
+CREATE TABLE "bankDB"."LoanType" (
+    "Id" integer NOT NULL,
+    "Name" character varying(30) NOT NULL,
+    "Description" character varying(200) NOT NULL,
+    "Rate" real NOT NULL,
+    "MinStartSum" real NOT NULL,
+    "MaxStartSum" real NOT NULL,
+    "Term" integer NOT NULL
+);
+
+
+ALTER TABLE "bankDB"."LoanType" OWNER TO postgres;
+
+--
+-- TOC entry 234 (class 1259 OID 16911)
+-- Name: LoanType_Id_seq; Type: SEQUENCE; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."LoanType" ALTER COLUMN "Id" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "bankDB"."LoanType_Id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 99999
+    CACHE 1
+);
+
+
+--
+-- TOC entry 4891 (class 0 OID 16409)
 -- Dependencies: 218
 -- Data for Name: Client; Type: TABLE DATA; Schema: bankDB; Owner: postgres
 --
 
-COPY "bankDB"."Client" ("PassportNumber", "FullName", "Address", "Phone", "E-mail") FROM stdin;
-793918777	Русакова Агафья Артемовна	к. Чулым, ул. Микрорайон, д. 3, 335873	85528615464	galina08@gmail.com
-157712532	Лихачев Харитон Богданович	п. Истра, бул. Строительный, д. 8/3, 202939	86818727677	krasilnikovaija@yahoo.com
-15334936	Елизавета Святославовна Лихачева	д. Одинцово, ш. Дарвина, д. 2/2 к. 14, 030959	78710512920	tretjakovilarion@yandex.ru
-997403724	Мария Тарасовна Зыкова	с. Киржач, пр. Вавилова, д. 143 к. 7/3, 581848	78393157982	sokolovdemid@gmail.com
-710751005	Назар Фомич Крылов	клх Кирово-Чепецк, пр. Пархоменко, д. 51 к. 220, 022893	86007944257	milenfomichev@rambler.ru
-121748022	Галина Святославовна Некрасова	п. Усть-Катав, бул. Кочубея, д. 606 к. 3/5, 846641	77476804830	isidor69@gmail.com
-189266391	Крюкова Елизавета Борисовна	д. Оленегорск (Якут.), пр. Королева, д. 95, 771803	86970156808	oktjabrina_16@gmail.com
-856093670	Мухин Потап Вячеславович	к. Новочеркасск, ул. Халтурина, д. 3 стр. 4/5, 323611	76921434582	evdokimovboris@yandex.ru
-324629513	Владимирова Ольга Романовна	к. Старая Русса, алл. Приморская, д. 39 стр. 2/5, 500187	80745955216	kuprijan_23@mail.ru
-116549023	Фадеев Милан Гаврилович	ст. Одинцово, алл. Заливная, д. 612 стр. 863, 913075	79178544542	simonovsaveli@yandex.ru
-51690385	Фадеев Фока Яковлевич	ст. Ногинск (Моск.), пр. Щорса, д. 813 стр. 5, 756425	89348592289	vorobevelizar@hotmail.com
-571140644	Оксана Аркадьевна Соловьева	д. Хасавюрт, ш. Станционное, д. 4, 640885	80209282910	makar24@hotmail.com
-123609496	Лука Вячеславович Наумов	д. Карачаевск, ш. Астраханское, д. 9/8 к. 522, 901051	72381924356	seliverst_1983@yandex.ru
-129798791	Носов Анисим Владиславович	г. Валаам, бул. Баумана, д. 9/8 стр. 60, 046782	71400117644	tkonovalov@hotmail.com
-952442573	Ираклий Елисеевич Макаров	клх Клин, алл. Детская, д. 9/4, 976363	71988453310	evstigne_1973@yahoo.com
-\.
+INSERT INTO "bankDB"."Client" VALUES (793918777, 'Русакова Агафья Артемовна', 'к. Чулым, ул. Микрорайон, д. 3, 335873', 85528615464, 'galina08@gmail.com');
+INSERT INTO "bankDB"."Client" VALUES (157712532, 'Лихачев Харитон Богданович', 'п. Истра, бул. Строительный, д. 8/3, 202939', 86818727677, 'krasilnikovaija@yahoo.com');
+INSERT INTO "bankDB"."Client" VALUES (15334936, 'Елизавета Святославовна Лихачева', 'д. Одинцово, ш. Дарвина, д. 2/2 к. 14, 030959', 78710512920, 'tretjakovilarion@yandex.ru');
+INSERT INTO "bankDB"."Client" VALUES (997403724, 'Мария Тарасовна Зыкова', 'с. Киржач, пр. Вавилова, д. 143 к. 7/3, 581848', 78393157982, 'sokolovdemid@gmail.com');
+INSERT INTO "bankDB"."Client" VALUES (710751005, 'Назар Фомич Крылов', 'клх Кирово-Чепецк, пр. Пархоменко, д. 51 к. 220, 022893', 86007944257, 'milenfomichev@rambler.ru');
+INSERT INTO "bankDB"."Client" VALUES (121748022, 'Галина Святославовна Некрасова', 'п. Усть-Катав, бул. Кочубея, д. 606 к. 3/5, 846641', 77476804830, 'isidor69@gmail.com');
+INSERT INTO "bankDB"."Client" VALUES (189266391, 'Крюкова Елизавета Борисовна', 'д. Оленегорск (Якут.), пр. Королева, д. 95, 771803', 86970156808, 'oktjabrina_16@gmail.com');
+INSERT INTO "bankDB"."Client" VALUES (856093670, 'Мухин Потап Вячеславович', 'к. Новочеркасск, ул. Халтурина, д. 3 стр. 4/5, 323611', 76921434582, 'evdokimovboris@yandex.ru');
+INSERT INTO "bankDB"."Client" VALUES (324629513, 'Владимирова Ольга Романовна', 'к. Старая Русса, алл. Приморская, д. 39 стр. 2/5, 500187', 80745955216, 'kuprijan_23@mail.ru');
+INSERT INTO "bankDB"."Client" VALUES (116549023, 'Фадеев Милан Гаврилович', 'ст. Одинцово, алл. Заливная, д. 612 стр. 863, 913075', 79178544542, 'simonovsaveli@yandex.ru');
+INSERT INTO "bankDB"."Client" VALUES (51690385, 'Фадеев Фока Яковлевич', 'ст. Ногинск (Моск.), пр. Щорса, д. 813 стр. 5, 756425', 89348592289, 'vorobevelizar@hotmail.com');
+INSERT INTO "bankDB"."Client" VALUES (571140644, 'Оксана Аркадьевна Соловьева', 'д. Хасавюрт, ш. Станционное, д. 4, 640885', 80209282910, 'makar24@hotmail.com');
+INSERT INTO "bankDB"."Client" VALUES (123609496, 'Лука Вячеславович Наумов', 'д. Карачаевск, ш. Астраханское, д. 9/8 к. 522, 901051', 72381924356, 'seliverst_1983@yandex.ru');
+INSERT INTO "bankDB"."Client" VALUES (129798791, 'Носов Анисим Владиславович', 'г. Валаам, бул. Баумана, д. 9/8 стр. 60, 046782', 71400117644, 'tkonovalov@hotmail.com');
+INSERT INTO "bankDB"."Client" VALUES (952442573, 'Ираклий Елисеевич Макаров', 'клх Клин, алл. Детская, д. 9/4, 976363', 71988453310, 'evstigne_1973@yahoo.com');
 
 
 --
--- TOC entry 4868 (class 0 OID 16414)
+-- TOC entry 4892 (class 0 OID 16414)
 -- Dependencies: 219
 -- Data for Name: Currency; Type: TABLE DATA; Schema: bankDB; Owner: postgres
 --
 
-COPY "bankDB"."Currency" ("IdCurrency", "Name", "Country") FROM stdin;
-1	Российский Рубль	Россия
-2	Доллар США	США
-3	Евро	Европа
-4	Фунт стерлингов	Великобритания
-\.
+INSERT INTO "bankDB"."Currency" OVERRIDING SYSTEM VALUE VALUES (1, 'Российский Рубль', 'Россия');
+INSERT INTO "bankDB"."Currency" OVERRIDING SYSTEM VALUE VALUES (2, 'Доллар США', 'США');
+INSERT INTO "bankDB"."Currency" OVERRIDING SYSTEM VALUE VALUES (3, 'Евро', 'Европа');
+INSERT INTO "bankDB"."Currency" OVERRIDING SYSTEM VALUE VALUES (4, 'Фунт стерлингов', 'Великобритания');
 
 
 --
--- TOC entry 4870 (class 0 OID 16442)
+-- TOC entry 4894 (class 0 OID 16442)
 -- Dependencies: 221
 -- Data for Name: DepositAgreement; Type: TABLE DATA; Schema: bankDB; Owner: postgres
 --
 
-COPY "bankDB"."DepositAgreement" ("AgreementNumber", "Name", "Description", "DepositDate", "PaymentDay", "FactCloseDate", "PlanCloseDate", "Status", "DepositRate", "StartSum", "SummaryPayment", "TabelNumber", "PassportNumber", "IdCurrency") FROM stdin;
-15	Красивый	Спорт кидать теория основание промолчать инструкция скользить. Угроза район призыв дрогнуть привлекать плод привлекать.	2023-06-20	6	\N	2024-06-20	Open	7	100000	0	100014	952442573	2
-16	Умный	Видимо хлеб за песня художественный теория. Войти столетие дошлый совет пространство затянуться лиловый адвокат.	2023-08-13	20	\N	2025-08-13	Open	12	202000	0	100020	123609496	2
-17	Умный	Видимо хлеб за песня художественный теория. Войти столетие дошлый совет пространство затянуться лиловый адвокат.	2023-01-03	23	\N	2025-01-03	Open	12	197000	0	100013	324629513	1
-18	Молодёжный	Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.	2023-05-28	24	\N	2025-05-28	Open	10	273000	0	100015	157712532	1
-19	Молодёжный	Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.	2023-09-07	25	\N	2025-09-07	Open	10	146000	0	100016	129798791	1
-20	Красивый	Спорт кидать теория основание промолчать инструкция скользить. Угроза район призыв дрогнуть привлекать плод привлекать.	2023-07-17	22	\N	2024-07-17	Open	7	277000	0	100016	189266391	4
-\.
+INSERT INTO "bankDB"."DepositAgreement" OVERRIDING SYSTEM VALUE VALUES (21, '2023-06-20', 6, NULL, '2024-06-20', 'Open', 100000, 0, 100014, 952442573, 2, 1);
+INSERT INTO "bankDB"."DepositAgreement" OVERRIDING SYSTEM VALUE VALUES (22, '2023-08-13', 20, NULL, '2025-08-13', 'Open', 202000, 0, 100020, 123609496, 2, 2);
+INSERT INTO "bankDB"."DepositAgreement" OVERRIDING SYSTEM VALUE VALUES (23, '2023-01-03', 23, NULL, '2025-01-03', 'Open', 197000, 0, 100013, 324629513, 1, 2);
+INSERT INTO "bankDB"."DepositAgreement" OVERRIDING SYSTEM VALUE VALUES (24, '2023-05-28', 24, NULL, '2025-05-28', 'Open', 273000, 0, 100015, 157712532, 1, 3);
+INSERT INTO "bankDB"."DepositAgreement" OVERRIDING SYSTEM VALUE VALUES (25, '2023-09-07', 25, NULL, '2025-09-07', 'Open', 146000, 0, 100016, 129798791, 1, 3);
+INSERT INTO "bankDB"."DepositAgreement" OVERRIDING SYSTEM VALUE VALUES (26, '2023-07-17', 22, NULL, '2024-07-17', 'Open', 277000, 0, 100016, 189266391, 4, 1);
 
 
 --
--- TOC entry 4872 (class 0 OID 16457)
--- Dependencies: 223
+-- TOC entry 4900 (class 0 OID 16820)
+-- Dependencies: 227
 -- Data for Name: DepositPaySchedule; Type: TABLE DATA; Schema: bankDB; Owner: postgres
 --
 
-COPY "bankDB"."DepositPaySchedule" ("AgreementNumber", "PlanPaymentDate", "Payment", "FactPaymentDate") FROM stdin;
-15	2023-07-06	583	\N
-15	2023-08-06	587	\N
-15	2023-09-06	590	\N
-15	2023-10-06	594	\N
-15	2023-11-06	597	\N
-15	2023-12-06	601	\N
-15	2024-01-06	604	\N
-15	2024-02-06	608	\N
-15	2024-03-06	611	\N
-15	2024-04-06	615	\N
-15	2024-05-06	618	\N
-15	2024-06-06	622	\N
-16	2023-09-20	2020	\N
-16	2023-10-20	2040	\N
-16	2023-11-20	2061	\N
-16	2023-12-20	2081	\N
-16	2024-01-20	2102	\N
-16	2024-02-20	2123	\N
-16	2024-03-20	2144	\N
-16	2024-04-20	2166	\N
-16	2024-05-20	2187	\N
-16	2024-06-20	2209	\N
-16	2024-07-20	2231	\N
-16	2024-08-20	2254	\N
-16	2024-09-20	2276	\N
-16	2024-10-20	2299	\N
-16	2024-11-20	2322	\N
-16	2024-12-20	2345	\N
-16	2025-01-20	2369	\N
-16	2025-02-20	2392	\N
-16	2025-03-20	2416	\N
-16	2025-04-20	2440	\N
-16	2025-05-20	2465	\N
-16	2025-06-20	2489	\N
-16	2025-07-20	2514	\N
-16	2025-08-20	2539	\N
-17	2023-02-23	1970	\N
-17	2023-03-23	1990	\N
-17	2023-04-23	2010	\N
-17	2023-05-23	2030	\N
-17	2023-06-23	2050	\N
-17	2023-07-23	2070	\N
-17	2023-08-23	2091	\N
-17	2023-09-23	2112	\N
-17	2023-10-23	2133	\N
-17	2023-11-23	2155	\N
-17	2023-12-23	2176	\N
-17	2024-01-23	2198	\N
-17	2024-02-23	2220	\N
-17	2024-03-23	2242	\N
-17	2024-04-23	2264	\N
-17	2024-05-23	2287	\N
-17	2024-06-23	2310	\N
-17	2024-07-23	2333	\N
-17	2024-08-23	2356	\N
-17	2024-09-23	2380	\N
-17	2024-10-23	2404	\N
-17	2024-11-23	2428	\N
-17	2024-12-23	2452	\N
-17	2025-01-23	2477	\N
-18	2023-06-24	2275	\N
-18	2023-07-24	2294	\N
-18	2023-08-24	2313	\N
-18	2023-09-24	2332	\N
-18	2023-10-24	2352	\N
-18	2023-11-24	2371	\N
-18	2023-12-24	2391	\N
-18	2024-01-24	2411	\N
-18	2024-02-24	2431	\N
-18	2024-03-24	2451	\N
-18	2024-04-24	2472	\N
-18	2024-05-24	2492	\N
-18	2024-06-24	2513	\N
-18	2024-07-24	2534	\N
-18	2024-08-24	2555	\N
-18	2024-09-24	2577	\N
-18	2024-10-24	2598	\N
-18	2024-11-24	2620	\N
-18	2024-12-24	2642	\N
-18	2025-01-24	2664	\N
-18	2025-02-24	2686	\N
-18	2025-03-24	2708	\N
-18	2025-04-24	2731	\N
-18	2025-05-24	2753	\N
-19	2023-10-25	1217	\N
-19	2023-11-25	1227	\N
-19	2023-12-25	1237	\N
-19	2024-01-25	1247	\N
-19	2024-02-25	1258	\N
-19	2024-03-25	1268	\N
-19	2024-04-25	1279	\N
-19	2024-05-25	1289	\N
-19	2024-06-25	1300	\N
-19	2024-07-25	1311	\N
-19	2024-08-25	1322	\N
-19	2024-09-25	1333	\N
-19	2024-10-25	1344	\N
-19	2024-11-25	1355	\N
-19	2024-12-25	1367	\N
-19	2025-01-25	1378	\N
-19	2025-02-25	1389	\N
-19	2025-03-25	1401	\N
-19	2025-04-25	1413	\N
-19	2025-05-25	1424	\N
-19	2025-06-25	1436	\N
-19	2025-07-25	1448	\N
-19	2025-08-25	1460	\N
-19	2025-09-25	1473	\N
-20	2023-08-22	1616	\N
-20	2023-09-22	1625	\N
-20	2023-10-22	1635	\N
-20	2023-11-22	1644	\N
-20	2023-12-22	1654	\N
-20	2024-01-22	1664	\N
-20	2024-02-22	1673	\N
-20	2024-03-22	1683	\N
-20	2024-04-22	1693	\N
-20	2024-05-22	1703	\N
-20	2024-06-22	1713	\N
-20	2024-07-22	1723	\N
-\.
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (363, 21, '2023-07-06', 583.33, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (364, 21, '2023-08-06', 586.74, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (365, 21, '2023-09-06', 590.16, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (366, 21, '2023-10-06', 593.6, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (367, 21, '2023-11-06', 597.06, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (368, 21, '2023-12-06', 600.55, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (369, 21, '2024-01-06', 604.05, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (370, 21, '2024-02-06', 607.57, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (371, 21, '2024-03-06', 611.12, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (372, 21, '2024-04-06', 614.68, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (373, 21, '2024-05-06', 618.27, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (374, 21, '2024-06-06', 621.87, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (375, 22, '2023-09-20', 2020, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (376, 22, '2023-10-20', 2040.2, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (377, 22, '2023-11-20', 2060.6, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (378, 22, '2023-12-20', 2081.21, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (379, 22, '2024-01-20', 2102.02, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (380, 22, '2024-02-20', 2123.04, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (381, 22, '2024-03-20', 2144.27, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (382, 22, '2024-04-20', 2165.71, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (383, 22, '2024-05-20', 2187.37, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (384, 22, '2024-06-20', 2209.24, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (385, 22, '2024-07-20', 2231.34, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (386, 22, '2024-08-20', 2253.65, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (387, 22, '2024-09-20', 2276.19, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (388, 22, '2024-10-20', 2298.95, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (389, 22, '2024-11-20', 2321.94, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (390, 22, '2024-12-20', 2345.16, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (391, 22, '2025-01-20', 2368.61, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (392, 22, '2025-02-20', 2392.29, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (393, 22, '2025-03-20', 2416.22, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (394, 22, '2025-04-20', 2440.38, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (395, 22, '2025-05-20', 2464.78, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (396, 22, '2025-06-20', 2489.43, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (397, 22, '2025-07-20', 2514.33, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (398, 22, '2025-08-20', 2539.47, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (399, 23, '2023-02-23', 1970, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (400, 23, '2023-03-23', 1989.7, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (401, 23, '2023-04-23', 2009.6, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (402, 23, '2023-05-23', 2029.69, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (403, 23, '2023-06-23', 2049.99, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (404, 23, '2023-07-23', 2070.49, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (405, 23, '2023-08-23', 2091.19, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (406, 23, '2023-09-23', 2112.11, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (407, 23, '2023-10-23', 2133.23, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (408, 23, '2023-11-23', 2154.56, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (409, 23, '2023-12-23', 2176.11, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (410, 23, '2024-01-23', 2197.87, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (411, 23, '2024-02-23', 2219.85, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (412, 23, '2024-03-23', 2242.04, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (413, 23, '2024-04-23', 2264.46, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (414, 23, '2024-05-23', 2287.11, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (415, 23, '2024-06-23', 2309.98, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (416, 23, '2024-07-23', 2333.08, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (417, 23, '2024-08-23', 2356.41, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (418, 23, '2024-09-23', 2379.97, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (419, 23, '2024-10-23', 2403.77, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (420, 23, '2024-11-23', 2427.81, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (421, 23, '2024-12-23', 2452.09, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (422, 23, '2025-01-23', 2476.61, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (423, 24, '2023-06-24', 2275, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (424, 24, '2023-07-24', 2293.96, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (425, 24, '2023-08-24', 2313.07, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (426, 24, '2023-09-24', 2332.35, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (427, 24, '2023-10-24', 2351.79, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (428, 24, '2023-11-24', 2371.38, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (429, 24, '2023-12-24', 2391.15, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (430, 24, '2024-01-24', 2411.07, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (431, 24, '2024-02-24', 2431.16, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (432, 24, '2024-03-24', 2451.42, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (433, 24, '2024-04-24', 2471.85, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (434, 24, '2024-05-24', 2492.45, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (435, 24, '2024-06-24', 2513.22, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (436, 24, '2024-07-24', 2534.17, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (437, 24, '2024-08-24', 2555.28, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (438, 24, '2024-09-24', 2576.58, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (439, 24, '2024-10-24', 2598.05, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (440, 24, '2024-11-24', 2619.7, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (441, 24, '2024-12-24', 2641.53, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (442, 24, '2025-01-24', 2663.54, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (443, 24, '2025-02-24', 2685.74, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (444, 24, '2025-03-24', 2708.12, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (445, 24, '2025-04-24', 2730.69, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (446, 24, '2025-05-24', 2753.44, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (447, 25, '2023-10-25', 1216.67, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (448, 25, '2023-11-25', 1226.81, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (449, 25, '2023-12-25', 1237.03, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (450, 25, '2024-01-25', 1247.34, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (451, 25, '2024-02-25', 1257.73, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (452, 25, '2024-03-25', 1268.21, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (453, 25, '2024-04-25', 1278.78, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (454, 25, '2024-05-25', 1289.44, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (455, 25, '2024-06-25', 1300.18, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (456, 25, '2024-07-25', 1311.02, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (457, 25, '2024-08-25', 1321.94, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (458, 25, '2024-09-25', 1332.96, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (459, 25, '2024-10-25', 1344.07, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (460, 25, '2024-11-25', 1355.27, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (461, 25, '2024-12-25', 1366.56, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (462, 25, '2025-01-25', 1377.95, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (463, 25, '2025-02-25', 1389.43, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (464, 25, '2025-03-25', 1401.01, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (465, 25, '2025-04-25', 1412.69, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (466, 25, '2025-05-25', 1424.46, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (467, 25, '2025-06-25', 1436.33, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (468, 25, '2025-07-25', 1448.3, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (469, 25, '2025-08-25', 1460.37, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (470, 25, '2025-09-25', 1472.54, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (471, 26, '2023-08-22', 1615.83, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (472, 26, '2023-09-22', 1625.26, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (473, 26, '2023-10-22', 1634.74, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (474, 26, '2023-11-22', 1644.28, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (475, 26, '2023-12-22', 1653.87, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (476, 26, '2024-01-22', 1663.51, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (477, 26, '2024-02-22', 1673.22, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (478, 26, '2024-03-22', 1682.98, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (479, 26, '2024-04-22', 1692.8, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (480, 26, '2024-05-22', 1702.67, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (481, 26, '2024-06-22', 1712.6, NULL);
+INSERT INTO "bankDB"."DepositPaySchedule" OVERRIDING SYSTEM VALUE VALUES (482, 26, '2024-07-22', 1722.59, NULL);
 
 
 --
--- TOC entry 4865 (class 0 OID 16399)
+-- TOC entry 4905 (class 0 OID 16856)
+-- Dependencies: 232
+-- Data for Name: DepositType; Type: TABLE DATA; Schema: bankDB; Owner: postgres
+--
+
+INSERT INTO "bankDB"."DepositType" OVERRIDING SYSTEM VALUE VALUES (1, 'Красивый', 'Спорт кидать теория основание промолчать инструкция скользить. Угроза район призыв дрогнуть привлекать плод привлекать.', 7, 100000, 600000, 12);
+INSERT INTO "bankDB"."DepositType" OVERRIDING SYSTEM VALUE VALUES (2, 'Умный', 'Видимо хлеб за песня художественный теория. Войти столетие дошлый совет пространство затянуться лиловый адвокат.', 12, 100000, 700000, 24);
+INSERT INTO "bankDB"."DepositType" OVERRIDING SYSTEM VALUE VALUES (3, 'Молодёжный', 'Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.', 10, 80000, 500000, 24);
+
+
+--
+-- TOC entry 4889 (class 0 OID 16399)
 -- Dependencies: 216
 -- Data for Name: Employee; Type: TABLE DATA; Schema: bankDB; Owner: postgres
 --
 
-COPY "bankDB"."Employee" ("TabelNumber", "FullName", "PassportNumber", "Age", "Phone", "Address", "IdCategory") FROM stdin;
-100011	Арсений Вилорович Рыбаков	17880135	52	75788605119	ст. Новый Оскол, ш. Мелиоративное, д. 984, 623840	3
-100012	Мухин Георгий Тимурович	250497905	36	79586804890	к. Троицк (Моск.), алл. Павлова, д. 5, 965930	4
-100013	Лукия Михайловна Лобанова	779012004	29	73658656011	г. Углич, ул. Верхняя, д. 1 стр. 251, 680122	3
-100014	Трофим Богданович Корнилов	405184786	37	83731616739	ст. Красноярск, ул. Торговая, д. 6/9 стр. 6, 945303	2
-100015	Пономарев Олег Иосипович	198566376	34	85140617390	клх Арзамас, бул. Гвардейский, д. 30, 774957	1
-100016	Лихачев Корнил Якубович	199708425	41	87968201626	д. Сыктывкар, бул. Раздольный, д. 369, 029151	2
-100017	Агап Адамович Матвеев	154603810	37	73705470174	ст. Кинешма, алл. Широкая, д. 599 стр. 6/7, 749607	1
-100018	Новиков Феликс Ярославович	782762631	46	75790699785	п. Диксон, пер. Кузнецкий, д. 8, 391558	2
-100019	Михайлова Агата Владимировна	320158094	58	89213833510	д. Миллерово, ш. Николаева, д. 4/5 стр. 50, 477472	2
-100020	Доронин Касьян Арсеньевич	440271121	22	72213679224	к. Азов (Рост.), пер. Волжский, д. 2/7 стр. 173, 240859	1
-\.
+INSERT INTO "bankDB"."Employee" OVERRIDING SYSTEM VALUE VALUES (100011, 'Арсений Вилорович Рыбаков', 17880135, 52, 75788605119, 'ст. Новый Оскол, ш. Мелиоративное, д. 984, 623840', 3);
+INSERT INTO "bankDB"."Employee" OVERRIDING SYSTEM VALUE VALUES (100012, 'Мухин Георгий Тимурович', 250497905, 36, 79586804890, 'к. Троицк (Моск.), алл. Павлова, д. 5, 965930', 4);
+INSERT INTO "bankDB"."Employee" OVERRIDING SYSTEM VALUE VALUES (100013, 'Лукия Михайловна Лобанова', 779012004, 29, 73658656011, 'г. Углич, ул. Верхняя, д. 1 стр. 251, 680122', 3);
+INSERT INTO "bankDB"."Employee" OVERRIDING SYSTEM VALUE VALUES (100014, 'Трофим Богданович Корнилов', 405184786, 37, 83731616739, 'ст. Красноярск, ул. Торговая, д. 6/9 стр. 6, 945303', 2);
+INSERT INTO "bankDB"."Employee" OVERRIDING SYSTEM VALUE VALUES (100015, 'Пономарев Олег Иосипович', 198566376, 34, 85140617390, 'клх Арзамас, бул. Гвардейский, д. 30, 774957', 1);
+INSERT INTO "bankDB"."Employee" OVERRIDING SYSTEM VALUE VALUES (100016, 'Лихачев Корнил Якубович', 199708425, 41, 87968201626, 'д. Сыктывкар, бул. Раздольный, д. 369, 029151', 2);
+INSERT INTO "bankDB"."Employee" OVERRIDING SYSTEM VALUE VALUES (100017, 'Агап Адамович Матвеев', 154603810, 37, 73705470174, 'ст. Кинешма, алл. Широкая, д. 599 стр. 6/7, 749607', 1);
+INSERT INTO "bankDB"."Employee" OVERRIDING SYSTEM VALUE VALUES (100018, 'Новиков Феликс Ярославович', 782762631, 46, 75790699785, 'п. Диксон, пер. Кузнецкий, д. 8, 391558', 2);
+INSERT INTO "bankDB"."Employee" OVERRIDING SYSTEM VALUE VALUES (100019, 'Михайлова Агата Владимировна', 320158094, 58, 89213833510, 'д. Миллерово, ш. Николаева, д. 4/5 стр. 50, 477472', 2);
+INSERT INTO "bankDB"."Employee" OVERRIDING SYSTEM VALUE VALUES (100020, 'Доронин Касьян Арсеньевич', 440271121, 22, 72213679224, 'к. Азов (Рост.), пер. Волжский, д. 2/7 стр. 173, 240859', 1);
 
 
 --
--- TOC entry 4866 (class 0 OID 16404)
+-- TOC entry 4890 (class 0 OID 16404)
 -- Dependencies: 217
 -- Data for Name: EmployeeCategory; Type: TABLE DATA; Schema: bankDB; Owner: postgres
 --
 
-COPY "bankDB"."EmployeeCategory" ("IdCategory", "Name", "Description", "Salary") FROM stdin;
-1	Оператор call-центра банка	Выбирать школьный полностью дальний вытаскивать освободить. Выкинуть угодный деловой рис солнце другой рай. Наткнуться непривычный еврейский число строительство порядок провал.	45000
-2	Менеджер по продажам банковских услуг	Желание поздравлять лиловый. Дружно скользить разводить коммунизм деньги. Намерение фонарик порода привлекать. Означать ответить инвалид войти.	80000
-3	Сотрудник по работе с клиентами	Четко функция бочок видимо отражение. Одиннадцать мимо грудь багровый трясти. Сынок одиннадцать угол вчера витрина коробка зима.	60000
-4	Менеджер обслуживания	Разуметься радость висеть единый самостоятельно указанный уронить. Карандаш страсть бегать совещание рис школьный четко. Ставить успокоиться пол ручей.	68000
-\.
+INSERT INTO "bankDB"."EmployeeCategory" OVERRIDING SYSTEM VALUE VALUES (1, 'Оператор call-центра банка', 'Выбирать школьный полностью дальний вытаскивать освободить. Выкинуть угодный деловой рис солнце другой рай. Наткнуться непривычный еврейский число строительство порядок провал.', 45000);
+INSERT INTO "bankDB"."EmployeeCategory" OVERRIDING SYSTEM VALUE VALUES (2, 'Менеджер по продажам банковских услуг', 'Желание поздравлять лиловый. Дружно скользить разводить коммунизм деньги. Намерение фонарик порода привлекать. Означать ответить инвалид войти.', 80000);
+INSERT INTO "bankDB"."EmployeeCategory" OVERRIDING SYSTEM VALUE VALUES (3, 'Сотрудник по работе с клиентами', 'Четко функция бочок видимо отражение. Одиннадцать мимо грудь багровый трясти. Сынок одиннадцать угол вчера витрина коробка зима.', 60000);
+INSERT INTO "bankDB"."EmployeeCategory" OVERRIDING SYSTEM VALUE VALUES (4, 'Менеджер обслуживания', 'Разуметься радость висеть единый самостоятельно указанный уронить. Карандаш страсть бегать совещание рис школьный четко. Ставить успокоиться пол ручей.', 68000);
 
 
 --
--- TOC entry 4869 (class 0 OID 16424)
+-- TOC entry 4893 (class 0 OID 16424)
 -- Dependencies: 220
 -- Data for Name: LoanAgreement; Type: TABLE DATA; Schema: bankDB; Owner: postgres
 --
 
-COPY "bankDB"."LoanAgreement" ("AgreementNumber", "Name", "Description", "LoanDate", "PaymentDay", "FactCloseDate", "PlanCloseDate", "Status", "InterestRate", "StartSum", "Debt", "TabelNumber", "PassportNumber", "IdCurrency") FROM stdin;
-1	Молодёжный	Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.	2023-02-20	9	\N	2025-02-20	Open	8	154000	154000	100015	123609496	2
-2	Выгодный	Сынок очко уронить дорогой промолчать роса. Тяжелый инвалид промолчать. Пропасть находить запретить.	2023-09-29	27	\N	2025-09-29	Open	5	282000	282000	100017	571140644	4
-3	Молодёжный	Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.	2023-07-22	11	\N	2025-07-22	Open	8	158000	158000	100017	324629513	1
-4	Молодёжный	Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.	2023-08-04	20	\N	2025-08-04	Open	8	288000	288000	100013	51690385	3
-5	Молодёжный	Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.	2023-03-28	21	\N	2025-03-28	Open	8	226000	226000	100014	121748022	4
-6	Классный	Аж анализ покинуть бетонный счастье. Спешить промолчать механический что бок. Потянуться хозяйка пропаганда миф.	2023-08-10	27	\N	2024-08-10	Open	14	200000	200000	100011	129798791	2
-\.
+INSERT INTO "bankDB"."LoanAgreement" OVERRIDING SYSTEM VALUE VALUES (7, '2023-02-20', 9, NULL, '2025-02-20', 'Open', 154000, 154000, 100015, 123609496, 2, 6);
+INSERT INTO "bankDB"."LoanAgreement" OVERRIDING SYSTEM VALUE VALUES (8, '2023-09-29', 27, NULL, '2025-09-29', 'Open', 282000, 282000, 100017, 571140644, 4, 4);
+INSERT INTO "bankDB"."LoanAgreement" OVERRIDING SYSTEM VALUE VALUES (9, '2023-07-22', 11, NULL, '2025-07-22', 'Open', 158000, 158000, 100017, 324629513, 1, 6);
+INSERT INTO "bankDB"."LoanAgreement" OVERRIDING SYSTEM VALUE VALUES (10, '2023-08-04', 20, NULL, '2025-08-04', 'Open', 288000, 288000, 100013, 51690385, 3, 6);
+INSERT INTO "bankDB"."LoanAgreement" OVERRIDING SYSTEM VALUE VALUES (11, '2023-03-28', 21, NULL, '2025-03-28', 'Open', 226000, 226000, 100014, 121748022, 4, 6);
+INSERT INTO "bankDB"."LoanAgreement" OVERRIDING SYSTEM VALUE VALUES (12, '2023-08-10', 27, NULL, '2024-08-10', 'Open', 200000, 200000, 100011, 129798791, 2, 5);
 
 
 --
--- TOC entry 4871 (class 0 OID 16452)
--- Dependencies: 222
+-- TOC entry 4902 (class 0 OID 16834)
+-- Dependencies: 229
 -- Data for Name: LoanPaySchedule; Type: TABLE DATA; Schema: bankDB; Owner: postgres
 --
 
-COPY "bankDB"."LoanPaySchedule" ("AgreementNumber", "PlanPaymentDate", "DebtPayment", "InterestPayment", "FactPaymentDate") FROM stdin;
-1	2023-03-09	6417	1027	\N
-1	2023-04-09	6417	984	\N
-1	2023-05-09	6417	941	\N
-1	2023-06-09	6417	898	\N
-1	2023-07-09	6417	856	\N
-1	2023-08-09	6417	813	\N
-1	2023-09-09	6417	770	\N
-1	2023-10-09	6417	727	\N
-1	2023-11-09	6417	684	\N
-1	2023-12-09	6417	642	\N
-1	2024-01-09	6417	599	\N
-1	2024-02-09	6417	556	\N
-1	2024-03-09	6417	513	\N
-1	2024-04-09	6417	471	\N
-1	2024-05-09	6417	428	\N
-1	2024-06-09	6417	385	\N
-1	2024-07-09	6417	342	\N
-1	2024-08-09	6417	299	\N
-1	2024-09-09	6417	257	\N
-1	2024-10-09	6417	214	\N
-1	2024-11-09	6417	171	\N
-1	2024-12-09	6417	128	\N
-1	2025-01-09	6417	86	\N
-1	2025-02-09	6417	43	\N
-2	2023-10-27	11750	1175	\N
-2	2023-11-27	11750	1126	\N
-2	2023-12-27	11750	1077	\N
-2	2024-01-27	11750	1028	\N
-2	2024-02-27	11750	979	\N
-2	2024-03-27	11750	930	\N
-2	2024-04-27	11750	881	\N
-2	2024-05-27	11750	832	\N
-2	2024-06-27	11750	783	\N
-2	2024-07-27	11750	734	\N
-2	2024-08-27	11750	685	\N
-2	2024-09-27	11750	636	\N
-2	2024-10-27	11750	588	\N
-2	2024-11-27	11750	539	\N
-2	2024-12-27	11750	490	\N
-2	2025-01-27	11750	441	\N
-2	2025-02-27	11750	392	\N
-2	2025-03-27	11750	343	\N
-2	2025-04-27	11750	294	\N
-2	2025-05-27	11750	245	\N
-2	2025-06-27	11750	196	\N
-2	2025-07-27	11750	147	\N
-2	2025-08-27	11750	98	\N
-2	2025-09-27	11750	49	\N
-3	2023-08-11	6584	1053	\N
-3	2023-09-11	6584	1009	\N
-3	2023-10-11	6584	966	\N
-3	2023-11-11	6584	922	\N
-3	2023-12-11	6584	878	\N
-3	2024-01-11	6584	834	\N
-3	2024-02-11	6584	790	\N
-3	2024-03-11	6584	746	\N
-3	2024-04-11	6584	702	\N
-3	2024-05-11	6584	658	\N
-3	2024-06-11	6584	614	\N
-3	2024-07-11	6584	571	\N
-3	2024-08-11	6584	527	\N
-3	2024-09-11	6584	483	\N
-3	2024-10-11	6584	439	\N
-3	2024-11-11	6584	395	\N
-3	2024-12-11	6584	351	\N
-3	2025-01-11	6584	307	\N
-3	2025-02-11	6584	263	\N
-3	2025-03-11	6584	219	\N
-3	2025-04-11	6584	175	\N
-3	2025-05-11	6584	132	\N
-3	2025-06-11	6584	88	\N
-3	2025-07-11	6584	44	\N
-4	2023-09-20	12000	1920	\N
-4	2023-10-20	12000	1840	\N
-4	2023-11-20	12000	1760	\N
-4	2023-12-20	12000	1680	\N
-4	2024-01-20	12000	1600	\N
-4	2024-02-20	12000	1520	\N
-4	2024-03-20	12000	1440	\N
-4	2024-04-20	12000	1360	\N
-4	2024-05-20	12000	1280	\N
-4	2024-06-20	12000	1200	\N
-4	2024-07-20	12000	1120	\N
-4	2024-08-20	12000	1040	\N
-4	2024-09-20	12000	960	\N
-4	2024-10-20	12000	880	\N
-4	2024-11-20	12000	800	\N
-4	2024-12-20	12000	720	\N
-4	2025-01-20	12000	640	\N
-4	2025-02-20	12000	560	\N
-4	2025-03-20	12000	480	\N
-4	2025-04-20	12000	400	\N
-4	2025-05-20	12000	320	\N
-4	2025-06-20	12000	240	\N
-4	2025-07-20	12000	160	\N
-4	2025-08-20	12000	80	\N
-5	2023-04-21	9417	1507	\N
-5	2023-05-21	9417	1444	\N
-5	2023-06-21	9417	1381	\N
-5	2023-07-21	9417	1318	\N
-5	2023-08-21	9417	1256	\N
-5	2023-09-21	9417	1193	\N
-5	2023-10-21	9417	1130	\N
-5	2023-11-21	9417	1067	\N
-5	2023-12-21	9417	1004	\N
-5	2024-01-21	9417	942	\N
-5	2024-02-21	9417	879	\N
-5	2024-03-21	9417	816	\N
-5	2024-04-21	9417	753	\N
-5	2024-05-21	9417	691	\N
-5	2024-06-21	9417	628	\N
-5	2024-07-21	9417	565	\N
-5	2024-08-21	9417	502	\N
-5	2024-09-21	9417	439	\N
-5	2024-10-21	9417	377	\N
-5	2024-11-21	9417	314	\N
-5	2024-12-21	9417	251	\N
-5	2025-01-21	9417	188	\N
-5	2025-02-21	9417	126	\N
-5	2025-03-21	9417	63	\N
-6	2023-09-27	16667	2333	\N
-6	2023-10-27	16667	2139	\N
-6	2023-11-27	16667	1944	\N
-6	2023-12-27	16667	1750	\N
-6	2024-01-27	16667	1556	\N
-6	2024-02-27	16667	1361	\N
-6	2024-03-27	16667	1167	\N
-6	2024-04-27	16667	972	\N
-6	2024-05-27	16667	778	\N
-6	2024-06-27	16667	583	\N
-6	2024-07-27	16667	389	\N
-6	2024-08-27	16667	194	\N
-\.
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (265, 7, '2023-03-09', 6416.67, 1026.67, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (266, 7, '2023-04-09', 6416.67, 983.89, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (267, 7, '2023-05-09', 6416.67, 941.11, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (268, 7, '2023-06-09', 6416.67, 898.33, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (269, 7, '2023-07-09', 6416.67, 855.56, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (270, 7, '2023-08-09', 6416.67, 812.78, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (271, 7, '2023-09-09', 6416.67, 770, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (272, 7, '2023-10-09', 6416.67, 727.22, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (273, 7, '2023-11-09', 6416.67, 684.44, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (274, 7, '2023-12-09', 6416.67, 641.67, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (275, 7, '2024-01-09', 6416.67, 598.89, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (276, 7, '2024-02-09', 6416.67, 556.11, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (277, 7, '2024-03-09', 6416.67, 513.33, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (278, 7, '2024-04-09', 6416.67, 470.56, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (279, 7, '2024-05-09', 6416.67, 427.78, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (280, 7, '2024-06-09', 6416.67, 385, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (281, 7, '2024-07-09', 6416.67, 342.22, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (282, 7, '2024-08-09', 6416.67, 299.44, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (283, 7, '2024-09-09', 6416.67, 256.67, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (284, 7, '2024-10-09', 6416.67, 213.89, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (285, 7, '2024-11-09', 6416.67, 171.11, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (286, 7, '2024-12-09', 6416.67, 128.33, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (287, 7, '2025-01-09', 6416.67, 85.56, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (288, 7, '2025-02-09', 6416.67, 42.78, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (289, 8, '2023-10-27', 11750, 1175, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (290, 8, '2023-11-27', 11750, 1126.04, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (291, 8, '2023-12-27', 11750, 1077.08, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (292, 8, '2024-01-27', 11750, 1028.12, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (293, 8, '2024-02-27', 11750, 979.17, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (294, 8, '2024-03-27', 11750, 930.21, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (295, 8, '2024-04-27', 11750, 881.25, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (296, 8, '2024-05-27', 11750, 832.29, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (297, 8, '2024-06-27', 11750, 783.33, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (298, 8, '2024-07-27', 11750, 734.38, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (299, 8, '2024-08-27', 11750, 685.42, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (300, 8, '2024-09-27', 11750, 636.46, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (301, 8, '2024-10-27', 11750, 587.5, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (302, 8, '2024-11-27', 11750, 538.54, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (303, 8, '2024-12-27', 11750, 489.58, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (304, 8, '2025-01-27', 11750, 440.62, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (305, 8, '2025-02-27', 11750, 391.67, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (306, 8, '2025-03-27', 11750, 342.71, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (307, 8, '2025-04-27', 11750, 293.75, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (308, 8, '2025-05-27', 11750, 244.79, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (309, 8, '2025-06-27', 11750, 195.83, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (310, 8, '2025-07-27', 11750, 146.88, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (311, 8, '2025-08-27', 11750, 97.92, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (312, 8, '2025-09-27', 11750, 48.96, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (313, 9, '2023-08-11', 6583.33, 1053.33, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (314, 9, '2023-09-11', 6583.33, 1009.44, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (315, 9, '2023-10-11', 6583.33, 965.56, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (316, 9, '2023-11-11', 6583.33, 921.67, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (317, 9, '2023-12-11', 6583.33, 877.78, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (318, 9, '2024-01-11', 6583.33, 833.89, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (319, 9, '2024-02-11', 6583.33, 790, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (320, 9, '2024-03-11', 6583.33, 746.11, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (321, 9, '2024-04-11', 6583.33, 702.22, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (322, 9, '2024-05-11', 6583.33, 658.33, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (323, 9, '2024-06-11', 6583.33, 614.44, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (324, 9, '2024-07-11', 6583.33, 570.56, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (325, 9, '2024-08-11', 6583.33, 526.67, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (326, 9, '2024-09-11', 6583.33, 482.78, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (327, 9, '2024-10-11', 6583.33, 438.89, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (328, 9, '2024-11-11', 6583.33, 395, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (329, 9, '2024-12-11', 6583.33, 351.11, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (330, 9, '2025-01-11', 6583.33, 307.22, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (331, 9, '2025-02-11', 6583.33, 263.33, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (332, 9, '2025-03-11', 6583.33, 219.44, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (333, 9, '2025-04-11', 6583.33, 175.56, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (334, 9, '2025-05-11', 6583.33, 131.67, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (335, 9, '2025-06-11', 6583.33, 87.78, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (336, 9, '2025-07-11', 6583.33, 43.89, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (337, 10, '2023-09-20', 12000, 1920, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (338, 10, '2023-10-20', 12000, 1840, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (339, 10, '2023-11-20', 12000, 1760, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (340, 10, '2023-12-20', 12000, 1680, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (341, 10, '2024-01-20', 12000, 1600, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (342, 10, '2024-02-20', 12000, 1520, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (343, 10, '2024-03-20', 12000, 1440, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (344, 10, '2024-04-20', 12000, 1360, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (345, 10, '2024-05-20', 12000, 1280, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (346, 10, '2024-06-20', 12000, 1200, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (347, 10, '2024-07-20', 12000, 1120, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (348, 10, '2024-08-20', 12000, 1040, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (349, 10, '2024-09-20', 12000, 960, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (350, 10, '2024-10-20', 12000, 880, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (351, 10, '2024-11-20', 12000, 800, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (352, 10, '2024-12-20', 12000, 720, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (353, 10, '2025-01-20', 12000, 640, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (354, 10, '2025-02-20', 12000, 560, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (355, 10, '2025-03-20', 12000, 480, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (356, 10, '2025-04-20', 12000, 400, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (357, 10, '2025-05-20', 12000, 320, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (358, 10, '2025-06-20', 12000, 240, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (359, 10, '2025-07-20', 12000, 160, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (360, 10, '2025-08-20', 12000, 80, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (361, 11, '2023-04-21', 9416.67, 1506.67, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (362, 11, '2023-05-21', 9416.67, 1443.89, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (363, 11, '2023-06-21', 9416.67, 1381.11, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (364, 11, '2023-07-21', 9416.67, 1318.33, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (365, 11, '2023-08-21', 9416.67, 1255.56, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (366, 11, '2023-09-21', 9416.67, 1192.78, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (367, 11, '2023-10-21', 9416.67, 1130, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (368, 11, '2023-11-21', 9416.67, 1067.22, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (369, 11, '2023-12-21', 9416.67, 1004.44, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (370, 11, '2024-01-21', 9416.67, 941.67, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (371, 11, '2024-02-21', 9416.67, 878.89, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (372, 11, '2024-03-21', 9416.67, 816.11, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (373, 11, '2024-04-21', 9416.67, 753.33, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (374, 11, '2024-05-21', 9416.67, 690.56, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (375, 11, '2024-06-21', 9416.67, 627.78, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (376, 11, '2024-07-21', 9416.67, 565, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (377, 11, '2024-08-21', 9416.67, 502.22, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (378, 11, '2024-09-21', 9416.67, 439.44, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (379, 11, '2024-10-21', 9416.67, 376.67, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (380, 11, '2024-11-21', 9416.67, 313.89, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (381, 11, '2024-12-21', 9416.67, 251.11, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (382, 11, '2025-01-21', 9416.67, 188.33, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (383, 11, '2025-02-21', 9416.67, 125.56, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (384, 11, '2025-03-21', 9416.67, 62.78, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (385, 12, '2023-09-27', 16666.67, 2333.33, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (386, 12, '2023-10-27', 16666.67, 2138.89, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (387, 12, '2023-11-27', 16666.67, 1944.44, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (388, 12, '2023-12-27', 16666.67, 1750, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (389, 12, '2024-01-27', 16666.67, 1555.56, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (390, 12, '2024-02-27', 16666.67, 1361.11, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (391, 12, '2024-03-27', 16666.67, 1166.67, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (392, 12, '2024-04-27', 16666.67, 972.22, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (393, 12, '2024-05-27', 16666.67, 777.78, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (394, 12, '2024-06-27', 16666.67, 583.33, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (395, 12, '2024-07-27', 16666.67, 388.89, NULL);
+INSERT INTO "bankDB"."LoanPaySchedule" OVERRIDING SYSTEM VALUE VALUES (396, 12, '2024-08-27', 16666.67, 194.44, NULL);
 
 
 --
--- TOC entry 4883 (class 0 OID 0)
--- Dependencies: 227
+-- TOC entry 4904 (class 0 OID 16845)
+-- Dependencies: 231
+-- Data for Name: LoanType; Type: TABLE DATA; Schema: bankDB; Owner: postgres
+--
+
+INSERT INTO "bankDB"."LoanType" OVERRIDING SYSTEM VALUE VALUES (4, 'Выгодный', 'Сынок очко уронить дорогой промолчать роса. Тяжелый инвалид промолчать. Пропасть находить запретить.', 5, 100000, 500000, 24);
+INSERT INTO "bankDB"."LoanType" OVERRIDING SYSTEM VALUE VALUES (5, 'Классный', 'Аж анализ покинуть бетонный счастье. Спешить промолчать механический что бок. Потянуться хозяйка пропаганда миф.', 14, 50000, 300000, 12);
+INSERT INTO "bankDB"."LoanType" OVERRIDING SYSTEM VALUE VALUES (6, 'Молодёжный', 'Сомнительный дальний вообще покидать результат. Тревога реклама пропасть райком. Жидкий пропаганда мгновение сынок через.', 8, 80000, 400000, 24);
+
+
+--
+-- TOC entry 4915 (class 0 OID 0)
+-- Dependencies: 225
 -- Name: Currency_IdCurrency_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
 --
 
@@ -639,17 +773,35 @@ SELECT pg_catalog.setval('"bankDB"."Currency_IdCurrency_seq"', 4, true);
 
 
 --
--- TOC entry 4884 (class 0 OID 0)
--- Dependencies: 225
+-- TOC entry 4916 (class 0 OID 0)
+-- Dependencies: 228
+-- Name: DeposinPaySchedule_Id_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"bankDB"."DeposinPaySchedule_Id_seq"', 482, true);
+
+
+--
+-- TOC entry 4917 (class 0 OID 0)
+-- Dependencies: 223
 -- Name: DepositAgreement_AgreementNumber_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"bankDB"."DepositAgreement_AgreementNumber_seq"', 20, true);
+SELECT pg_catalog.setval('"bankDB"."DepositAgreement_AgreementNumber_seq"', 26, true);
 
 
 --
--- TOC entry 4885 (class 0 OID 0)
--- Dependencies: 228
+-- TOC entry 4918 (class 0 OID 0)
+-- Dependencies: 233
+-- Name: DepositType_Id_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"bankDB"."DepositType_Id_seq"', 3, true);
+
+
+--
+-- TOC entry 4919 (class 0 OID 0)
+-- Dependencies: 226
 -- Name: EmployeeCategory_IdCategory_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
 --
 
@@ -657,8 +809,8 @@ SELECT pg_catalog.setval('"bankDB"."EmployeeCategory_IdCategory_seq"', 4, true);
 
 
 --
--- TOC entry 4886 (class 0 OID 0)
--- Dependencies: 224
+-- TOC entry 4920 (class 0 OID 0)
+-- Dependencies: 222
 -- Name: Employee_TabelNumber_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
 --
 
@@ -666,16 +818,34 @@ SELECT pg_catalog.setval('"bankDB"."Employee_TabelNumber_seq"', 100020, true);
 
 
 --
--- TOC entry 4887 (class 0 OID 0)
--- Dependencies: 226
+-- TOC entry 4921 (class 0 OID 0)
+-- Dependencies: 224
 -- Name: LoanAgreeement_AgreementNumber_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"bankDB"."LoanAgreeement_AgreementNumber_seq"', 6, true);
+SELECT pg_catalog.setval('"bankDB"."LoanAgreeement_AgreementNumber_seq"', 12, true);
 
 
 --
--- TOC entry 4706 (class 2606 OID 16484)
+-- TOC entry 4922 (class 0 OID 0)
+-- Dependencies: 230
+-- Name: LoanPaySchedule_Id_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"bankDB"."LoanPaySchedule_Id_seq"', 396, true);
+
+
+--
+-- TOC entry 4923 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: LoanType_Id_seq; Type: SEQUENCE SET; Schema: bankDB; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"bankDB"."LoanType_Id_seq"', 6, true);
+
+
+--
+-- TOC entry 4724 (class 2606 OID 16484)
 -- Name: DepositAgreement AgreementNumber; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -684,7 +854,7 @@ ALTER TABLE ONLY "bankDB"."DepositAgreement"
 
 
 --
--- TOC entry 4696 (class 2606 OID 16647)
+-- TOC entry 4714 (class 2606 OID 16647)
 -- Name: Client Client_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -693,7 +863,7 @@ ALTER TABLE ONLY "bankDB"."Client"
 
 
 --
--- TOC entry 4698 (class 2606 OID 16418)
+-- TOC entry 4716 (class 2606 OID 16418)
 -- Name: Currency Currency_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -702,16 +872,16 @@ ALTER TABLE ONLY "bankDB"."Currency"
 
 
 --
--- TOC entry 4675 (class 2606 OID 16600)
+-- TOC entry 4689 (class 2606 OID 16867)
 -- Name: LoanAgreement Debt; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
 ALTER TABLE "bankDB"."LoanAgreement"
-    ADD CONSTRAINT "Debt" CHECK (("Debt" >= 0)) NOT VALID;
+    ADD CONSTRAINT "Debt" CHECK (("Debt" >= (0)::double precision)) NOT VALID;
 
 
 --
--- TOC entry 4708 (class 2606 OID 16446)
+-- TOC entry 4726 (class 2606 OID 16446)
 -- Name: DepositAgreement DepositAgreement_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -720,16 +890,7 @@ ALTER TABLE ONLY "bankDB"."DepositAgreement"
 
 
 --
--- TOC entry 4681 (class 2606 OID 16540)
--- Name: DepositAgreement DepositRate; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
---
-
-ALTER TABLE "bankDB"."DepositAgreement"
-    ADD CONSTRAINT "DepositRate" CHECK ((("DepositRate" < 101) AND ("DepositRate" > '-1'::integer))) NOT VALID;
-
-
---
--- TOC entry 4692 (class 2606 OID 16408)
+-- TOC entry 4710 (class 2606 OID 16408)
 -- Name: EmployeeCategory EmployeeCategory_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -738,7 +899,7 @@ ALTER TABLE ONLY "bankDB"."EmployeeCategory"
 
 
 --
--- TOC entry 4688 (class 2606 OID 16403)
+-- TOC entry 4706 (class 2606 OID 16403)
 -- Name: Employee Employee_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -747,7 +908,7 @@ ALTER TABLE ONLY "bankDB"."Employee"
 
 
 --
--- TOC entry 4682 (class 2606 OID 16539)
+-- TOC entry 4694 (class 2606 OID 16539)
 -- Name: DepositAgreement FactCloseDate; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -756,7 +917,7 @@ ALTER TABLE "bankDB"."DepositAgreement"
 
 
 --
--- TOC entry 4676 (class 2606 OID 16596)
+-- TOC entry 4690 (class 2606 OID 16596)
 -- Name: LoanAgreement FactCloseDate; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -765,16 +926,7 @@ ALTER TABLE "bankDB"."LoanAgreement"
 
 
 --
--- TOC entry 4677 (class 2606 OID 16598)
--- Name: LoanAgreement InterestRate; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
---
-
-ALTER TABLE "bankDB"."LoanAgreement"
-    ADD CONSTRAINT "InterestRate" CHECK ((("InterestRate" < 101) AND ("InterestRate" > '-1'::integer))) NOT VALID;
-
-
---
--- TOC entry 4702 (class 2606 OID 16428)
+-- TOC entry 4720 (class 2606 OID 16428)
 -- Name: LoanAgreement LoanAgreeement_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -783,16 +935,7 @@ ALTER TABLE ONLY "bankDB"."LoanAgreement"
 
 
 --
--- TOC entry 4710 (class 2606 OID 16456)
--- Name: LoanPaySchedule LoanPayShedule_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
---
-
-ALTER TABLE ONLY "bankDB"."LoanPaySchedule"
-    ADD CONSTRAINT "LoanPayShedule_pkey" PRIMARY KEY ("AgreementNumber", "PlanPaymentDate");
-
-
---
--- TOC entry 4678 (class 2606 OID 16595)
+-- TOC entry 4691 (class 2606 OID 16595)
 -- Name: LoanAgreement PaymentDay; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -801,25 +944,25 @@ ALTER TABLE "bankDB"."LoanAgreement"
 
 
 --
--- TOC entry 4683 (class 2606 OID 16541)
--- Name: DepositAgreement StartSum; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
---
-
-ALTER TABLE "bankDB"."DepositAgreement"
-    ADD CONSTRAINT "StartSum" CHECK (("StartSum" > 0)) NOT VALID;
-
-
---
--- TOC entry 4679 (class 2606 OID 16599)
+-- TOC entry 4692 (class 2606 OID 16873)
 -- Name: LoanAgreement StartSum; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
 ALTER TABLE "bankDB"."LoanAgreement"
-    ADD CONSTRAINT "StartSum" CHECK (("StartSum" > 0)) NOT VALID;
+    ADD CONSTRAINT "StartSum" CHECK (("StartSum" > (0)::double precision)) NOT VALID;
 
 
 --
--- TOC entry 4684 (class 2606 OID 16542)
+-- TOC entry 4695 (class 2606 OID 16887)
+-- Name: DepositAgreement StartSum; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."DepositAgreement"
+    ADD CONSTRAINT "StartSum" CHECK (("StartSum" > (0)::double precision)) NOT VALID;
+
+
+--
+-- TOC entry 4696 (class 2606 OID 16542)
 -- Name: DepositAgreement Status; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -828,7 +971,7 @@ ALTER TABLE "bankDB"."DepositAgreement"
 
 
 --
--- TOC entry 4680 (class 2606 OID 16597)
+-- TOC entry 4693 (class 2606 OID 16597)
 -- Name: LoanAgreement Status; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -837,16 +980,16 @@ ALTER TABLE "bankDB"."LoanAgreement"
 
 
 --
--- TOC entry 4685 (class 2606 OID 16543)
+-- TOC entry 4697 (class 2606 OID 16894)
 -- Name: DepositAgreement SummaryPayment; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
 ALTER TABLE "bankDB"."DepositAgreement"
-    ADD CONSTRAINT "SummaryPayment" CHECK (("SummaryPayment" >= 0)) NOT VALID;
+    ADD CONSTRAINT "SummaryPayment" CHECK (("SummaryPayment" >= (0)::double precision)) NOT VALID;
 
 
 --
--- TOC entry 4690 (class 2606 OID 16465)
+-- TOC entry 4708 (class 2606 OID 16465)
 -- Name: Employee TabelNumber; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -855,7 +998,7 @@ ALTER TABLE ONLY "bankDB"."Employee"
 
 
 --
--- TOC entry 4704 (class 2606 OID 16579)
+-- TOC entry 4722 (class 2606 OID 16579)
 -- Name: LoanAgreement agreement_loan_number; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -864,7 +1007,7 @@ ALTER TABLE ONLY "bankDB"."LoanAgreement"
 
 
 --
--- TOC entry 4694 (class 2606 OID 16479)
+-- TOC entry 4712 (class 2606 OID 16479)
 -- Name: EmployeeCategory category_id; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -873,7 +1016,7 @@ ALTER TABLE ONLY "bankDB"."EmployeeCategory"
 
 
 --
--- TOC entry 4700 (class 2606 OID 16482)
+-- TOC entry 4718 (class 2606 OID 16482)
 -- Name: Currency currenct_id; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -882,16 +1025,61 @@ ALTER TABLE ONLY "bankDB"."Currency"
 
 
 --
--- TOC entry 4712 (class 2606 OID 16697)
--- Name: DepositPaySchedule date_agreement_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+-- TOC entry 4734 (class 2606 OID 16860)
+-- Name: DepositType deposit_type_id_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."DepositType"
+    ADD CONSTRAINT deposit_type_id_pkey PRIMARY KEY ("Id");
+
+
+--
+-- TOC entry 4732 (class 2606 OID 16849)
+-- Name: LoanType id_loan_type_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."LoanType"
+    ADD CONSTRAINT id_loan_type_pkey PRIMARY KEY ("Id");
+
+
+--
+-- TOC entry 4728 (class 2606 OID 16824)
+-- Name: DepositPaySchedule id_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
 ALTER TABLE ONLY "bankDB"."DepositPaySchedule"
-    ADD CONSTRAINT date_agreement_pkey PRIMARY KEY ("AgreementNumber", "PlanPaymentDate") INCLUDE ("AgreementNumber", "PlanPaymentDate");
+    ADD CONSTRAINT id_pkey PRIMARY KEY ("Id");
 
 
 --
--- TOC entry 4673 (class 2606 OID 16667)
+-- TOC entry 4730 (class 2606 OID 16838)
+-- Name: LoanPaySchedule loanSchedule_id_pkey; Type: CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."LoanPaySchedule"
+    ADD CONSTRAINT "loanSchedule_id_pkey" PRIMARY KEY ("Id");
+
+
+--
+-- TOC entry 4702 (class 2606 OID 16905)
+-- Name: DepositType valid_min; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."DepositType"
+    ADD CONSTRAINT valid_min CHECK (("MinStartSum" > (0)::double precision)) NOT VALID;
+
+
+--
+-- TOC entry 4699 (class 2606 OID 16908)
+-- Name: LoanType valid_min; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."LoanType"
+    ADD CONSTRAINT valid_min CHECK (("MinStartSum" > (0)::double precision)) NOT VALID;
+
+
+--
+-- TOC entry 4687 (class 2606 OID 16667)
 -- Name: Client valid_passport; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -900,7 +1088,7 @@ ALTER TABLE "bankDB"."Client"
 
 
 --
--- TOC entry 4670 (class 2606 OID 16682)
+-- TOC entry 4684 (class 2606 OID 16682)
 -- Name: Employee valid_passport; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -909,7 +1097,7 @@ ALTER TABLE "bankDB"."Employee"
 
 
 --
--- TOC entry 4686 (class 2606 OID 16687)
+-- TOC entry 4698 (class 2606 OID 16687)
 -- Name: DepositAgreement valid_payment; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -918,7 +1106,7 @@ ALTER TABLE "bankDB"."DepositAgreement"
 
 
 --
--- TOC entry 4674 (class 2606 OID 16666)
+-- TOC entry 4688 (class 2606 OID 16666)
 -- Name: Client valid_phone; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -927,7 +1115,7 @@ ALTER TABLE "bankDB"."Client"
 
 
 --
--- TOC entry 4671 (class 2606 OID 16683)
+-- TOC entry 4685 (class 2606 OID 16683)
 -- Name: Employee valid_phone; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -936,7 +1124,25 @@ ALTER TABLE "bankDB"."Employee"
 
 
 --
--- TOC entry 4672 (class 2606 OID 16480)
+-- TOC entry 4703 (class 2606 OID 16904)
+-- Name: DepositType valid_rate; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."DepositType"
+    ADD CONSTRAINT valid_rate CHECK ((("Rate" > (0)::double precision) AND ("Rate" < (100)::double precision))) NOT VALID;
+
+
+--
+-- TOC entry 4700 (class 2606 OID 16907)
+-- Name: LoanType valid_rate; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."LoanType"
+    ADD CONSTRAINT valid_rate CHECK ((("Rate" > (0)::double precision) AND ("Rate" < (100)::double precision))) NOT VALID;
+
+
+--
+-- TOC entry 4686 (class 2606 OID 16480)
 -- Name: EmployeeCategory valid_salary; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -945,25 +1151,43 @@ ALTER TABLE "bankDB"."EmployeeCategory"
 
 
 --
--- TOC entry 4720 (class 2606 OID 16631)
--- Name: LoanPaySchedule agreement_number_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+-- TOC entry 4704 (class 2606 OID 16906)
+-- Name: DepositType valid_term; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
-ALTER TABLE ONLY "bankDB"."LoanPaySchedule"
-    ADD CONSTRAINT agreement_number_fk FOREIGN KEY ("AgreementNumber") REFERENCES "bankDB"."LoanAgreement"("AgreementNumber") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
+ALTER TABLE "bankDB"."DepositType"
+    ADD CONSTRAINT valid_term CHECK (("Term" > 0)) NOT VALID;
 
 
 --
--- TOC entry 4721 (class 2606 OID 16691)
--- Name: DepositPaySchedule agreement_number_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+-- TOC entry 4701 (class 2606 OID 16909)
+-- Name: LoanType valid_term; Type: CHECK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE "bankDB"."LoanType"
+    ADD CONSTRAINT valid_term CHECK (("Term" > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4744 (class 2606 OID 16825)
+-- Name: DepositPaySchedule agreement_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
 ALTER TABLE ONLY "bankDB"."DepositPaySchedule"
-    ADD CONSTRAINT agreement_number_fk FOREIGN KEY ("AgreementNumber") REFERENCES "bankDB"."DepositAgreement"("AgreementNumber") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
+    ADD CONSTRAINT agreement_fk FOREIGN KEY ("AgreementNumber") REFERENCES "bankDB"."DepositAgreement"("AgreementNumber") ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
--- TOC entry 4714 (class 2606 OID 16653)
+-- TOC entry 4745 (class 2606 OID 16839)
+-- Name: LoanPaySchedule agreement_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."LoanPaySchedule"
+    ADD CONSTRAINT agreement_fk FOREIGN KEY ("AgreementNumber") REFERENCES "bankDB"."LoanAgreement"("AgreementNumber") ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+--
+-- TOC entry 4736 (class 2606 OID 16653)
 -- Name: LoanAgreement cliend_passport_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -972,7 +1196,7 @@ ALTER TABLE ONLY "bankDB"."LoanAgreement"
 
 
 --
--- TOC entry 4717 (class 2606 OID 16648)
+-- TOC entry 4740 (class 2606 OID 16648)
 -- Name: DepositAgreement client_passport_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -981,7 +1205,7 @@ ALTER TABLE ONLY "bankDB"."DepositAgreement"
 
 
 --
--- TOC entry 4715 (class 2606 OID 16590)
+-- TOC entry 4737 (class 2606 OID 16590)
 -- Name: LoanAgreement currenct_id_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -990,7 +1214,7 @@ ALTER TABLE ONLY "bankDB"."LoanAgreement"
 
 
 --
--- TOC entry 4718 (class 2606 OID 16533)
+-- TOC entry 4741 (class 2606 OID 16533)
 -- Name: DepositAgreement currency_id_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -999,7 +1223,16 @@ ALTER TABLE ONLY "bankDB"."DepositAgreement"
 
 
 --
--- TOC entry 4713 (class 2606 OID 16473)
+-- TOC entry 4742 (class 2606 OID 16862)
+-- Name: DepositAgreement deposit_type_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."DepositAgreement"
+    ADD CONSTRAINT deposit_type_fk FOREIGN KEY ("IdType") REFERENCES "bankDB"."DepositType"("Id") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
+
+
+--
+-- TOC entry 4735 (class 2606 OID 16473)
 -- Name: Employee employee_id_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -1008,7 +1241,7 @@ ALTER TABLE ONLY "bankDB"."Employee"
 
 
 --
--- TOC entry 4719 (class 2606 OID 16523)
+-- TOC entry 4743 (class 2606 OID 16523)
 -- Name: DepositAgreement employee_tabel_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -1017,7 +1250,7 @@ ALTER TABLE ONLY "bankDB"."DepositAgreement"
 
 
 --
--- TOC entry 4716 (class 2606 OID 16580)
+-- TOC entry 4738 (class 2606 OID 16580)
 -- Name: LoanAgreement employee_tabel_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
 --
 
@@ -1025,7 +1258,16 @@ ALTER TABLE ONLY "bankDB"."LoanAgreement"
     ADD CONSTRAINT employee_tabel_fk FOREIGN KEY ("TabelNumber") REFERENCES "bankDB"."Employee"("TabelNumber") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
 
 
--- Completed on 2023-10-24 21:04:35
+--
+-- TOC entry 4739 (class 2606 OID 16851)
+-- Name: LoanAgreement type_id_fk; Type: FK CONSTRAINT; Schema: bankDB; Owner: postgres
+--
+
+ALTER TABLE ONLY "bankDB"."LoanAgreement"
+    ADD CONSTRAINT type_id_fk FOREIGN KEY ("TypeId") REFERENCES "bankDB"."LoanType"("Id") ON UPDATE RESTRICT ON DELETE RESTRICT NOT VALID;
+
+
+-- Completed on 2023-10-27 21:22:42
 
 --
 -- PostgreSQL database dump complete
