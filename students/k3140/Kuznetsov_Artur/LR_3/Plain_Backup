@@ -1,0 +1,1317 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 16.0
+-- Dumped by pg_dump version 16.0
+
+-- Started on 2023-11-09 02:59:58
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 4984 (class 1262 OID 5)
+-- Name: postgres; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE postgres WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'Russian_Russia.1251';
+
+
+ALTER DATABASE postgres OWNER TO postgres;
+
+\connect postgres
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 4985 (class 0 OID 0)
+-- Dependencies: 4984
+-- Name: DATABASE postgres; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON DATABASE postgres IS 'default administrative connection database';
+
+
+--
+-- TOC entry 6 (class 2615 OID 16403)
+-- Name: Session; Type: SCHEMA; Schema: -; Owner: pg_database_owner
+--
+
+CREATE SCHEMA "Session";
+
+
+ALTER SCHEMA "Session" OWNER TO pg_database_owner;
+
+--
+-- TOC entry 7 (class 2615 OID 2200)
+-- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+-- *not* creating schema, since initdb creates it
+
+
+ALTER SCHEMA public OWNER TO postgres;
+
+--
+-- TOC entry 2 (class 3079 OID 16384)
+-- Name: adminpack; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS adminpack WITH SCHEMA pg_catalog;
+
+
+--
+-- TOC entry 4988 (class 0 OID 0)
+-- Dependencies: 2
+-- Name: EXTENSION adminpack; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION adminpack IS 'administrative functions for PostgreSQL';
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 232 (class 1259 OID 16664)
+-- Name: attestation; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session".attestation (
+    attestation_id integer NOT NULL,
+    discipline_in_syllabus_id integer NOT NULL,
+    professor_id integer NOT NULL,
+    studying_student_id integer NOT NULL,
+    mark character(1) NOT NULL,
+    attempt integer NOT NULL,
+    attestation_date date NOT NULL
+);
+
+
+ALTER TABLE "Session".attestation OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 16439)
+-- Name: auditorium; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session".auditorium (
+    auditorium_id integer NOT NULL,
+    platform_id integer NOT NULL,
+    capacity integer NOT NULL,
+    type integer NOT NULL,
+    auditorium_number integer NOT NULL
+);
+
+
+ALTER TABLE "Session".auditorium OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 16429)
+-- Name: department; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session".department (
+    department_id integer NOT NULL,
+    department_name character varying(100) NOT NULL,
+    platform_id integer NOT NULL
+);
+
+
+ALTER TABLE "Session".department OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 16409)
+-- Name: direction; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session".direction (
+    direction_id integer NOT NULL,
+    direction_name character varying(100) NOT NULL,
+    level_of_edu character varying NOT NULL
+);
+
+
+ALTER TABLE "Session".direction OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 16511)
+-- Name: discipline; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session".discipline (
+    discipline_id integer NOT NULL,
+    discipline_name character varying(100) NOT NULL,
+    form_of_attestation integer NOT NULL,
+    form_of_work integer NOT NULL,
+    total_number_of_hours integer NOT NULL,
+    number_of_laboratory_hours integer,
+    number_of_lecture_hours integer,
+    number_of_practical_hours integer
+);
+
+
+ALTER TABLE "Session".discipline OWNER TO postgres;
+
+--
+-- TOC entry 228 (class 1259 OID 16530)
+-- Name: discipline in syllabus; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session"."discipline in syllabus" (
+    discipline_in_syllabus_id integer NOT NULL,
+    discipline_id integer NOT NULL,
+    syllabus_id integer NOT NULL,
+    semester smallint NOT NULL
+);
+
+
+ALTER TABLE "Session"."discipline in syllabus" OWNER TO postgres;
+
+--
+-- TOC entry 224 (class 1259 OID 16469)
+-- Name: educational program; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session"."educational program" (
+    educational_program_id integer NOT NULL,
+    department_id integer NOT NULL,
+    direction_id integer NOT NULL,
+    start_of_preparation date NOT NULL,
+    end_of_preparation date NOT NULL,
+    form_of_education character varying NOT NULL,
+    learning_format character varying NOT NULL
+);
+
+
+ALTER TABLE "Session"."educational program" OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 16479)
+-- Name: group; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session"."group" (
+    group_id integer NOT NULL,
+    syllabus_id integer NOT NULL,
+    group_number character varying(100) NOT NULL,
+    time_of_existence_from date NOT NULL,
+    time_of_existence_to date,
+    year_of_study integer NOT NULL
+);
+
+
+ALTER TABLE "Session"."group" OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 16414)
+-- Name: platform; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session".platform (
+    platform_id integer NOT NULL,
+    address character varying(100) NOT NULL
+);
+
+
+ALTER TABLE "Session".platform OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 16499)
+-- Name: professor; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session".professor (
+    professor_id integer NOT NULL,
+    name character varying NOT NULL,
+    surname character varying NOT NULL,
+    patronymic character varying,
+    "position" character varying NOT NULL,
+    department_id integer NOT NULL
+);
+
+
+ALTER TABLE "Session".professor OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 16577)
+-- Name: scholarship; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session".scholarship (
+    scholarship_id integer NOT NULL,
+    scholarship_type_id integer NOT NULL,
+    payment_start date NOT NULL,
+    payment_end date NOT NULL,
+    studying_student_id integer NOT NULL
+);
+
+
+ALTER TABLE "Session".scholarship OWNER TO postgres;
+
+--
+-- TOC entry 230 (class 1259 OID 16603)
+-- Name: scholarship type; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session"."scholarship type" (
+    scholarship_type_id integer NOT NULL,
+    form_of_scholarship character varying(100) NOT NULL,
+    conditions_of_scholarship character varying(100) NOT NULL,
+    sum_of_scholarship integer NOT NULL
+);
+
+
+ALTER TABLE "Session"."scholarship type" OWNER TO postgres;
+
+--
+-- TOC entry 231 (class 1259 OID 16614)
+-- Name: session schedule; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session"."session schedule" (
+    session_schedule_id integer NOT NULL,
+    professor_id integer NOT NULL,
+    discipline_in_syllabus_id integer NOT NULL,
+    group_id integer NOT NULL,
+    auditorium_id integer NOT NULL,
+    date date NOT NULL,
+    number_of_class integer NOT NULL
+);
+
+
+ALTER TABLE "Session"."session schedule" OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 16404)
+-- Name: student; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session".student (
+    grade_book_id integer NOT NULL,
+    course integer NOT NULL,
+    surname character varying(20) NOT NULL,
+    name character varying(20) NOT NULL,
+    patronymic character varying(20)
+);
+
+
+ALTER TABLE "Session".student OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 16419)
+-- Name: studying student; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session"."studying student" (
+    studying_student_id integer NOT NULL,
+    grade_book_id integer NOT NULL,
+    group_id integer NOT NULL,
+    status character varying(100) NOT NULL,
+    group_stay_from date NOT NULL,
+    group_stay_to date
+);
+
+
+ALTER TABLE "Session"."studying student" OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 16464)
+-- Name: syllabus; Type: TABLE; Schema: Session; Owner: postgres
+--
+
+CREATE TABLE "Session".syllabus (
+    syllabus_id integer NOT NULL,
+    educational_program_id integer NOT NULL,
+    year_of_enrollment integer NOT NULL
+);
+
+
+ALTER TABLE "Session".syllabus OWNER TO postgres;
+
+--
+-- TOC entry 4978 (class 0 OID 16664)
+-- Dependencies: 232
+-- Data for Name: attestation; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (115, 269, 60, 675686, 'C', 1, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (105, 446, 458, 867159, 'A', 3, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (184, 888, 870, 648114, 'D', 1, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (474, 709, 650, 106586, 'B', 1, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (451, 693, 333, 825342, 'B', 2, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (429, 762, 965, 749222, 'C', 2, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (231, 753, 372, 820856, 'B', 2, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (224, 971, 976, 633100, 'A', 3, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (279, 466, 155, 460218, 'D', 3, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (198, 959, 146, 582963, 'A', 2, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (20, 412, 872, 563063, 'C', 3, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (473, 911, 989, 674836, 'C', 1, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (206, 826, 132, 254999, 'B', 2, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (66, 950, 836, 977888, 'B', 2, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (148, 485, 36, 931087, 'A', 1, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (154, 735, 949, 828851, 'F', 3, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (333, 669, 727, 887161, 'C', 2, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (395, 538, 936, 256066, 'A', 3, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (444, 559, 477, 916337, 'C', 3, '2023-11-16') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".attestation (attestation_id, discipline_in_syllabus_id, professor_id, studying_student_id, mark, attempt, attestation_date) VALUES (281, 228, 556, 389660, 'F', 1, '2023-11-16') ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4968 (class 0 OID 16439)
+-- Dependencies: 222
+-- Data for Name: auditorium; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (491, 58, 33, 3, 4740) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (391, 162, 121, 5, 7637) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (728, 175, 56, 5, 9029) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (778, 224, 55, 4, 4582) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (505, 245, 91, 5, 5999) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (612, 344, 101, 3, 5370) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (170, 438, 114, 2, 1573) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (263, 494, 102, 4, 8823) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (266, 524, 66, 1, 6186) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (349, 570, 58, 3, 8824) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (334, 750, 99, 1, 3967) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (765, 803, 58, 1, 5905) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (379, 807, 133, 5, 4062) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (225, 815, 137, 2, 2176) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (357, 834, 45, 2, 8135) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (361, 835, 74, 2, 8208) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (259, 904, 69, 1, 2283) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (766, 937, 115, 1, 5938) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (896, 940, 26, 4, 8228) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".auditorium (auditorium_id, platform_id, capacity, type, auditorium_number) VALUES (715, 969, 46, 2, 1069) ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4967 (class 0 OID 16429)
+-- Dependencies: 221
+-- Data for Name: department; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (253, 'ultrices aliquet maecenas leo odio condimentum id', 58) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (864, 'interdum eu tincidunt in leo maecenas pulvinar', 162) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (456, 'nulla suscipit ligula', 175) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (661, 'commodo vulputate justo in blandit ultrices', 224) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (320, 'facilisi cras', 245) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (86, 'penatibus et magnis dis parturient montes nascetur', 344) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (284, 'interdum mauris', 438) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (482, 'semper porta volutpat quam pede lobortis ligula sit', 494) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (762, 'augue quam sollicitudin vitae', 524) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (634, 'lectus in quam fringilla rhoncus mauris enim leo', 570) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (884, 'odio odio elementum eu interdum eu', 750) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (477, 'mauris morbi', 803) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (316, 'aenean lectus pellentesque eget nunc donec quis', 807) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (115, 'donec odio justo sollicitudin ut suscipit a feugiat', 815) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (898, 'odio donec vitae nisi nam ultrices', 834) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (736, 'sed nisl', 835) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (675, 'ultrices posuere cubilia', 904) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (582, 'proin interdum mauris non', 937) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (533, 'maecenas leo odio condimentum id luctus nec', 940) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".department (department_id, department_name, platform_id) VALUES (616, 'tortor quis turpis sed', 969) ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4964 (class 0 OID 16409)
+-- Dependencies: 218
+-- Data for Name: direction; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (65, 'consequat morbi a ipsum integer a nibh in', 'Бакалавриат') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (629, 'vivamus tortor duis mattis egestas metus', 'ДПО') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (582, 'non ligula pellentesque', 'Повышение квалификации') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (397, 'viverra dapibus nulla', 'ДПО') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (851, 'ante vel', 'Повышение квалификации') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (431, 'phasellus in', 'ДПО') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (361, 'morbi vestibulum', 'ДПО') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (515, 'dis parturient', 'Повышение квалификации') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (804, 'ultrices posuere cubilia curae donec pharetra magna', 'Проф подготовка') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (310, 'vestibulum ante ipsum primis in faucibus orci', 'Магистратура') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (187, 'in libero ut massa volutpat convallis', 'Повышение квалификации') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (132, 'eleifend quam a odio in hac', 'Бакалавриат') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (651, 'curae duis faucibus accumsan odio curabitur', 'Проф подготовка') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (698, 'libero nullam sit amet turpis', 'СПО') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (580, 'vitae nisi', 'Аспирантура') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (276, 'lectus in quam fringilla rhoncus mauris enim leo', 'СПО') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (358, 'in ante vestibulum ante', 'Бакалавриат') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (652, 'facilisi cras non velit nec nisi vulputate nonummy', 'Магистратура') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (445, 'lobortis ligula sit amet', 'СПО') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".direction (direction_id, direction_name, level_of_edu) VALUES (278, 'nulla tempus vivamus in felis', 'Магистратура') ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4973 (class 0 OID 16511)
+-- Dependencies: 227
+-- Data for Name: discipline; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (133, 'mauris viverra diam', 3, 2, 407, 25, 27, 78) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (421, 'quis orci nullam molestie nibh in lectus pellentesque', 3, 2, 375, 40, 22, 89) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (114, 'bibendum felis sed interdum venenatis turpis enim blandit', 1, 2, 380, 41, 14, 20) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (177, 'tristique tortor', 1, 2, 358, 41, 98, 8) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (881, 'amet diam', 1, 3, 468, 86, 31, 34) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (437, 'in leo maecenas pulvinar lobortis est', 3, 1, 367, 51, 27, 42) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (310, 'eget rutrum at lorem integer', 3, 2, 322, 42, 41, 35) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (44, 'luctus cum sociis natoque penatibus', 2, 1, 411, 52, 75, 7) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (536, 'luctus nec molestie sed justo', 1, 3, 319, 9, 18, 21) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (875, 'iaculis justo in hac habitasse', 2, 1, 483, 50, 71, 65) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (653, 'quisque porta volutpat erat quisque erat eros', 2, 2, 402, 55, 24, 66) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (893, 'enim in tempor turpis nec euismod', 1, 1, 301, 10, 11, 80) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (962, 'quis tortor id nulla ultrices aliquet maecenas leo', 3, 1, 431, 4, 89, 71) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (999, 'in quis justo maecenas rhoncus', 3, 1, 386, 90, 43, 23) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (54, 'accumsan tortor quis turpis sed ante vivamus tortor', 3, 3, 342, 66, 8, 35) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (60, 'nibh in hac habitasse platea dictumst', 3, 1, 346, 77, 8, 84) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (441, 'odio cras mi pede', 2, 1, 456, 2, 72, 9) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (184, 'curabitur gravida nisi', 3, 1, 448, 87, 57, 59) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (942, 'libero quis orci', 1, 2, 380, 22, 76, 83) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".discipline (discipline_id, discipline_name, form_of_attestation, form_of_work, total_number_of_hours, number_of_laboratory_hours, number_of_lecture_hours, number_of_practical_hours) VALUES (181, 'nascetur ridiculus mus vivamus', 3, 3, 345, 36, 43, 44) ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4974 (class 0 OID 16530)
+-- Dependencies: 228
+-- Data for Name: discipline in syllabus; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (269, 44, 138, 8) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (446, 54, 569, 9) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (888, 60, 882, 9) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (709, 114, 750, 8) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (693, 133, 606, 3) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (762, 177, 268, 5) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (753, 181, 188, 10) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (971, 184, 324, 4) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (466, 310, 112, 7) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (959, 421, 473, 7) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (412, 437, 192, 8) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (911, 441, 506, 7) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (826, 536, 267, 1) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (950, 653, 10, 7) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (485, 875, 143, 7) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (735, 881, 402, 10) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (669, 893, 815, 4) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (538, 942, 318, 10) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (559, 962, 758, 10) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."discipline in syllabus" (discipline_in_syllabus_id, discipline_id, syllabus_id, semester) VALUES (228, 999, 44, 5) ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4970 (class 0 OID 16469)
+-- Dependencies: 224
+-- Data for Name: educational program; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (757, 253, 65, '2023-10-26', '2023-11-09', 'Заочная', 'Заочный') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (875, 864, 629, '2023-10-26', '2023-11-09', 'Очно-заочная', 'Заочный') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (169, 456, 582, '2023-10-26', '2023-11-09', 'Очно-заочная', 'Вечерняя') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (922, 661, 397, '2023-10-26', '2023-11-09', 'Заочная', 'Смешанная') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (321, 320, 851, '2023-10-26', '2023-11-09', 'Очная', 'Очный') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (846, 86, 431, '2023-10-26', '2023-11-09', 'Очная', 'Вечерняя') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (672, 284, 361, '2023-10-26', '2023-11-09', 'Заочная', 'Вечерняя') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (141, 482, 515, '2023-10-26', '2023-11-09', 'Заочная', 'Очный') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (357, 762, 804, '2023-10-26', '2023-11-09', 'Заочная', 'Вечерняя') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (844, 634, 310, '2023-10-26', '2023-11-09', 'Очно-заочная', 'Очный') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (505, 884, 187, '2023-10-26', '2023-11-09', 'Очно-заочная', 'Вечерняя') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (464, 477, 132, '2023-10-26', '2023-11-09', 'Заочная', 'Очный') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (86, 316, 651, '2023-10-26', '2023-11-09', 'Заочная', 'Вечерняя') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (454, 115, 698, '2023-10-26', '2023-11-09', 'Очно-заочная', 'Вечерняя') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (621, 898, 580, '2023-10-26', '2023-11-09', 'Заочная', 'Очный') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (306, 736, 276, '2023-10-26', '2023-11-09', 'Очно-заочная', 'Заочный') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (397, 675, 358, '2023-10-26', '2023-11-09', 'Очная', 'Очный') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (533, 582, 652, '2023-10-26', '2023-11-09', 'Очная', 'Вечерняя') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (134, 533, 445, '2023-10-26', '2023-11-09', 'Заочная', 'Очный') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."educational program" (educational_program_id, department_id, direction_id, start_of_preparation, end_of_preparation, form_of_education, learning_format) VALUES (115, 616, 278, '2023-10-26', '2023-11-09', 'Заочная', 'Вечерняя') ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4971 (class 0 OID 16479)
+-- Dependencies: 225
+-- Data for Name: group; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (103, 138, 'nam ultrices libero non mattis pulvinar nulla pede', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (211, 569, 'morbi porttitor', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (185, 882, 'leo odio condimentum id luctus nec', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (19, 750, 'ipsum ac tellus semper interdum mauris', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (155, 606, 'vestibulum quam sapien varius ut blandit non interdum', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (119, 268, 'mattis nibh', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (208, 188, 'quis odio consequat varius integer', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (22, 324, 'proin interdum mauris non', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (143, 112, 'est lacinia nisi venenatis tristique fusce congue diam', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (176, 473, 'lectus vestibulum', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (132, 192, 'aenean lectus pellentesque eget nunc donec quis', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (164, 506, 'id turpis integer aliquet massa id lobortis convallis', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (218, 267, 'commodo vulputate justo', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (231, 10, 'neque duis bibendum morbi non quam nec', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (117, 143, 'penatibus et magnis dis', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (93, 402, 'donec ut mauris eget massa', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (73, 815, 'ultrices aliquet maecenas leo odio condimentum id', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (169, 318, 'quis tortor id nulla ultrices aliquet', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (203, 758, 'odio elementum eu', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."group" (group_id, syllabus_id, group_number, time_of_existence_from, time_of_existence_to, year_of_study) VALUES (277, 44, 'sed nisl', '2023-10-26', '2023-11-09', 2023) ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4965 (class 0 OID 16414)
+-- Dependencies: 219
+-- Data for Name: platform; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session".platform (platform_id, address) VALUES (940, '4 Tennessee Place') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (224, '410 Katie Alley') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (162, '5743 7th Terrace') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (750, '85 Thierer Hill') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (58, '382 Carioca Hill') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (175, '2737 Petterle Parkway') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (807, '28 Claremont Junction') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (835, '58 Fair Oaks Road') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (524, '28497 Eagle Crest Drive') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (815, '70 Namekagon Pass') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (494, '16 Welch Point') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (245, '800 Hagan Hill') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (344, '616 Harbort Road') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (904, '31281 Prairie Rose Trail') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (570, '6467 Duke Point') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (834, '5 Pawling Trail') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (937, '02 Mosinee Street') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (803, '3484 Messerschmidt Center') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (438, '459 Hauk Court') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".platform (platform_id, address) VALUES (969, '761 Florence Lane') ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4972 (class 0 OID 16499)
+-- Dependencies: 226
+-- Data for Name: professor; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (60, 'lobortis vel dapibus at diam', 'eget tempus vel pede morbi', 'massa id lobortis convallis tortor risus dapibus', 'dis parturient', 253) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (458, 'vivamus metus arcu adipiscing molestie hendrerit', 'sapien arcu sed augue aliquam erat volutpat in', 'maecenas leo odio condimentum id luctus nec', 'est risus auctor sed tristique in tempus', 864) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (870, 'maecenas leo', 'neque duis bibendum morbi non quam nec', 'dui vel nisl duis ac nibh', 'consequat lectus in est risus', 456) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (650, 'turpis a pede', 'turpis adipiscing', 'sociis natoque penatibus et magnis dis parturient', 'nulla suspendisse potenti cras in purus eu magna', 661) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (333, 'massa quis augue luctus tincidunt nulla mollis', 'aenean sit amet justo morbi ut', 'ultrices posuere cubilia curae mauris viverra diam', 'mi nulla ac enim in', 320) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (965, 'erat eros', 'eget nunc donec quis orci eget', 'nulla suscipit ligula', 'curabitur convallis duis consequat dui nec nisi', 86) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (372, 'curae mauris viverra diam vitae quam', 'justo etiam pretium iaculis', 'enim in tempor turpis nec euismod scelerisque quam', 'orci luctus et', 284) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (976, 'convallis morbi', 'in hac habitasse platea dictumst etiam faucibus cursus', 'molestie nibh in lectus pellentesque at nulla', 'vestibulum ante ipsum', 482) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (155, 'odio odio elementum eu interdum eu', 'non sodales sed tincidunt eu', 'est lacinia nisi venenatis tristique fusce congue diam', 'fusce consequat', 762) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (146, 'lobortis ligula sit amet', 'nulla elit ac nulla sed vel enim', 'id mauris', 'lectus vestibulum', 634) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (872, 'nullam orci pede venenatis non', 'neque vestibulum eget vulputate ut ultrices vel', 'non interdum in ante vestibulum ante ipsum primis', 'sit amet turpis elementum ligula vehicula', 884) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (989, 'dui vel nisl duis ac nibh', 'vestibulum proin eu', 'adipiscing molestie hendrerit at vulputate vitae', 'iaculis justo in', 477) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (132, 'libero quis orci nullam molestie nibh in', 'ultrices posuere cubilia curae donec pharetra magna', 'id luctus nec molestie sed justo pellentesque', 'sollicitudin vitae consectetuer eget rutrum at lorem', 316) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (836, 'sed tincidunt', 'non lectus aliquam sit amet diam in magna', 'nulla suscipit ligula', 'adipiscing molestie hendrerit at', 115) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (36, 'nullam varius nulla', 'faucibus cursus urna ut', 'ipsum primis in faucibus orci luctus et', 'dui luctus rutrum nulla tellus in sagittis', 898) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (949, 'mauris vulputate elementum', 'cubilia curae', 'ut rhoncus aliquet pulvinar sed', 'posuere felis sed lacus', 736) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (727, 'in libero ut massa volutpat convallis', 'vestibulum quam sapien varius ut blandit non', 'scelerisque mauris sit amet eros suspendisse accumsan', 'accumsan felis ut', 675) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (936, 'lectus aliquam sit amet diam', 'leo odio condimentum id luctus nec', 'vestibulum eget vulputate ut ultrices', 'vestibulum ante ipsum primis in faucibus orci', 582) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (477, 'vestibulum sed magna at nunc commodo placerat praesent', 'mattis odio donec vitae nisi nam', 'lectus vestibulum', 'erat curabitur gravida nisi at', 533) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".professor (professor_id, name, surname, patronymic, "position", department_id) VALUES (556, 'lobortis vel dapibus at diam nam tristique', 'nulla suspendisse potenti cras in purus eu magna', 'luctus rutrum nulla tellus in sagittis dui vel', 'rutrum ac lobortis vel dapibus at diam nam', 616) ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4975 (class 0 OID 16577)
+-- Dependencies: 229
+-- Data for Name: scholarship; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (621, 66, '2023-10-26', '2023-11-09', 675686) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (179, 94, '2023-10-26', '2023-11-09', 867159) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (482, 96, '2023-10-26', '2023-11-09', 648114) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (337, 108, '2023-10-26', '2023-11-09', 106586) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (413, 349, '2023-10-26', '2023-11-09', 825342) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (587, 447, '2023-10-26', '2023-11-09', 749222) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (141, 453, '2023-10-26', '2023-11-09', 820856) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (678, 541, '2023-10-26', '2023-11-09', 633100) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (439, 625, '2023-10-26', '2023-11-09', 460218) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (500, 668, '2023-10-26', '2023-11-09', 582963) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (837, 673, '2023-10-26', '2023-11-09', 563063) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (724, 685, '2023-10-26', '2023-11-09', 674836) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (137, 688, '2023-10-26', '2023-11-09', 254999) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (959, 698, '2023-10-26', '2023-11-09', 977888) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (933, 756, '2023-10-26', '2023-11-09', 931087) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (459, 760, '2023-10-26', '2023-11-09', 828851) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (537, 763, '2023-10-26', '2023-11-09', 887161) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (860, 791, '2023-10-26', '2023-11-09', 256066) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (286, 810, '2023-10-26', '2023-11-09', 916337) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".scholarship (scholarship_id, scholarship_type_id, payment_start, payment_end, studying_student_id) VALUES (691, 971, '2023-10-26', '2023-11-09', 389660) ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4976 (class 0 OID 16603)
+-- Dependencies: 230
+-- Data for Name: scholarship type; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (791, 'metus sapien ut nunc', 'eget tincidunt eget', 15650) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (625, 'consequat nulla nisl nunc nisl', 'in tempor turpis nec euismod scelerisque quam turpis', 10412) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (698, 'ligula sit amet eleifend pede libero quis', 'duis consequat dui nec', 1396) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (668, 'vehicula consequat morbi a ipsum integer a', 'vel nisl duis ac', 2564) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (447, 'pellentesque at', 'adipiscing molestie hendrerit at', 18329) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (760, 'felis sed lacus morbi sem', 'phasellus sit amet erat nulla', 2777) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (541, 'sapien quis libero nullam sit amet turpis', 'et magnis dis parturient montes nascetur ridiculus', 19550) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (688, 'mus etiam vel augue vestibulum rutrum rutrum neque', 'vulputate vitae', 4648) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (673, 'aliquam non mauris morbi non lectus', 'felis ut at dolor quis odio consequat varius', 1678) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (349, 'augue a suscipit nulla', 'semper est quam pharetra', 14177) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (94, 'turpis nec euismod', 'eleifend luctus ultricies eu nibh quisque id', 12197) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (108, 'cras non velit nec', 'magnis dis parturient', 9833) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (763, 'felis donec', 'id ornare imperdiet sapien urna', 12618) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (756, 'libero quis orci nullam molestie nibh in lectus', 'pede ullamcorper augue a', 17228) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (453, 'consectetuer adipiscing elit proin risus praesent lectus vestibulum', 'integer aliquet massa', 17421) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (810, 'semper rutrum nulla nunc', 'luctus ultricies eu nibh quisque id justo sit', 12695) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (96, 'dui maecenas tristique est', 'ut odio cras mi pede', 11104) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (66, 'eu sapien cursus', 'tortor id', 13654) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (685, 'elementum pellentesque quisque porta volutpat', 'morbi sem mauris laoreet', 3161) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."scholarship type" (scholarship_type_id, form_of_scholarship, conditions_of_scholarship, sum_of_scholarship) VALUES (971, 'sodales scelerisque mauris sit', 'nec nisi vulputate nonummy maecenas tincidunt lacus at', 13582) ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4977 (class 0 OID 16614)
+-- Dependencies: 231
+-- Data for Name: session schedule; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (817, 60, 269, 103, 491, '2023-11-16', 6) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (37, 458, 446, 211, 391, '2023-11-16', 8) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (975, 870, 888, 185, 728, '2023-11-16', 8) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (168, 650, 709, 19, 778, '2023-11-16', 4) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (884, 333, 693, 155, 505, '2023-11-16', 8) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (910, 965, 762, 119, 612, '2023-11-16', 2) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (715, 372, 753, 208, 170, '2023-11-16', 3) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (923, 976, 971, 22, 263, '2023-11-16', 8) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (732, 155, 466, 143, 266, '2023-11-16', 5) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (170, 146, 959, 176, 349, '2023-11-16', 2) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (929, 872, 412, 132, 334, '2023-11-16', 6) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (350, 989, 911, 164, 765, '2023-11-16', 6) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (273, 132, 826, 218, 379, '2023-11-16', 6) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (216, 836, 950, 231, 225, '2023-11-16', 3) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (323, 36, 485, 117, 357, '2023-11-16', 6) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (537, 949, 735, 93, 361, '2023-11-16', 6) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (863, 727, 669, 73, 259, '2023-11-16', 8) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (729, 936, 538, 169, 766, '2023-11-16', 7) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (36, 477, 559, 203, 896, '2023-11-16', 8) ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."session schedule" (session_schedule_id, professor_id, discipline_in_syllabus_id, group_id, auditorium_id, date, number_of_class) VALUES (186, 556, 228, 277, 715, '2023-11-16', 8) ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4963 (class 0 OID 16404)
+-- Dependencies: 217
+-- Data for Name: student; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (793977, 3, 'Timeby', 'Faythe', 'Hannaford') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (669644, 1, 'Mackerel', 'Fanchon', 'Torri') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (164932, 5, 'Marron', 'Twyla', 'Bees') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (182991, 1, 'Bartolacci', 'Ruthie', 'Pressdee') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (985248, 1, 'Iveson', 'Barnie', 'Mithon') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (264239, 2, 'Hause', 'Celestine', 'McGready') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (602820, 1, 'Vassar', 'Rania', 'De Gogay') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (788346, 1, 'Joddens', 'Peg', 'Lackie') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (689100, 3, 'Springell', 'Sanson', 'MacInherney') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (604509, 3, 'Eannetta', 'Ellette', 'Gowrich') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (536281, 3, 'Freke', 'Elnore', 'Fricker') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (494414, 3, 'Huriche', 'Flore', 'Seakings') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (706938, 3, 'McAsgill', 'Larine', 'Reddlesden') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (678306, 4, 'Ezzle', 'Nicola', 'Llopis') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (734625, 1, 'Meredith', 'Mirella', 'Crosfield') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (894006, 2, 'Hinze', 'Alford', 'Grenshiels') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (491382, 4, 'Hercules', 'Winona', 'Ilbert') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (823778, 3, 'Eady', 'Aleda', 'Ranahan') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (593770, 1, 'Grogor', 'Francoise', 'Poundford') ON CONFLICT DO NOTHING;
+INSERT INTO "Session".student (grade_book_id, course, surname, name, patronymic) VALUES (440851, 2, 'Flowers', 'Candra', 'Morican') ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4966 (class 0 OID 16419)
+-- Dependencies: 220
+-- Data for Name: studying student; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (675686, 164932, 103, 'magna bibendum imperdiet nullam orci pede', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (867159, 182991, 211, 'faucibus cursus urna ut', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (648114, 264239, 185, 'lacus at velit vivamus vel nulla', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (106586, 440851, 19, 'sagittis nam congue risus semper porta volutpat', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (825342, 491382, 155, 'est risus auctor sed tristique in tempus', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (749222, 494414, 119, 'sit amet consectetuer adipiscing elit', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (820856, 536281, 208, 'ante vel ipsum praesent blandit lacinia erat', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (633100, 593770, 22, 'hac habitasse platea dictumst', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (460218, 602820, 143, 'faucibus cursus urna ut', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (582963, 604509, 176, 'adipiscing molestie hendrerit at vulputate vitae', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (563063, 669644, 132, 'vestibulum ante ipsum primis in faucibus orci', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (674836, 678306, 164, 'interdum mauris', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (254999, 689100, 218, 'accumsan felis ut', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (977888, 706938, 231, 'est et tempus semper est quam', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (931087, 734625, 117, 'nulla suspendisse potenti cras in purus eu magna', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (828851, 788346, 93, 'eget nunc donec quis orci eget', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (887161, 793977, 73, 'blandit ultrices', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (256066, 823778, 169, 'interdum mauris', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (916337, 894006, 203, 'adipiscing molestie hendrerit at', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+INSERT INTO "Session"."studying student" (studying_student_id, grade_book_id, group_id, status, group_stay_from, group_stay_to) VALUES (389660, 985248, 277, 'vestibulum quam sapien varius ut blandit non', '2023-10-26', '2023-11-09') ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4969 (class 0 OID 16464)
+-- Dependencies: 223
+-- Data for Name: syllabus; Type: TABLE DATA; Schema: Session; Owner: postgres
+--
+
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (138, 757, 2018) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (569, 875, 2022) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (882, 169, 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (750, 922, 2018) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (606, 321, 2020) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (268, 846, 2018) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (188, 672, 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (324, 141, 2019) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (112, 357, 2020) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (473, 844, 2019) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (192, 505, 2017) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (506, 464, 2017) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (267, 86, 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (10, 454, 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (143, 621, 2019) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (402, 306, 2021) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (815, 397, 2023) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (318, 533, 2021) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (758, 134, 2019) ON CONFLICT DO NOTHING;
+INSERT INTO "Session".syllabus (syllabus_id, educational_program_id, year_of_enrollment) VALUES (44, 115, 2019) ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 4766 (class 2606 OID 17281)
+-- Name: attestation attempt_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session".attestation
+    ADD CONSTRAINT attempt_chk CHECK (((attempt >= 0) AND (attempt <= 3))) NOT VALID;
+
+
+--
+-- TOC entry 4799 (class 2606 OID 17283)
+-- Name: attestation attestation_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".attestation
+    ADD CONSTRAINT attestation_pkey PRIMARY KEY (attestation_id);
+
+
+--
+-- TOC entry 4779 (class 2606 OID 16443)
+-- Name: auditorium auditorium_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".auditorium
+    ADD CONSTRAINT auditorium_pkey PRIMARY KEY (auditorium_id);
+
+
+--
+-- TOC entry 4753 (class 2606 OID 16494)
+-- Name: auditorium capacity_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session".auditorium
+    ADD CONSTRAINT capacity_chk CHECK ((capacity > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4749 (class 2606 OID 16495)
+-- Name: student course_chk1; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session".student
+    ADD CONSTRAINT course_chk1 CHECK ((course > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4750 (class 2606 OID 16898)
+-- Name: student course_chk2; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session".student
+    ADD CONSTRAINT course_chk2 CHECK ((course <= 5)) NOT VALID;
+
+
+--
+-- TOC entry 4756 (class 2606 OID 16496)
+-- Name: educational program date_of_preparation_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session"."educational program"
+    ADD CONSTRAINT date_of_preparation_chk CHECK ((start_of_preparation < end_of_preparation)) NOT VALID;
+
+
+--
+-- TOC entry 4777 (class 2606 OID 16433)
+-- Name: department department_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".department
+    ADD CONSTRAINT department_pkey PRIMARY KEY (department_id);
+
+
+--
+-- TOC entry 4771 (class 2606 OID 16413)
+-- Name: direction direction_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".direction
+    ADD CONSTRAINT direction_pkey PRIMARY KEY (direction_id);
+
+
+--
+-- TOC entry 4791 (class 2606 OID 16534)
+-- Name: discipline in syllabus discipline in syllabus_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."discipline in syllabus"
+    ADD CONSTRAINT "discipline in syllabus_pkey" PRIMARY KEY (discipline_in_syllabus_id);
+
+
+--
+-- TOC entry 4789 (class 2606 OID 16521)
+-- Name: discipline discipline_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".discipline
+    ADD CONSTRAINT discipline_pkey PRIMARY KEY (discipline_id);
+
+
+--
+-- TOC entry 4783 (class 2606 OID 16473)
+-- Name: educational program educational program_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."educational program"
+    ADD CONSTRAINT "educational program_pkey" PRIMARY KEY (educational_program_id);
+
+
+--
+-- TOC entry 4757 (class 2606 OID 17302)
+-- Name: educational program form_of_education_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session"."educational program"
+    ADD CONSTRAINT form_of_education_chk CHECK (((form_of_education)::text = ANY ((ARRAY['Очная'::character varying, 'Заочная'::character varying, 'Очно-заочная'::character varying])::text[]))) NOT VALID;
+
+
+--
+-- TOC entry 4785 (class 2606 OID 16483)
+-- Name: group group_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."group"
+    ADD CONSTRAINT group_pkey PRIMARY KEY (group_id);
+
+
+--
+-- TOC entry 4752 (class 2606 OID 17265)
+-- Name: studying student group_stay_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session"."studying student"
+    ADD CONSTRAINT group_stay_chk CHECK ((group_stay_from < group_stay_to)) NOT VALID;
+
+
+--
+-- TOC entry 4758 (class 2606 OID 17303)
+-- Name: educational program learning_format_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session"."educational program"
+    ADD CONSTRAINT learning_format_chk CHECK (((learning_format)::text = ANY ((ARRAY['Очный'::character varying, 'Заочный'::character varying, 'Смешанная'::character varying, 'Вечерняя'::character varying])::text[]))) NOT VALID;
+
+
+--
+-- TOC entry 4751 (class 2606 OID 17251)
+-- Name: direction level_of_edu_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session".direction
+    ADD CONSTRAINT level_of_edu_chk CHECK (((level_of_edu)::text = ANY ((ARRAY['Бакалавриат'::character varying, 'Магистратура'::character varying, 'Аспирантура'::character varying, 'СПО'::character varying, 'ДПО'::character varying, 'Повышение квалификации'::character varying, 'Проф подготовка'::character varying])::text[]))) NOT VALID;
+
+
+--
+-- TOC entry 4767 (class 2606 OID 17280)
+-- Name: attestation mark_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session".attestation
+    ADD CONSTRAINT mark_chk CHECK ((mark = ANY (ARRAY['A'::bpchar, 'B'::bpchar, 'C'::bpchar, 'D'::bpchar, 'E'::bpchar, 'F'::bpchar]))) NOT VALID;
+
+
+--
+-- TOC entry 4765 (class 2606 OID 17252)
+-- Name: session schedule number_of_class_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session"."session schedule"
+    ADD CONSTRAINT number_of_class_chk CHECK (((number_of_class > 0) AND (number_of_class <= 8))) NOT VALID;
+
+
+--
+-- TOC entry 4760 (class 2606 OID 17272)
+-- Name: discipline number_of_class_hours_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session".discipline
+    ADD CONSTRAINT number_of_class_hours_chk CHECK (((number_of_laboratory_hours IS NOT NULL) OR (number_of_lecture_hours IS NOT NULL) OR (number_of_practical_hours IS NOT NULL))) NOT VALID;
+
+
+--
+-- TOC entry 4773 (class 2606 OID 16418)
+-- Name: platform platform_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".platform
+    ADD CONSTRAINT platform_pkey PRIMARY KEY (platform_id);
+
+
+--
+-- TOC entry 4787 (class 2606 OID 16505)
+-- Name: professor professor_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".professor
+    ADD CONSTRAINT professor_pkey PRIMARY KEY (professor_id);
+
+
+--
+-- TOC entry 4795 (class 2606 OID 16607)
+-- Name: scholarship type scholarship type_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."scholarship type"
+    ADD CONSTRAINT "scholarship type_pkey" PRIMARY KEY (scholarship_type_id);
+
+
+--
+-- TOC entry 4793 (class 2606 OID 16581)
+-- Name: scholarship scholarship_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".scholarship
+    ADD CONSTRAINT scholarship_pkey PRIMARY KEY (scholarship_id);
+
+
+--
+-- TOC entry 4762 (class 2606 OID 16535)
+-- Name: discipline in syllabus semester_chk1; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session"."discipline in syllabus"
+    ADD CONSTRAINT semester_chk1 CHECK ((semester > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4763 (class 2606 OID 16576)
+-- Name: discipline in syllabus semester_chk2; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session"."discipline in syllabus"
+    ADD CONSTRAINT semester_chk2 CHECK ((semester <= 10)) NOT VALID;
+
+
+--
+-- TOC entry 4797 (class 2606 OID 16618)
+-- Name: session schedule session schedule_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."session schedule"
+    ADD CONSTRAINT "session schedule_pkey" PRIMARY KEY (session_schedule_id);
+
+
+--
+-- TOC entry 4769 (class 2606 OID 16408)
+-- Name: student student_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".student
+    ADD CONSTRAINT student_pkey PRIMARY KEY (grade_book_id);
+
+
+--
+-- TOC entry 4775 (class 2606 OID 17254)
+-- Name: studying student studying_student_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."studying student"
+    ADD CONSTRAINT studying_student_pkey PRIMARY KEY (studying_student_id);
+
+
+--
+-- TOC entry 4764 (class 2606 OID 16613)
+-- Name: scholarship type sum_of_scholarship_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session"."scholarship type"
+    ADD CONSTRAINT sum_of_scholarship_chk CHECK ((sum_of_scholarship > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4781 (class 2606 OID 16468)
+-- Name: syllabus syllabus_pkey; Type: CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".syllabus
+    ADD CONSTRAINT syllabus_pkey PRIMARY KEY (syllabus_id);
+
+
+--
+-- TOC entry 4759 (class 2606 OID 17266)
+-- Name: group time_of_existence; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session"."group"
+    ADD CONSTRAINT time_of_existence CHECK ((time_of_existence_from < time_of_existence_to)) NOT VALID;
+
+
+--
+-- TOC entry 4761 (class 2606 OID 17273)
+-- Name: discipline total_number_of_hours_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session".discipline
+    ADD CONSTRAINT total_number_of_hours_chk CHECK ((((number_of_laboratory_hours + number_of_lecture_hours) + number_of_practical_hours) < total_number_of_hours)) NOT VALID;
+
+
+--
+-- TOC entry 4754 (class 2606 OID 16776)
+-- Name: auditorium type_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session".auditorium
+    ADD CONSTRAINT type_chk CHECK ((type > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4755 (class 2606 OID 17304)
+-- Name: syllabus year_of_enrollment_chk; Type: CHECK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE "Session".syllabus
+    ADD CONSTRAINT year_of_enrollment_chk CHECK (((year_of_enrollment > 1980) AND (year_of_enrollment < 2050))) NOT VALID;
+
+
+--
+-- TOC entry 4813 (class 2606 OID 16654)
+-- Name: session schedule auditorium_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."session schedule"
+    ADD CONSTRAINT auditorium_id_fkey FOREIGN KEY (auditorium_id) REFERENCES "Session".auditorium(auditorium_id) NOT VALID;
+
+
+--
+-- TOC entry 4808 (class 2606 OID 16506)
+-- Name: professor department_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".professor
+    ADD CONSTRAINT department_id_fkey FOREIGN KEY (department_id) REFERENCES "Session".department(department_id) NOT VALID;
+
+
+--
+-- TOC entry 4805 (class 2606 OID 16551)
+-- Name: educational program department_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."educational program"
+    ADD CONSTRAINT department_id_fkey FOREIGN KEY (department_id) REFERENCES "Session".department(department_id) NOT VALID;
+
+
+--
+-- TOC entry 4806 (class 2606 OID 16556)
+-- Name: educational program direction_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."educational program"
+    ADD CONSTRAINT direction_id_fkey FOREIGN KEY (direction_id) REFERENCES "Session".direction(direction_id) NOT VALID;
+
+
+--
+-- TOC entry 4809 (class 2606 OID 16536)
+-- Name: discipline in syllabus discipline_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."discipline in syllabus"
+    ADD CONSTRAINT discipline_id_fkey FOREIGN KEY (discipline_id) REFERENCES "Session".discipline(discipline_id) NOT VALID;
+
+
+--
+-- TOC entry 4814 (class 2606 OID 16624)
+-- Name: session schedule discipline_in_syllabus_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."session schedule"
+    ADD CONSTRAINT discipline_in_syllabus_id_fkey FOREIGN KEY (discipline_in_syllabus_id) REFERENCES "Session"."discipline in syllabus"(discipline_in_syllabus_id) NOT VALID;
+
+
+--
+-- TOC entry 4817 (class 2606 OID 16667)
+-- Name: attestation discipline_in_syllabus_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".attestation
+    ADD CONSTRAINT discipline_in_syllabus_id_fkey FOREIGN KEY (discipline_in_syllabus_id) REFERENCES "Session"."discipline in syllabus"(discipline_in_syllabus_id) NOT VALID;
+
+
+--
+-- TOC entry 4804 (class 2606 OID 16474)
+-- Name: syllabus educational_program_id; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".syllabus
+    ADD CONSTRAINT educational_program_id FOREIGN KEY (educational_program_id) REFERENCES "Session"."educational program"(educational_program_id) NOT VALID;
+
+
+--
+-- TOC entry 4800 (class 2606 OID 17255)
+-- Name: studying student grade_book_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."studying student"
+    ADD CONSTRAINT grade_book_id_fkey FOREIGN KEY (grade_book_id) REFERENCES "Session".student(grade_book_id) NOT VALID;
+
+
+--
+-- TOC entry 4815 (class 2606 OID 16644)
+-- Name: session schedule group_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."session schedule"
+    ADD CONSTRAINT group_id_fkey FOREIGN KEY (group_id) REFERENCES "Session"."group"(group_id) NOT VALID;
+
+
+--
+-- TOC entry 4801 (class 2606 OID 17260)
+-- Name: studying student group_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."studying student"
+    ADD CONSTRAINT group_id_fkey FOREIGN KEY (group_id) REFERENCES "Session"."group"(group_id) NOT VALID;
+
+
+--
+-- TOC entry 4802 (class 2606 OID 16434)
+-- Name: department platform_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".department
+    ADD CONSTRAINT platform_id_fkey FOREIGN KEY (platform_id) REFERENCES "Session".platform(platform_id) NOT VALID;
+
+
+--
+-- TOC entry 4803 (class 2606 OID 16444)
+-- Name: auditorium platform_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".auditorium
+    ADD CONSTRAINT platform_id_fkey FOREIGN KEY (platform_id) REFERENCES "Session".platform(platform_id) NOT VALID;
+
+
+--
+-- TOC entry 4816 (class 2606 OID 16619)
+-- Name: session schedule professor_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."session schedule"
+    ADD CONSTRAINT professor_id_fkey FOREIGN KEY (professor_id) REFERENCES "Session".professor(professor_id) NOT VALID;
+
+
+--
+-- TOC entry 4818 (class 2606 OID 16682)
+-- Name: attestation professor_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".attestation
+    ADD CONSTRAINT professor_id_fkey FOREIGN KEY (professor_id) REFERENCES "Session".professor(professor_id) NOT VALID;
+
+
+--
+-- TOC entry 4811 (class 2606 OID 16608)
+-- Name: scholarship scholarship_type_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".scholarship
+    ADD CONSTRAINT scholarship_type_id_fkey FOREIGN KEY (scholarship_type_id) REFERENCES "Session"."scholarship type"(scholarship_type_id) NOT VALID;
+
+
+--
+-- TOC entry 4819 (class 2606 OID 17284)
+-- Name: attestation studying_student_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".attestation
+    ADD CONSTRAINT studying_student_id_fkey FOREIGN KEY (studying_student_id) REFERENCES "Session"."studying student"(studying_student_id) NOT VALID;
+
+
+--
+-- TOC entry 4812 (class 2606 OID 17297)
+-- Name: scholarship studying_student_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session".scholarship
+    ADD CONSTRAINT studying_student_id_fkey FOREIGN KEY (studying_student_id) REFERENCES "Session"."studying student"(studying_student_id) NOT VALID;
+
+
+--
+-- TOC entry 4807 (class 2606 OID 16489)
+-- Name: group syllabus_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."group"
+    ADD CONSTRAINT syllabus_id_fkey FOREIGN KEY (syllabus_id) REFERENCES "Session".syllabus(syllabus_id) NOT VALID;
+
+
+--
+-- TOC entry 4810 (class 2606 OID 16546)
+-- Name: discipline in syllabus syllabus_id_fkey; Type: FK CONSTRAINT; Schema: Session; Owner: postgres
+--
+
+ALTER TABLE ONLY "Session"."discipline in syllabus"
+    ADD CONSTRAINT syllabus_id_fkey FOREIGN KEY (syllabus_id) REFERENCES "Session".syllabus(syllabus_id) NOT VALID;
+
+
+--
+-- TOC entry 4986 (class 0 OID 0)
+-- Dependencies: 6
+-- Name: SCHEMA "Session"; Type: ACL; Schema: -; Owner: pg_database_owner
+--
+
+GRANT USAGE ON SCHEMA "Session" TO PUBLIC;
+
+
+--
+-- TOC entry 4987 (class 0 OID 0)
+-- Dependencies: 7
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE USAGE ON SCHEMA public FROM PUBLIC;
+
+
+-- Completed on 2023-11-09 02:59:58
+
+--
+-- PostgreSQL database dump complete
+--
+
