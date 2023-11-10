@@ -5,7 +5,7 @@
 -- Dumped from database version 14.9
 -- Dumped by pg_dump version 14.9
 
--- Started on 2023-10-29 12:27:49
+-- Started on 2023-11-10 17:08:44
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -19,6 +19,57 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- TOC entry 3544 (class 1262 OID 13754)
+-- Name: postgres; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE postgres WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'Russian_Russia.1251';
+
+
+ALTER DATABASE postgres OWNER TO postgres;
+
+\connect postgres
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 3545 (class 0 OID 0)
+-- Dependencies: 3544
+-- Name: DATABASE postgres; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON DATABASE postgres IS 'default administrative connection database';
+
+
+--
+-- TOC entry 8 (class 2615 OID 16394)
+-- Name: pgagent; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA pgagent;
+
+
+ALTER SCHEMA pgagent OWNER TO postgres;
+
+--
+-- TOC entry 3546 (class 0 OID 0)
+-- Dependencies: 8
+-- Name: SCHEMA pgagent; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON SCHEMA pgagent IS 'pgAgent system tables';
+
+
+--
 -- TOC entry 10 (class 2615 OID 16558)
 -- Name: railways; Type: SCHEMA; Schema: -; Owner: postgres
 --
@@ -27,6 +78,40 @@ CREATE SCHEMA railways;
 
 
 ALTER SCHEMA railways OWNER TO postgres;
+
+--
+-- TOC entry 2 (class 3079 OID 16384)
+-- Name: adminpack; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS adminpack WITH SCHEMA pg_catalog;
+
+
+--
+-- TOC entry 3547 (class 0 OID 0)
+-- Dependencies: 2
+-- Name: EXTENSION adminpack; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION adminpack IS 'administrative functions for PostgreSQL';
+
+
+--
+-- TOC entry 3 (class 3079 OID 16395)
+-- Name: pgagent; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgagent WITH SCHEMA pgagent;
+
+
+--
+-- TOC entry 3548 (class 0 OID 0)
+-- Dependencies: 3
+-- Name: EXTENSION pgagent; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pgagent IS 'A PostgreSQL job scheduler';
+
 
 SET default_tablespace = '';
 
@@ -240,7 +325,88 @@ CREATE TABLE railways.trains (
 ALTER TABLE railways.trains OWNER TO postgres;
 
 --
--- TOC entry 3450 (class 0 OID 16574)
+-- TOC entry 3258 (class 0 OID 16396)
+-- Dependencies: 215
+-- Data for Name: pga_jobagent; Type: TABLE DATA; Schema: pgagent; Owner: postgres
+--
+
+COPY pgagent.pga_jobagent (jagpid, jaglogintime, jagstation) FROM stdin;
+8596	2023-11-09 03:58:16.129202+03	Mary-Laptop
+\.
+
+
+--
+-- TOC entry 3259 (class 0 OID 16405)
+-- Dependencies: 217
+-- Data for Name: pga_jobclass; Type: TABLE DATA; Schema: pgagent; Owner: postgres
+--
+
+COPY pgagent.pga_jobclass (jclid, jclname) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3260 (class 0 OID 16415)
+-- Dependencies: 219
+-- Data for Name: pga_job; Type: TABLE DATA; Schema: pgagent; Owner: postgres
+--
+
+COPY pgagent.pga_job (jobid, jobjclid, jobname, jobdesc, jobhostagent, jobenabled, jobcreated, jobchanged, jobagentid, jobnextrun, joblastrun) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3262 (class 0 OID 16463)
+-- Dependencies: 223
+-- Data for Name: pga_schedule; Type: TABLE DATA; Schema: pgagent; Owner: postgres
+--
+
+COPY pgagent.pga_schedule (jscid, jscjobid, jscname, jscdesc, jscenabled, jscstart, jscend, jscminutes, jschours, jscweekdays, jscmonthdays, jscmonths) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3263 (class 0 OID 16491)
+-- Dependencies: 225
+-- Data for Name: pga_exception; Type: TABLE DATA; Schema: pgagent; Owner: postgres
+--
+
+COPY pgagent.pga_exception (jexid, jexscid, jexdate, jextime) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3264 (class 0 OID 16505)
+-- Dependencies: 227
+-- Data for Name: pga_joblog; Type: TABLE DATA; Schema: pgagent; Owner: postgres
+--
+
+COPY pgagent.pga_joblog (jlgid, jlgjobid, jlgstatus, jlgstart, jlgduration) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3261 (class 0 OID 16439)
+-- Dependencies: 221
+-- Data for Name: pga_jobstep; Type: TABLE DATA; Schema: pgagent; Owner: postgres
+--
+
+COPY pgagent.pga_jobstep (jstid, jstjobid, jstname, jstdesc, jstenabled, jstkind, jstcode, jstconnstr, jstdbname, jstonerror, jscnextrun) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3265 (class 0 OID 16521)
+-- Dependencies: 229
+-- Data for Name: pga_jobsteplog; Type: TABLE DATA; Schema: pgagent; Owner: postgres
+--
+
+COPY pgagent.pga_jobsteplog (jslid, jsljlgid, jsljstid, jslstatus, jslresult, jslstart, jslduration, jsloutput) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3530 (class 0 OID 16574)
 -- Dependencies: 233
 -- Data for Name: carriages; Type: TABLE DATA; Schema: railways; Owner: postgres
 --
@@ -265,7 +431,7 @@ COPY railways.carriages (carriage_id, carriage_type_id, carriage_serial_number) 
 
 
 --
--- TOC entry 3451 (class 0 OID 16579)
+-- TOC entry 3531 (class 0 OID 16579)
 -- Dependencies: 234
 -- Data for Name: carriages_types; Type: TABLE DATA; Schema: railways; Owner: postgres
 --
@@ -281,7 +447,7 @@ COPY railways.carriages_types (carriage_type_id, name_carriage_type, number_of_s
 
 
 --
--- TOC entry 3456 (class 0 OID 16607)
+-- TOC entry 3536 (class 0 OID 16607)
 -- Dependencies: 239
 -- Data for Name: cash_registers; Type: TABLE DATA; Schema: railways; Owner: postgres
 --
@@ -297,7 +463,7 @@ COPY railways.cash_registers (cash_register_id, adress) FROM stdin;
 
 
 --
--- TOC entry 3454 (class 0 OID 16597)
+-- TOC entry 3534 (class 0 OID 16597)
 -- Dependencies: 237
 -- Data for Name: passengers; Type: TABLE DATA; Schema: railways; Owner: postgres
 --
@@ -314,7 +480,7 @@ COPY railways.passengers (passenger_id, name, surname, middle_name, document_ser
 
 
 --
--- TOC entry 3458 (class 0 OID 16758)
+-- TOC entry 3538 (class 0 OID 16758)
 -- Dependencies: 241
 -- Data for Name: scheduled_train_carriages; Type: TABLE DATA; Schema: railways; Owner: postgres
 --
@@ -338,7 +504,7 @@ COPY railways.scheduled_train_carriages (scheduled_train_carriage_id, carriage_i
 
 
 --
--- TOC entry 3447 (class 0 OID 16559)
+-- TOC entry 3527 (class 0 OID 16559)
 -- Dependencies: 230
 -- Data for Name: scheduled_trains; Type: TABLE DATA; Schema: railways; Owner: postgres
 --
@@ -364,7 +530,7 @@ COPY railways.scheduled_trains (scheduled_train_id) FROM stdin;
 
 
 --
--- TOC entry 3449 (class 0 OID 16569)
+-- TOC entry 3529 (class 0 OID 16569)
 -- Dependencies: 232
 -- Data for Name: seats; Type: TABLE DATA; Schema: railways; Owner: postgres
 --
@@ -380,7 +546,7 @@ COPY railways.seats (seat_id, seat_number, is_empty, price, scheduled_train_carr
 
 
 --
--- TOC entry 3448 (class 0 OID 16564)
+-- TOC entry 3528 (class 0 OID 16564)
 -- Dependencies: 231
 -- Data for Name: stations; Type: TABLE DATA; Schema: railways; Owner: postgres
 --
@@ -401,7 +567,7 @@ COPY railways.stations (station_id, station_name, station_type) FROM stdin;
 
 
 --
--- TOC entry 3455 (class 0 OID 16602)
+-- TOC entry 3535 (class 0 OID 16602)
 -- Dependencies: 238
 -- Data for Name: tickets; Type: TABLE DATA; Schema: railways; Owner: postgres
 --
@@ -413,7 +579,7 @@ COPY railways.tickets (ticket_id, passenger_id, cash_register_id, departure_stat
 
 
 --
--- TOC entry 3457 (class 0 OID 16612)
+-- TOC entry 3537 (class 0 OID 16612)
 -- Dependencies: 240
 -- Data for Name: timetable; Type: TABLE DATA; Schema: railways; Owner: postgres
 --
@@ -437,7 +603,7 @@ COPY railways.timetable (timetable_id, train_id, status, departure_time, arrival
 
 
 --
--- TOC entry 3452 (class 0 OID 16587)
+-- TOC entry 3532 (class 0 OID 16587)
 -- Dependencies: 235
 -- Data for Name: train_stations; Type: TABLE DATA; Schema: railways; Owner: postgres
 --
@@ -483,7 +649,7 @@ COPY railways.train_stations (train_station_id, train_id, station_id, departure_
 
 
 --
--- TOC entry 3453 (class 0 OID 16592)
+-- TOC entry 3533 (class 0 OID 16592)
 -- Dependencies: 236
 -- Data for Name: trains; Type: TABLE DATA; Schema: railways; Owner: postgres
 --
@@ -503,7 +669,7 @@ COPY railways.trains (train_id, train_number, train_name, train_type, monday_dep
 
 
 --
--- TOC entry 3271 (class 2606 OID 16578)
+-- TOC entry 3351 (class 2606 OID 16578)
 -- Name: carriages carriages_pkey; Type: CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -512,7 +678,7 @@ ALTER TABLE ONLY railways.carriages
 
 
 --
--- TOC entry 3274 (class 2606 OID 16585)
+-- TOC entry 3354 (class 2606 OID 16585)
 -- Name: carriages_types carriages_types_pkey; Type: CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -521,7 +687,7 @@ ALTER TABLE ONLY railways.carriages_types
 
 
 --
--- TOC entry 3291 (class 2606 OID 16611)
+-- TOC entry 3371 (class 2606 OID 16611)
 -- Name: cash_registers cash_registers_pkey; Type: CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -530,7 +696,7 @@ ALTER TABLE ONLY railways.cash_registers
 
 
 --
--- TOC entry 3284 (class 2606 OID 16601)
+-- TOC entry 3364 (class 2606 OID 16601)
 -- Name: passengers passengers_pkey; Type: CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -539,7 +705,7 @@ ALTER TABLE ONLY railways.passengers
 
 
 --
--- TOC entry 3295 (class 2606 OID 16762)
+-- TOC entry 3375 (class 2606 OID 16762)
 -- Name: scheduled_train_carriages scheduled_train_carriages_pkey; Type: CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -548,7 +714,7 @@ ALTER TABLE ONLY railways.scheduled_train_carriages
 
 
 --
--- TOC entry 3265 (class 2606 OID 16563)
+-- TOC entry 3345 (class 2606 OID 16563)
 -- Name: scheduled_trains scheduled_train_pkey; Type: CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -557,7 +723,7 @@ ALTER TABLE ONLY railways.scheduled_trains
 
 
 --
--- TOC entry 3269 (class 2606 OID 16573)
+-- TOC entry 3349 (class 2606 OID 16573)
 -- Name: seats seats_pkey; Type: CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -566,7 +732,7 @@ ALTER TABLE ONLY railways.seats
 
 
 --
--- TOC entry 3267 (class 2606 OID 16568)
+-- TOC entry 3347 (class 2606 OID 16568)
 -- Name: stations stations_pkey; Type: CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -575,7 +741,7 @@ ALTER TABLE ONLY railways.stations
 
 
 --
--- TOC entry 3263 (class 2606 OID 16742)
+-- TOC entry 3320 (class 2606 OID 16742)
 -- Name: timetable status_check; Type: CHECK CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -584,7 +750,7 @@ ALTER TABLE railways.timetable
 
 
 --
--- TOC entry 3289 (class 2606 OID 16606)
+-- TOC entry 3369 (class 2606 OID 16606)
 -- Name: tickets tickets_pkey; Type: CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -593,7 +759,7 @@ ALTER TABLE ONLY railways.tickets
 
 
 --
--- TOC entry 3293 (class 2606 OID 16616)
+-- TOC entry 3373 (class 2606 OID 16616)
 -- Name: timetable timetable_pkey; Type: CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -602,7 +768,7 @@ ALTER TABLE ONLY railways.timetable
 
 
 --
--- TOC entry 3280 (class 2606 OID 16699)
+-- TOC entry 3360 (class 2606 OID 16699)
 -- Name: trains train_number; Type: CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -611,7 +777,7 @@ ALTER TABLE ONLY railways.trains
 
 
 --
--- TOC entry 3278 (class 2606 OID 16591)
+-- TOC entry 3358 (class 2606 OID 16591)
 -- Name: train_stations train_stations_pkey; Type: CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -620,7 +786,7 @@ ALTER TABLE ONLY railways.train_stations
 
 
 --
--- TOC entry 3282 (class 2606 OID 16596)
+-- TOC entry 3362 (class 2606 OID 16596)
 -- Name: trains trains_pkey; Type: CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -629,7 +795,7 @@ ALTER TABLE ONLY railways.trains
 
 
 --
--- TOC entry 3262 (class 2606 OID 16741)
+-- TOC entry 3319 (class 2606 OID 16741)
 -- Name: tickets way_of_paying_ckeck; Type: CHECK CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -638,7 +804,7 @@ ALTER TABLE railways.tickets
 
 
 --
--- TOC entry 3272 (class 1259 OID 16622)
+-- TOC entry 3352 (class 1259 OID 16622)
 -- Name: fki_carriage_type_id_fk; Type: INDEX; Schema: railways; Owner: postgres
 --
 
@@ -646,7 +812,7 @@ CREATE INDEX fki_carriage_type_id_fk ON railways.carriages USING btree (carriage
 
 
 --
--- TOC entry 3285 (class 1259 OID 16685)
+-- TOC entry 3365 (class 1259 OID 16685)
 -- Name: fki_cash_register_id_fk; Type: INDEX; Schema: railways; Owner: postgres
 --
 
@@ -654,7 +820,7 @@ CREATE INDEX fki_cash_register_id_fk ON railways.tickets USING btree (cash_regis
 
 
 --
--- TOC entry 3286 (class 1259 OID 16673)
+-- TOC entry 3366 (class 1259 OID 16673)
 -- Name: fki_passenger_id_fk; Type: INDEX; Schema: railways; Owner: postgres
 --
 
@@ -662,7 +828,7 @@ CREATE INDEX fki_passenger_id_fk ON railways.tickets USING btree (passenger_id);
 
 
 --
--- TOC entry 3287 (class 1259 OID 16679)
+-- TOC entry 3367 (class 1259 OID 16679)
 -- Name: fki_seat_id_fk; Type: INDEX; Schema: railways; Owner: postgres
 --
 
@@ -670,7 +836,7 @@ CREATE INDEX fki_seat_id_fk ON railways.tickets USING btree (seat);
 
 
 --
--- TOC entry 3275 (class 1259 OID 16651)
+-- TOC entry 3355 (class 1259 OID 16651)
 -- Name: fki_station_id_fk; Type: INDEX; Schema: railways; Owner: postgres
 --
 
@@ -678,7 +844,7 @@ CREATE INDEX fki_station_id_fk ON railways.train_stations USING btree (station_i
 
 
 --
--- TOC entry 3276 (class 1259 OID 16645)
+-- TOC entry 3356 (class 1259 OID 16645)
 -- Name: fki_train_id_fk; Type: INDEX; Schema: railways; Owner: postgres
 --
 
@@ -686,7 +852,7 @@ CREATE INDEX fki_train_id_fk ON railways.train_stations USING btree (train_id);
 
 
 --
--- TOC entry 3305 (class 2606 OID 16763)
+-- TOC entry 3385 (class 2606 OID 16763)
 -- Name: scheduled_train_carriages carriage_id_fk; Type: FK CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -695,7 +861,7 @@ ALTER TABLE ONLY railways.scheduled_train_carriages
 
 
 --
--- TOC entry 3297 (class 2606 OID 16629)
+-- TOC entry 3377 (class 2606 OID 16629)
 -- Name: carriages carriage_type_id_fk; Type: FK CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -704,7 +870,7 @@ ALTER TABLE ONLY railways.carriages
 
 
 --
--- TOC entry 3302 (class 2606 OID 16680)
+-- TOC entry 3382 (class 2606 OID 16680)
 -- Name: tickets cash_register_id_fk; Type: FK CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -713,7 +879,7 @@ ALTER TABLE ONLY railways.tickets
 
 
 --
--- TOC entry 3300 (class 2606 OID 16668)
+-- TOC entry 3380 (class 2606 OID 16668)
 -- Name: tickets passenger_id_fk; Type: FK CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -722,7 +888,7 @@ ALTER TABLE ONLY railways.tickets
 
 
 --
--- TOC entry 3296 (class 2606 OID 16778)
+-- TOC entry 3376 (class 2606 OID 16778)
 -- Name: seats scheduled_train_carriage_id_fk; Type: FK CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -731,7 +897,7 @@ ALTER TABLE ONLY railways.seats
 
 
 --
--- TOC entry 3306 (class 2606 OID 16768)
+-- TOC entry 3386 (class 2606 OID 16768)
 -- Name: scheduled_train_carriages scheduled_train_id_fk; Type: FK CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -740,7 +906,7 @@ ALTER TABLE ONLY railways.scheduled_train_carriages
 
 
 --
--- TOC entry 3304 (class 2606 OID 16773)
+-- TOC entry 3384 (class 2606 OID 16773)
 -- Name: timetable scheduled_train_id_fk; Type: FK CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -749,7 +915,7 @@ ALTER TABLE ONLY railways.timetable
 
 
 --
--- TOC entry 3301 (class 2606 OID 16674)
+-- TOC entry 3381 (class 2606 OID 16674)
 -- Name: tickets seat_id_fk; Type: FK CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -758,7 +924,7 @@ ALTER TABLE ONLY railways.tickets
 
 
 --
--- TOC entry 3299 (class 2606 OID 16646)
+-- TOC entry 3379 (class 2606 OID 16646)
 -- Name: train_stations station_id_fk; Type: FK CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -767,7 +933,7 @@ ALTER TABLE ONLY railways.train_stations
 
 
 --
--- TOC entry 3298 (class 2606 OID 16640)
+-- TOC entry 3378 (class 2606 OID 16640)
 -- Name: train_stations train_id_fk; Type: FK CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -776,7 +942,7 @@ ALTER TABLE ONLY railways.train_stations
 
 
 --
--- TOC entry 3303 (class 2606 OID 16657)
+-- TOC entry 3383 (class 2606 OID 16657)
 -- Name: timetable train_id_fk; Type: FK CONSTRAINT; Schema: railways; Owner: postgres
 --
 
@@ -785,14 +951,14 @@ ALTER TABLE ONLY railways.timetable
 
 
 --
--- TOC entry 3446 (class 0 OID 16569)
+-- TOC entry 3526 (class 0 OID 16569)
 -- Dependencies: 232
 -- Name: seats; Type: ROW SECURITY; Schema: railways; Owner: postgres
 --
 
 ALTER TABLE railways.seats ENABLE ROW LEVEL SECURITY;
 
--- Completed on 2023-10-29 12:27:50
+-- Completed on 2023-11-10 17:08:45
 
 --
 -- PostgreSQL database dump complete
