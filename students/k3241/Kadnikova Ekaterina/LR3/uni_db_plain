@@ -1,0 +1,1012 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 16.0
+-- Dumped by pg_dump version 16.0
+
+-- Started on 2023-10-27 12:06:42
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 6 (class 2615 OID 16405)
+-- Name: lab3; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA lab3;
+
+
+ALTER SCHEMA lab3 OWNER TO postgres;
+
+--
+-- TOC entry 2 (class 3079 OID 16384)
+-- Name: adminpack; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS adminpack WITH SCHEMA pg_catalog;
+
+
+--
+-- TOC entry 4945 (class 0 OID 0)
+-- Dependencies: 2
+-- Name: EXTENSION adminpack; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION adminpack IS 'administrative functions for PostgreSQL';
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 220 (class 1259 OID 24620)
+-- Name: Auditorium; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Auditorium" (
+    id_aud integer NOT NULL,
+    number_aud integer NOT NULL,
+    type_aud character varying(64),
+    adress character varying(64) NOT NULL,
+    busyness character varying(35),
+    id_department integer NOT NULL,
+    CONSTRAINT right_busyness_chk CHECK (((busyness)::text = ANY ((ARRAY['свободно'::character varying, 'занято'::character varying])::text[]))),
+    CONSTRAINT right_type_aud_chk CHECK (((type_aud)::text = ANY ((ARRAY['лекционная'::character varying, 'лабораторная'::character varying, 'практическая'::character varying, 'коворкинг'::character varying, 'офис'::character varying])::text[])))
+);
+
+
+ALTER TABLE lab3."Auditorium" OWNER TO postgres;
+
+--
+-- TOC entry 216 (class 1259 OID 24581)
+-- Name: Branch; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Branch" (
+    id_branch integer NOT NULL,
+    city_branch character varying(64) NOT NULL,
+    adress character varying(64) NOT NULL
+);
+
+
+ALTER TABLE lab3."Branch" OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 24586)
+-- Name: Department; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Department" (
+    id_department integer NOT NULL,
+    id_branch integer NOT NULL,
+    name_department character varying(64) NOT NULL
+);
+
+
+ALTER TABLE lab3."Department" OWNER TO postgres;
+
+--
+-- TOC entry 228 (class 1259 OID 24705)
+-- Name: Grade; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Grade" (
+    id_student integer NOT NULL,
+    id_group integer NOT NULL,
+    id_teacher integer NOT NULL,
+    id_subject_on_programm integer NOT NULL,
+    grade_date date NOT NULL,
+    grade integer DEFAULT 2,
+    trial_number integer DEFAULT 1,
+    CONSTRAINT right_grade_chk CHECK (((grade <= 5) AND (grade > 1))),
+    CONSTRAINT right_trial_number_chk CHECK ((trial_number <= 3))
+);
+
+
+ALTER TABLE lab3."Grade" OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 24646)
+-- Name: Group; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Group" (
+    id_group integer NOT NULL,
+    number_group integer NOT NULL,
+    status_group character varying(35) NOT NULL,
+    max_people_count integer DEFAULT 30,
+    CONSTRAINT right_group_number_chk CHECK (((number_group >= 100) AND (number_group <= 999))),
+    CONSTRAINT status_group_chk CHECK (((status_group)::text = ANY ((ARRAY['обучается'::character varying, 'набирается'::character varying, 'закрыта'::character varying])::text[])))
+);
+
+
+ALTER TABLE lab3."Group" OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 24668)
+-- Name: Group on programm; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Group on programm" (
+    id_programm integer NOT NULL,
+    id_group integer NOT NULL,
+    type_recruit character varying(35) NOT NULL,
+    date_start date NOT NULL,
+    date_finish date NOT NULL,
+    max_people_count integer,
+    CONSTRAINT right_dates_chk CHECK ((date_finish > date_start)),
+    CONSTRAINT right_type_recruit_chk CHECK (((type_recruit)::text = ANY ((ARRAY['очный'::character varying, 'дистанционный'::character varying])::text[])))
+);
+
+
+ALTER TABLE lab3."Group on programm" OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 24597)
+-- Name: Position; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Position" (
+    id_position integer NOT NULL,
+    name_position character varying(64) NOT NULL,
+    description_position text NOT NULL
+);
+
+
+ALTER TABLE lab3."Position" OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 24635)
+-- Name: Programm; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Programm" (
+    id_programm integer NOT NULL,
+    type_programm character varying(48) NOT NULL,
+    name_programm character varying(64) NOT NULL,
+    tuition_fee integer DEFAULT 0,
+    id_department integer NOT NULL,
+    CONSTRAINT right_programm_type_chk CHECK (((type_programm)::text = ANY ((ARRAY['бакалавриат'::character varying, 'аспирантура'::character varying, 'магистратура'::character varying])::text[])))
+);
+
+
+ALTER TABLE lab3."Programm" OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 24734)
+-- Name: Schedule; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Schedule" (
+    id_subject_on_programm integer NOT NULL,
+    id_teacher integer NOT NULL,
+    id_aud integer NOT NULL,
+    id_group integer NOT NULL,
+    lesson_time character varying(12) NOT NULL,
+    lesson_date date NOT NULL,
+    lesson_type character varying(35) NOT NULL,
+    week_number integer NOT NULL,
+    lesson_number integer DEFAULT 0,
+    CONSTRAINT right_lesson_type_chk CHECK (((lesson_type)::text = ANY ((ARRAY['лабораторный практикум'::character varying, 'лекция'::character varying, 'практика'::character varying])::text[])))
+);
+
+
+ALTER TABLE lab3."Schedule" OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 24630)
+-- Name: Student; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Student" (
+    id_student integer NOT NULL,
+    student_surname character varying(64) NOT NULL,
+    student_name character varying(64) NOT NULL,
+    student_middle_name character varying(64),
+    passport_number integer,
+    contacts character varying(64) NOT NULL
+);
+
+
+ALTER TABLE lab3."Student" OWNER TO postgres;
+
+--
+-- TOC entry 224 (class 1259 OID 24652)
+-- Name: Student in group; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Student in group" (
+    id_student integer NOT NULL,
+    id_group integer NOT NULL,
+    education_document integer
+);
+
+
+ALTER TABLE lab3."Student in group" OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 24684)
+-- Name: Study subject; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Study subject" (
+    id_subject integer NOT NULL,
+    name_subject character varying(72) NOT NULL,
+    total_hours_count integer NOT NULL,
+    type_hours_count integer,
+    certification_format character varying(35) NOT NULL,
+    CONSTRAINT right_certification_format_chk CHECK (((certification_format)::text = ANY ((ARRAY['экзамен'::character varying, 'зачет'::character varying, 'дифференцированный зачет'::character varying])::text[])))
+);
+
+
+ALTER TABLE lab3."Study subject" OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 24689)
+-- Name: Study subject on programm; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Study subject on programm" (
+    id_subject_on_programm integer NOT NULL,
+    id_programm integer NOT NULL,
+    id_subject integer NOT NULL
+);
+
+
+ALTER TABLE lab3."Study subject on programm" OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 24604)
+-- Name: Teacher; Type: TABLE; Schema: lab3; Owner: postgres
+--
+
+CREATE TABLE lab3."Teacher" (
+    id_teacher integer NOT NULL,
+    surname_teacher character varying(64) NOT NULL,
+    name_teacher character varying(64) NOT NULL,
+    middle_name_teacher character varying(64),
+    id_position integer NOT NULL,
+    id_department integer NOT NULL
+);
+
+
+ALTER TABLE lab3."Teacher" OWNER TO postgres;
+
+--
+-- TOC entry 4930 (class 0 OID 24620)
+-- Dependencies: 220
+-- Data for Name: Auditorium; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Auditorium" (id_aud, number_aud, type_aud, adress, busyness, id_department) FROM stdin;
+1	101	лекционная	Чайковского 11	свободно	1
+2	2102	лабораторная	Ломоносова 9	свободно	1
+3	2201	практическая	Ломоносова 9	занято	2
+4	3202	лабораторная	Кронверский 49	занято	2
+5	4301	коворкинг	Ломоносова 9	свободно	3
+6	302	офис	Биржевая 14	свободно	3
+7	401	лекционная	Биржевая 14	занято	1
+8	4402	практическая	Ломоносова 9	занято	3
+9	2501	лекционная	Кронверский 49	свободно	4
+10	502	лабораторная	Чайковского 11	свободно	5
+\.
+
+
+--
+-- TOC entry 4926 (class 0 OID 24581)
+-- Dependencies: 216
+-- Data for Name: Branch; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Branch" (id_branch, city_branch, adress) FROM stdin;
+1	Санкт-Петербург	Биржевая 14
+2	Санкт-Петербург	Ломоносова 9
+3	Санкт-Петербург	Кронверский 10
+4	Санкт-Петербург	Чайковского 11
+\.
+
+
+--
+-- TOC entry 4927 (class 0 OID 24586)
+-- Dependencies: 217
+-- Data for Name: Department; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Department" (id_department, id_branch, name_department) FROM stdin;
+1	1	ИКТ
+2	3	ФИТИП
+3	2	ФТМФ
+4	2	НОЖ
+5	4	ФТМИ
+\.
+
+
+--
+-- TOC entry 4938 (class 0 OID 24705)
+-- Dependencies: 228
+-- Data for Name: Grade; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Grade" (id_student, id_group, id_teacher, id_subject_on_programm, grade_date, grade, trial_number) FROM stdin;
+3	2	6	3	2023-01-12	4	2
+7	4	1	4	2022-01-03	3	1
+\.
+
+
+--
+-- TOC entry 4933 (class 0 OID 24646)
+-- Dependencies: 223
+-- Data for Name: Group; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Group" (id_group, number_group, status_group, max_people_count) FROM stdin;
+1	101	набирается	20
+2	102	обучается	25
+3	201	набирается	15
+4	202	закрыта	15
+5	301	обучается	30
+6	302	набирается	25
+7	401	обучается	20
+8	402	набирается	20
+9	501	закрыта	15
+10	502	набирается	25
+\.
+
+
+--
+-- TOC entry 4935 (class 0 OID 24668)
+-- Dependencies: 225
+-- Data for Name: Group on programm; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Group on programm" (id_programm, id_group, type_recruit, date_start, date_finish, max_people_count) FROM stdin;
+1	1	очный	2022-09-01	2023-05-31	32
+2	2	очный	2021-12-01	2022-08-31	32
+1	3	дистанционный	2022-09-01	2023-02-28	45
+3	4	дистанционный	2022-01-15	2022-06-30	45
+2	5	очный	2022-02-01	2022-11-30	32
+4	6	очный	2022-09-01	2023-04-30	25
+3	7	дистанционный	2021-11-15	2022-03-31	35
+1	8	очный	2022-01-01	2022-08-31	21
+4	9	дистанционный	2022-09-01	2023-03-31	34
+2	10	очный	2022-04-01	2022-12-31	27
+\.
+
+
+--
+-- TOC entry 4928 (class 0 OID 24597)
+-- Dependencies: 218
+-- Data for Name: Position; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Position" (id_position, name_position, description_position) FROM stdin;
+1	Преподаватель математики	Проводить лекции и практические занятия по мтаематике
+2	Практик по математике	Проводить практические занятия по математике
+3	Ментор по математике	Проверять домашние, рубежные и контрольные работы студентов
+4	Менеджер программы	Следить за всеми процессами на направлении
+5	Преподаватель английского языка	Проводить практические занятия по английскому языку
+6	Преподаватель по объектно-ориентированному программированию	Проводить лекции, практические занятия и лабораторыне практики по объектно-ориентированному программированию
+7	Ментор по объектно-ориентированному программированию	Проверять лабораторные работы студентов по объектно-ориентированному программированию
+8	Преподаватель по механике	Проводить лекции, практические занятия и лабораторные практикумы по механике
+9	Преподаватель по экономике	Проводить лекции и практические занятия по экономике
+\.
+
+
+--
+-- TOC entry 4932 (class 0 OID 24635)
+-- Dependencies: 222
+-- Data for Name: Programm; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Programm" (id_programm, type_programm, name_programm, tuition_fee, id_department) FROM stdin;
+1	бакалавриат	Прикладная информатика	300000	1
+2	бакалавриат	Школа разработки видеоигр	250000	1
+3	магистратура	Программирование и интернет-технологии	450000	2
+4	аспирантура	Фотоника	350000	3
+5	аспирантура	Региональная и отраслевая экономика	350000	5
+6	магистратура	Прикладная геномика	370000	4
+\.
+
+
+--
+-- TOC entry 4939 (class 0 OID 24734)
+-- Dependencies: 229
+-- Data for Name: Schedule; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Schedule" (id_subject_on_programm, id_teacher, id_aud, id_group, lesson_time, lesson_date, lesson_type, week_number, lesson_number) FROM stdin;
+3	6	9	2	11:40	2022-05-12	лабораторный практикум	4	3
+\.
+
+
+--
+-- TOC entry 4931 (class 0 OID 24630)
+-- Dependencies: 221
+-- Data for Name: Student; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Student" (id_student, student_surname, student_name, student_middle_name, passport_number, contacts) FROM stdin;
+1	Кадникова	Екатерина	Михайловна	4011111	tg/@rrrwwwaaarrr
+2	Кузнецова	Кира	Александровна	402300000	tg/@kikirkw
+3	Тарасов	Алексей	Михайлович	401622222	tg/@tarrrasa
+4	Иванов	Иван	Иванович	123456789	ivanov@mail.com
+5	Петров	Петр	Петрович	987654321	petrov@mail.com
+6	Сидоров	Сидор	Сидорович	456789123	sidorov@mail.com
+7	Кузнецов	Кузьма	Кузьмич	258369147	kuznetsov@mail.com
+8	Алексеев	Алексей	Алексеевич	147896325	alekseev@mail.com
+9	Смирнов	Семен	Семенович	963852741	smirnov@mail.com
+10	Николаев	Николай	Николаевич	654123987	nikolaev@mail.com
+11	Морозов	Михаил	Михайлович	321789654	morozov@mail.com
+12	Васильев	Василий	Васильевич	741852963	vasiliev@mail.com
+13	Козлов	Константин	Константинович	987123654	kozlov@mail.com
+\.
+
+
+--
+-- TOC entry 4934 (class 0 OID 24652)
+-- Dependencies: 224
+-- Data for Name: Student in group; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Student in group" (id_student, id_group, education_document) FROM stdin;
+1	1	45678294
+2	1	58358792
+3	2	58392010
+4	2	16479403
+5	3	9274718
+6	3	16363849
+7	4	34464839
+8	4	12456789
+9	5	87654322
+10	5	2234567
+\.
+
+
+--
+-- TOC entry 4936 (class 0 OID 24684)
+-- Dependencies: 226
+-- Data for Name: Study subject; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Study subject" (id_subject, name_subject, total_hours_count, type_hours_count, certification_format) FROM stdin;
+1	Математика	216	108	экзамен
+2	Экономика	108	54	зачет
+3	Объектно-ориентированное программирование	288	144	дифференцированный зачет
+4	История	108	54	экзамен
+5	Английский язык	216	216	зачет
+\.
+
+
+--
+-- TOC entry 4937 (class 0 OID 24689)
+-- Dependencies: 227
+-- Data for Name: Study subject on programm; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Study subject on programm" (id_subject_on_programm, id_programm, id_subject) FROM stdin;
+1	1	3
+2	1	1
+3	2	3
+4	3	1
+5	3	5
+6	4	1
+7	5	2
+8	5	5
+9	5	4
+\.
+
+
+--
+-- TOC entry 4929 (class 0 OID 24604)
+-- Dependencies: 219
+-- Data for Name: Teacher; Type: TABLE DATA; Schema: lab3; Owner: postgres
+--
+
+COPY lab3."Teacher" (id_teacher, surname_teacher, name_teacher, middle_name_teacher, id_position, id_department) FROM stdin;
+1	Петров	Иван	Иванович	1	5
+2	Смирнова	Елена	Александровна	2	4
+3	Иванов	Алексей	Петрович	3	3
+4	Кузнецова	Марина	Сергеевна	4	2
+5	Алексеев	Денис	Владимирович	5	1
+6	Сидорова	Ольга	Викторовна	6	2
+7	Васильев	Сергей	Игоревич	7	3
+8	Николаева	Юлия	Алексеевна	8	4
+9	Куликов	Андрей	Викторович	9	5
+\.
+
+
+--
+-- TOC entry 4725 (class 2606 OID 24624)
+-- Name: Auditorium auditorium_pkey; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Auditorium"
+    ADD CONSTRAINT auditorium_pkey PRIMARY KEY (id_aud);
+
+
+--
+-- TOC entry 4760 (class 2606 OID 24711)
+-- Name: Grade grade_pkey; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Grade"
+    ADD CONSTRAINT grade_pkey PRIMARY KEY (id_student, id_group, id_teacher, id_subject_on_programm);
+
+
+--
+-- TOC entry 4745 (class 2606 OID 24672)
+-- Name: Group on programm group_on_programm_pkey; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Group on programm"
+    ADD CONSTRAINT group_on_programm_pkey PRIMARY KEY (id_programm, id_group);
+
+
+--
+-- TOC entry 4737 (class 2606 OID 24651)
+-- Name: Group group_pkey; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Group"
+    ADD CONSTRAINT group_pkey PRIMARY KEY (id_group);
+
+
+--
+-- TOC entry 4727 (class 2606 OID 32769)
+-- Name: Auditorium id_aud; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Auditorium"
+    ADD CONSTRAINT id_aud UNIQUE (id_aud);
+
+
+--
+-- TOC entry 4703 (class 2606 OID 24585)
+-- Name: Branch id_branch; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Branch"
+    ADD CONSTRAINT id_branch PRIMARY KEY (id_branch);
+
+
+--
+-- TOC entry 4708 (class 2606 OID 24590)
+-- Name: Department id_department; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Department"
+    ADD CONSTRAINT id_department PRIMARY KEY (id_department);
+
+
+--
+-- TOC entry 4739 (class 2606 OID 32771)
+-- Name: Group id_group; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Group"
+    ADD CONSTRAINT id_group UNIQUE (id_group);
+
+
+--
+-- TOC entry 4714 (class 2606 OID 24603)
+-- Name: Position id_position; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Position"
+    ADD CONSTRAINT id_position PRIMARY KEY (id_position);
+
+
+--
+-- TOC entry 4733 (class 2606 OID 24640)
+-- Name: Programm id_programm; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Programm"
+    ADD CONSTRAINT id_programm PRIMARY KEY (id_programm);
+
+
+--
+-- TOC entry 4729 (class 2606 OID 24634)
+-- Name: Student id_student; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Student"
+    ADD CONSTRAINT id_student PRIMARY KEY (id_student);
+
+
+--
+-- TOC entry 4747 (class 2606 OID 32775)
+-- Name: Study subject id_subject; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Study subject"
+    ADD CONSTRAINT id_subject UNIQUE (id_subject);
+
+
+--
+-- TOC entry 4754 (class 2606 OID 24693)
+-- Name: Study subject on programm id_subject_on_programm; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Study subject on programm"
+    ADD CONSTRAINT id_subject_on_programm PRIMARY KEY (id_subject_on_programm);
+
+
+--
+-- TOC entry 4721 (class 2606 OID 24608)
+-- Name: Teacher id_teacher; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Teacher"
+    ADD CONSTRAINT id_teacher PRIMARY KEY (id_teacher);
+
+
+--
+-- TOC entry 4749 (class 2606 OID 32816)
+-- Name: Study subject name_subject; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Study subject"
+    ADD CONSTRAINT name_subject UNIQUE (name_subject);
+
+
+--
+-- TOC entry 4763 (class 2606 OID 24739)
+-- Name: Schedule schedule_pkey; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Schedule"
+    ADD CONSTRAINT schedule_pkey PRIMARY KEY (id_subject_on_programm, id_teacher, id_aud, id_group);
+
+
+--
+-- TOC entry 4751 (class 2606 OID 24688)
+-- Name: Study subject stude_subject_pkey; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Study subject"
+    ADD CONSTRAINT stude_subject_pkey PRIMARY KEY (id_subject);
+
+
+--
+-- TOC entry 4742 (class 2606 OID 24656)
+-- Name: Student in group student_in_group_pkey; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Student in group"
+    ADD CONSTRAINT student_in_group_pkey PRIMARY KEY (id_student, id_group);
+
+
+--
+-- TOC entry 4705 (class 2606 OID 32925)
+-- Name: Branch unique_branch_id; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Branch"
+    ADD CONSTRAINT unique_branch_id UNIQUE (id_branch);
+
+
+--
+-- TOC entry 4710 (class 2606 OID 32915)
+-- Name: Department unique_department_name; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Department"
+    ADD CONSTRAINT unique_department_name UNIQUE (name_department);
+
+
+--
+-- TOC entry 4712 (class 2606 OID 32913)
+-- Name: Department unique_deprtment_id; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Department"
+    ADD CONSTRAINT unique_deprtment_id UNIQUE (id_department);
+
+
+--
+-- TOC entry 4716 (class 2606 OID 32906)
+-- Name: Position unique_id_position; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Position"
+    ADD CONSTRAINT unique_id_position UNIQUE (id_position);
+
+
+--
+-- TOC entry 4756 (class 2606 OID 32910)
+-- Name: Study subject on programm unique_id_subject_on_programm; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Study subject on programm"
+    ADD CONSTRAINT unique_id_subject_on_programm UNIQUE (id_subject_on_programm);
+
+
+--
+-- TOC entry 4718 (class 2606 OID 32908)
+-- Name: Position unique_position_name; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Position"
+    ADD CONSTRAINT unique_position_name UNIQUE (name_position);
+
+
+--
+-- TOC entry 4735 (class 2606 OID 32919)
+-- Name: Programm unique_programm_id; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Programm"
+    ADD CONSTRAINT unique_programm_id UNIQUE (id_programm);
+
+
+--
+-- TOC entry 4731 (class 2606 OID 32923)
+-- Name: Student unique_student_id; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Student"
+    ADD CONSTRAINT unique_student_id UNIQUE (id_student);
+
+
+--
+-- TOC entry 4723 (class 2606 OID 32917)
+-- Name: Teacher unique_teacher_id; Type: CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Teacher"
+    ADD CONSTRAINT unique_teacher_id UNIQUE (id_teacher);
+
+
+--
+-- TOC entry 4761 (class 1259 OID 24755)
+-- Name: fki_id_аудитории; Type: INDEX; Schema: lab3; Owner: postgres
+--
+
+CREATE INDEX "fki_id_аудитории" ON lab3."Schedule" USING btree (id_aud);
+
+
+--
+-- TOC entry 4740 (class 1259 OID 24667)
+-- Name: fki_id_группы; Type: INDEX; Schema: lab3; Owner: postgres
+--
+
+CREATE INDEX "fki_id_группы" ON lab3."Student in group" USING btree (id_group);
+
+
+--
+-- TOC entry 4752 (class 1259 OID 24704)
+-- Name: fki_id_дисциплины; Type: INDEX; Schema: lab3; Owner: postgres
+--
+
+CREATE INDEX "fki_id_дисциплины" ON lab3."Study subject on programm" USING btree (id_subject);
+
+
+--
+-- TOC entry 4757 (class 1259 OID 24733)
+-- Name: fki_id_дисциплины_на_программе; Type: INDEX; Schema: lab3; Owner: postgres
+--
+
+CREATE INDEX "fki_id_дисциплины_на_программе" ON lab3."Grade" USING btree (id_subject_on_programm);
+
+
+--
+-- TOC entry 4719 (class 1259 OID 24619)
+-- Name: fki_id_подразделения; Type: INDEX; Schema: lab3; Owner: postgres
+--
+
+CREATE INDEX "fki_id_подразделения" ON lab3."Teacher" USING btree (id_department);
+
+
+--
+-- TOC entry 4758 (class 1259 OID 24727)
+-- Name: fki_id_преподавателя; Type: INDEX; Schema: lab3; Owner: postgres
+--
+
+CREATE INDEX "fki_id_преподавателя" ON lab3."Grade" USING btree (id_teacher);
+
+
+--
+-- TOC entry 4743 (class 1259 OID 24678)
+-- Name: fki_id_программы; Type: INDEX; Schema: lab3; Owner: postgres
+--
+
+CREATE INDEX "fki_id_программы" ON lab3."Group on programm" USING btree (id_programm);
+
+
+--
+-- TOC entry 4706 (class 1259 OID 24596)
+-- Name: fki_ш; Type: INDEX; Schema: lab3; Owner: postgres
+--
+
+CREATE INDEX "fki_ш" ON lab3."Department" USING btree (id_branch);
+
+
+--
+-- TOC entry 4779 (class 2606 OID 24750)
+-- Name: Schedule id_aud; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Schedule"
+    ADD CONSTRAINT id_aud FOREIGN KEY (id_aud) REFERENCES lab3."Auditorium"(id_aud);
+
+
+--
+-- TOC entry 4764 (class 2606 OID 24591)
+-- Name: Department id_branch; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Department"
+    ADD CONSTRAINT id_branch FOREIGN KEY (id_branch) REFERENCES lab3."Branch"(id_branch);
+
+
+--
+-- TOC entry 4765 (class 2606 OID 24614)
+-- Name: Teacher id_department; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Teacher"
+    ADD CONSTRAINT id_department FOREIGN KEY (id_department) REFERENCES lab3."Department"(id_department);
+
+
+--
+-- TOC entry 4767 (class 2606 OID 24625)
+-- Name: Auditorium id_department; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Auditorium"
+    ADD CONSTRAINT id_department FOREIGN KEY (id_department) REFERENCES lab3."Department"(id_department);
+
+
+--
+-- TOC entry 4768 (class 2606 OID 24641)
+-- Name: Programm id_department; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Programm"
+    ADD CONSTRAINT id_department FOREIGN KEY (id_department) REFERENCES lab3."Department"(id_department);
+
+
+--
+-- TOC entry 4769 (class 2606 OID 24662)
+-- Name: Student in group id_group; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Student in group"
+    ADD CONSTRAINT id_group FOREIGN KEY (id_group) REFERENCES lab3."Group"(id_group);
+
+
+--
+-- TOC entry 4771 (class 2606 OID 24679)
+-- Name: Group on programm id_group; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Group on programm"
+    ADD CONSTRAINT id_group FOREIGN KEY (id_group) REFERENCES lab3."Group"(id_group);
+
+
+--
+-- TOC entry 4775 (class 2606 OID 24717)
+-- Name: Grade id_group; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Grade"
+    ADD CONSTRAINT id_group FOREIGN KEY (id_group) REFERENCES lab3."Group"(id_group);
+
+
+--
+-- TOC entry 4780 (class 2606 OID 24756)
+-- Name: Schedule id_group; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Schedule"
+    ADD CONSTRAINT id_group FOREIGN KEY (id_group) REFERENCES lab3."Group"(id_group);
+
+
+--
+-- TOC entry 4766 (class 2606 OID 24609)
+-- Name: Teacher id_position; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Teacher"
+    ADD CONSTRAINT id_position FOREIGN KEY (id_position) REFERENCES lab3."Position"(id_position);
+
+
+--
+-- TOC entry 4772 (class 2606 OID 24673)
+-- Name: Group on programm id_programm; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Group on programm"
+    ADD CONSTRAINT id_programm FOREIGN KEY (id_programm) REFERENCES lab3."Programm"(id_programm);
+
+
+--
+-- TOC entry 4773 (class 2606 OID 24694)
+-- Name: Study subject on programm id_programm; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Study subject on programm"
+    ADD CONSTRAINT id_programm FOREIGN KEY (id_programm) REFERENCES lab3."Programm"(id_programm);
+
+
+--
+-- TOC entry 4770 (class 2606 OID 24657)
+-- Name: Student in group id_student; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Student in group"
+    ADD CONSTRAINT id_student FOREIGN KEY (id_student) REFERENCES lab3."Student"(id_student);
+
+
+--
+-- TOC entry 4776 (class 2606 OID 24712)
+-- Name: Grade id_student; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Grade"
+    ADD CONSTRAINT id_student FOREIGN KEY (id_student) REFERENCES lab3."Student"(id_student);
+
+
+--
+-- TOC entry 4774 (class 2606 OID 24699)
+-- Name: Study subject on programm id_subject; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Study subject on programm"
+    ADD CONSTRAINT id_subject FOREIGN KEY (id_subject) REFERENCES lab3."Study subject"(id_subject);
+
+
+--
+-- TOC entry 4777 (class 2606 OID 24728)
+-- Name: Grade id_subject_on_programm; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Grade"
+    ADD CONSTRAINT id_subject_on_programm FOREIGN KEY (id_subject_on_programm) REFERENCES lab3."Study subject on programm"(id_subject_on_programm);
+
+
+--
+-- TOC entry 4781 (class 2606 OID 24740)
+-- Name: Schedule id_subject_on_programm; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Schedule"
+    ADD CONSTRAINT id_subject_on_programm FOREIGN KEY (id_subject_on_programm) REFERENCES lab3."Study subject on programm"(id_subject_on_programm);
+
+
+--
+-- TOC entry 4778 (class 2606 OID 24722)
+-- Name: Grade id_teacher; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Grade"
+    ADD CONSTRAINT id_teacher FOREIGN KEY (id_teacher) REFERENCES lab3."Teacher"(id_teacher);
+
+
+--
+-- TOC entry 4782 (class 2606 OID 24745)
+-- Name: Schedule id_teacher; Type: FK CONSTRAINT; Schema: lab3; Owner: postgres
+--
+
+ALTER TABLE ONLY lab3."Schedule"
+    ADD CONSTRAINT id_teacher FOREIGN KEY (id_teacher) REFERENCES lab3."Teacher"(id_teacher);
+
+
+-- Completed on 2023-10-27 12:06:43
+
+--
+-- PostgreSQL database dump complete
+--
+
