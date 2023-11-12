@@ -1,0 +1,1817 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 15.4
+-- Dumped by pg_dump version 15.4
+
+-- Started on 2023-11-10 15:08:10
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 3487 (class 1262 OID 16398)
+-- Name: Airport; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE "Airport" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'Russian_Russia.1251';
+
+
+ALTER DATABASE "Airport" OWNER TO postgres;
+
+\connect "Airport"
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 217 (class 1259 OID 16439)
+-- Name: Aircraft_model; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Aircraft_model" (
+    model_number integer NOT NULL,
+    type character varying(20) NOT NULL,
+    number_of_seats integer NOT NULL,
+    purpose character varying(50) NOT NULL,
+    fuel_consumption integer DEFAULT 0,
+    load_capacity integer DEFAULT 0
+);
+
+
+ALTER TABLE public."Aircraft_model" OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 16519)
+-- Name: Flight; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Flight" (
+    flight_id integer NOT NULL,
+    "on-board_number" character varying(20) NOT NULL,
+    schedule_id integer NOT NULL,
+    departure_time date,
+    arrival_time date,
+    status character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public."Flight" OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 16446)
+-- Name: Plane; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Plane" (
+    "on-board_number" character varying(20) NOT NULL,
+    airline_name character varying(50),
+    date_of_last_repair date,
+    production_date date,
+    model_number integer
+);
+
+
+ALTER TABLE public."Plane" OWNER TO postgres;
+
+--
+-- TOC entry 238 (class 1259 OID 16993)
+-- Name: AircraftCountByModelLastMonth; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public."AircraftCountByModelLastMonth" AS
+ SELECT am.type AS aircraft_type,
+    count(DISTINCT p."on-board_number") AS aircraft_count
+   FROM ((public."Plane" p
+     JOIN public."Flight" f ON (((p."on-board_number")::text = (f."on-board_number")::text)))
+     JOIN public."Aircraft_model" am ON ((p.model_number = am.model_number)))
+  WHERE ((f.departure_time >= (CURRENT_DATE - '1 mon'::interval)) AND (f.departure_time <= CURRENT_DATE))
+  GROUP BY am.type;
+
+
+ALTER TABLE public."AircraftCountByModelLastMonth" OWNER TO postgres;
+
+--
+-- TOC entry 215 (class 1259 OID 16428)
+-- Name: Airline_employee; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Airline_employee" (
+    employee_code integer NOT NULL,
+    fullname character varying(100) NOT NULL,
+    flight_time_in_hours integer,
+    post character varying(20) NOT NULL,
+    airline_name character varying(50),
+    phone_number character varying(12),
+    email character varying(40)
+);
+
+
+ALTER TABLE public."Airline_employee" OWNER TO postgres;
+
+--
+-- TOC entry 232 (class 1259 OID 16578)
+-- Name: Airline_employee_employee_code_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Airline_employee" ALTER COLUMN employee_code ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public."Airline_employee_employee_code_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 214 (class 1259 OID 16422)
+-- Name: Airlline; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Airlline" (
+    airline_name character varying(50) NOT NULL,
+    owner character varying(50),
+    number_of_employees integer NOT NULL
+);
+
+
+ALTER TABLE public."Airlline" OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 16462)
+-- Name: Airport; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Airport" (
+    airport_number integer NOT NULL,
+    address character varying(50) NOT NULL,
+    number_of_lanes integer DEFAULT 0,
+    number_of_ladders integer DEFAULT 0,
+    capacity_of_the_waiting_room integer DEFAULT 0,
+    airport_name character varying(50) NOT NULL
+);
+
+
+ALTER TABLE public."Airport" OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 16461)
+-- Name: Airport_airport_number_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Airport" ALTER COLUMN airport_number ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public."Airport_airport_number_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 228 (class 1259 OID 16509)
+-- Name: Cashier; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Cashier" (
+    service_number integer NOT NULL,
+    fullname character varying(50) NOT NULL,
+    post character varying(50) NOT NULL,
+    cash_number integer NOT NULL,
+    phone_number character varying(12),
+    email character varying(40)
+);
+
+
+ALTER TABLE public."Cashier" OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 16508)
+-- Name: Cashier_service_number_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Cashier" ALTER COLUMN service_number ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public."Cashier_service_number_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 225 (class 1259 OID 16498)
+-- Name: Client; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Client" (
+    paper numeric(10,0) NOT NULL,
+    fullname character varying(50) NOT NULL,
+    phone_number character varying(12),
+    email character varying(40)
+);
+
+
+ALTER TABLE public."Client" OWNER TO postgres;
+
+--
+-- TOC entry 231 (class 1259 OID 16568)
+-- Name: Crew; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Crew" (
+    crew_id integer NOT NULL,
+    last_medical_examination date,
+    position_in_flight character varying(30) NOT NULL,
+    flight_id integer NOT NULL,
+    employee_code integer NOT NULL,
+    examination_status integer DEFAULT 0
+);
+
+
+ALTER TABLE public."Crew" OWNER TO postgres;
+
+--
+-- TOC entry 230 (class 1259 OID 16567)
+-- Name: Crew_crew_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Crew" ALTER COLUMN crew_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public."Crew_crew_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 235 (class 1259 OID 16611)
+-- Name: Flight_flight_number_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Flight" ALTER COLUMN flight_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public."Flight_flight_number_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 222 (class 1259 OID 16471)
+-- Name: Schedule; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Schedule" (
+    schedule_number integer NOT NULL,
+    in_flight_time integer DEFAULT 0 NOT NULL,
+    departure_time time with time zone NOT NULL,
+    arrival_time time with time zone NOT NULL,
+    departure_airport_number integer NOT NULL,
+    arrival_airport_number integer NOT NULL
+);
+
+
+ALTER TABLE public."Schedule" OWNER TO postgres;
+
+--
+-- TOC entry 237 (class 1259 OID 16983)
+-- Name: MoscowFlightsView; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public."MoscowFlightsView" AS
+ SELECT f.flight_id,
+    f."on-board_number",
+    f.departure_time,
+    f.arrival_time,
+    s_departure.airport_name AS departure_airport,
+    s_arrival.airport_name AS arrival_airport,
+    p.airline_name
+   FROM ((((public."Flight" f
+     JOIN public."Schedule" s ON ((f.schedule_id = s.schedule_number)))
+     JOIN public."Plane" p ON (((f."on-board_number")::text = (p."on-board_number")::text)))
+     JOIN public."Airport" s_departure ON ((s.departure_airport_number = s_departure.airport_number)))
+     JOIN public."Airport" s_arrival ON ((s.arrival_airport_number = s_arrival.airport_number)))
+  WHERE ((s_arrival.airport_number = ANY (ARRAY[1, 8, 21, 31, 41, 51, 61])) AND ((f.departure_time >= CURRENT_TIMESTAMP) AND (f.departure_time <= (CURRENT_TIMESTAMP + '7 days'::interval))))
+  ORDER BY f.departure_time;
+
+
+ALTER TABLE public."MoscowFlightsView" OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 16503)
+-- Name: Sales_cash; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Sales_cash" (
+    cash_number integer NOT NULL,
+    address character varying(50)
+);
+
+
+ALTER TABLE public."Sales_cash" OWNER TO postgres;
+
+--
+-- TOC entry 236 (class 1259 OID 16612)
+-- Name: Sales_cash_cash_number_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Sales_cash" ALTER COLUMN cash_number ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public."Sales_cash_cash_number_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 234 (class 1259 OID 16585)
+-- Name: Ticket; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Ticket" (
+    ticket_number integer NOT NULL,
+    flight_id integer NOT NULL,
+    schedule_id integer NOT NULL,
+    paper numeric(11,0) NOT NULL,
+    service_number integer,
+    registration_status character varying(20) DEFAULT 'В обработке'::character varying NOT NULL,
+    seat character varying(4),
+    price numeric,
+    seat_type character varying(10),
+    purchase_type character varying(10)
+);
+
+
+ALTER TABLE public."Ticket" OWNER TO postgres;
+
+--
+-- TOC entry 233 (class 1259 OID 16584)
+-- Name: Ticket_ticket_number_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Ticket" ALTER COLUMN ticket_number ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public."Ticket_ticket_number_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 224 (class 1259 OID 16483)
+-- Name: Transit_boarding; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Transit_boarding" (
+    "Transit_number" integer NOT NULL,
+    schedule_id integer NOT NULL,
+    departure_time time with time zone NOT NULL,
+    arrival_time time with time zone NOT NULL,
+    in_flight_time integer NOT NULL,
+    departure_airport_number integer NOT NULL,
+    arrival_airpor_number integer NOT NULL
+);
+
+
+ALTER TABLE public."Transit_boarding" OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 16482)
+-- Name: Transit_boarding_Transit_number_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Transit_boarding" ALTER COLUMN "Transit_number" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public."Transit_boarding_Transit_number_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 216 (class 1259 OID 16438)
+-- Name: aircraft_model_model_number_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Aircraft_model" ALTER COLUMN model_number ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.aircraft_model_model_number_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 221 (class 1259 OID 16470)
+-- Name: schedule_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Schedule" ALTER COLUMN schedule_number ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.schedule_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 3462 (class 0 OID 16439)
+-- Dependencies: 217
+-- Data for Name: Aircraft_model; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Aircraft_model" (model_number, type, number_of_seats, purpose, fuel_consumption, load_capacity) FROM stdin;
+2	АН-225	35	Малый пассажирский	10	50
+3	Су-76	80	Крупный пассажирский	13	45
+4	Airbus A319	100	Многофункциональный	15	50
+5	Heinkel He 111	34	Многофункциональный	21	150
+6	Ту-4	156	Крупный пассажирский	15	95
+15	Airbus A320	40	Крупный пассажирский	13	60
+16	Boing 737	60	Крупный пассажирский	20	50
+10	АН-15	30	Малый пассажирский	10	36
+11	АН-12	25	Малый пассажирский	8	30
+\.
+
+
+--
+-- TOC entry 3460 (class 0 OID 16428)
+-- Dependencies: 215
+-- Data for Name: Airline_employee; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Airline_employee" (employee_code, fullname, flight_time_in_hours, post, airline_name, phone_number, email) FROM stdin;
+5	Сергеев Максим Сергеевич	60	Лётчик	Аэрофлот	8960759208	bvdf@mail.ru
+4	Александров Александр Александрович	350	Лётчик	Россия	\N	\N
+1	Зубков Анатолий Иванович	150	Лётчик	Аэрофлот	\N	\N
+2	Беглов Андрей Сергеевич	0	Бортпроводник	Россия	\N	\N
+3	Макаров Максим Максимович	60	Лётчик	Аэрофлот	\N	\N
+6	Карпов Дмитрий Андреевич	44	Лётчик	Аэрофлот	891355672345	tatyana.sokolova@example.com
+7	Лазарев Денис Викторович	97	Лётчик	Аэрофлот	89138765432	ivanov@example.com
+8	Зайцева Анастасия Дмитриевна	170	Лётчик	Аэрофлот	891355432109	sergei.andreev@example.com
+9	Зайцева Анастасия Дмитриевна	73	Лётчик	Аэрофлот	89138765432	petrov@example.com
+10	Кузнецов Алексей Владимирович	70	Лётчик	Победа	891354321098	alex.kuznetsov@example.com
+11	Павлова Ольга Николаевна	72	Лётчик	Россия	89138765432	ekaterina.smirnova@example.com
+12	Иванов Иван Иванович	45	Лётчик	S7 AIRLINES	89138765432	elena.kozlova@example.com
+13	Павлова Ольга Николаевна	57	Лётчик	S7 AIRLINES	891352345678	igor.morozov@example.com
+14	Афанасьева Вера Александровна	161	Лётчик	Победа	891355432109	elena.kozlova@example.com
+15	Петров Петр Петрович	186	Лётчик	Аэрофлот	891351239876	max.nikitin@example.com
+16	Белов Владислав Михайлович	109	Лётчик	Россия	891355432109	andrey.lebedev@example.com
+17	Кузнецов Алексей Владимирович	37	Лётчик	Россия	891351239876	olga.pavlova@example.com
+18	Кузнецов Алексей Владимирович	96	Лётчик	Уральские авиалинии	89138765432	igor.morozov@example.com
+19	Зайцева Анастасия Дмитриевна	59	Лётчик	Победа	891353210987	alex.kuznetsov@example.com
+20	Петров Петр Петрович	194	Лётчик	Победа	891353210987	ivanov@example.com
+21	Петров Петр Петрович	100	Лётчик	S7 AIRLINES	891353456789	ivanov@example.com
+22	Сидоров Сидор Сидорович	156	Лётчик	Россия	891355672345	sergei.andreev@example.com
+23	Смирнова Екатерина Андреевна	148	Лётчик	Россия	891354321098	alex.kuznetsov@example.com
+24	Лазарев Денис Викторович	28	Лётчик	Аэрофлот	891351239876	alex.kuznetsov@example.com
+25	Смирнова Екатерина Андреевна	86	Лётчик	Победа	891356783456	sidorov@example.com
+26	Иванов Иван Иванович	29	Лётчик	Аэрофлот	891358901234	ekaterina.smirnova@example.com
+27	Афанасьева Вера Александровна	11	Лётчик	Победа	891353456789	ekaterina.smirnova@example.com
+28	Павлова Ольга Николаевна	198	Лётчик	Победа	891351239876	ekaterina.smirnova@example.com
+29	Карпов Дмитрий Андреевич	20	Лётчик	S7 AIRLINES	891354567890	petrov@example.com
+30	Белов Владислав Михайлович	93	Лётчик	Аэрофлот	89137891234	sidorov@example.com
+31	Сидоров Сидор Сидорович	0	Бортпроводник	Победа	891355672345	igor.morozov@example.com
+32	Кузнецов Алексей Владимирович	0	Бортпроводник	S7 AIRLINES	89137891234	elena.kozlova@example.com
+33	Кузнецов Алексей Владимирович	0	Бортпроводник	S7 AIRLINES	891353210987	maria.goncharova@example.com
+34	Карпов Дмитрий Андреевич	0	Бортпроводник	Уральские авиалинии	891355432109	tatyana.sokolova@example.com
+35	Петров Петр Петрович	0	Бортпроводник	Победа	891353210987	denis.fedorov@example.com
+36	Петров Петр Петрович	0	Бортпроводник	Россия	891353456789	elena.kozlova@example.com
+37	Лазарев Денис Викторович	0	Бортпроводник	Аэрофлот	891355672345	sidorov@example.com
+38	Павлова Ольга Николаевна	0	Бортпроводник	S7 AIRLINES	891351239876	denis.fedorov@example.com
+39	Петров Петр Петрович	0	Бортпроводник	Россия	89138765432	tatyana.sokolova@example.com
+40	Сидоров Сидор Сидорович	0	Бортпроводник	Уральские авиалинии	89131234567	igor.morozov@example.com
+41	Белов Владислав Михайлович	0	Бортпроводник	Уральские авиалинии	891354567890	max.nikitin@example.com
+42	Белов Владислав Михайлович	0	Бортпроводник	Уральские авиалинии	891356783456	anastasia.zaytseva@example.com
+43	Павлова Ольга Николаевна	0	Бортпроводник	Победа	891351239876	anastasia.zaytseva@example.com
+44	Павлова Ольга Николаевна	0	Бортпроводник	Аэрофлот	891352345678	denis.fedorov@example.com
+45	Белов Владислав Михайлович	0	Бортпроводник	Победа	891356783456	max.nikitin@example.com
+46	Кузнецов Алексей Владимирович	0	Бортпроводник	Аэрофлот	89138765432	sidorov@example.com
+47	Лазарев Денис Викторович	0	Бортпроводник	Россия	89139876543	denis.fedorov@example.com
+48	Петров Петр Петрович	0	Бортпроводник	S7 AIRLINES	891356783456	olga.pavlova@example.com
+49	Кузнецов Алексей Владимирович	0	Бортпроводник	S7 AIRLINES	891353456789	anastasia.zaytseva@example.com
+50	Сидоров Сидор Сидорович	0	Бортпроводник	Уральские авиалинии	891351239876	igor.morozov@example.com
+51	Павлова Ольга Николаевна	0	Бортпроводник	Победа	891355432109	ivanov@example.com
+52	Павлова Ольга Николаевна	0	Бортпроводник	Победа	891355672345	denis.fedorov@example.com
+53	Афанасьева Вера Александровна	0	Бортпроводник	Уральские авиалинии	891354567890	anastasia.zaytseva@example.com
+54	Петров Петр Петрович	0	Бортпроводник	Аэрофлот	891355672345	olga.pavlova@example.com
+55	Лазарев Денис Викторович	0	Бортпроводник	S7 AIRLINES	89138765432	elena.kozlova@example.com
+\.
+
+
+--
+-- TOC entry 3459 (class 0 OID 16422)
+-- Dependencies: 214
+-- Data for Name: Airlline; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Airlline" (airline_name, owner, number_of_employees) FROM stdin;
+Аэрофлот	Говорова Марина Михайловна	15403
+Победа	Петухов Семён Алексеевич	9605
+Уральские авиалинии	Владимир Владимирович Путин	13506
+S7 AIRLINES	Байден Анатолий Сергеевич	21530
+Россия	Петухов Семён Алексеевич	15403
+\.
+
+
+--
+-- TOC entry 3465 (class 0 OID 16462)
+-- Dependencies: 220
+-- Data for Name: Airport; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Airport" (airport_number, address, number_of_lanes, number_of_ladders, capacity_of_the_waiting_room, airport_name) FROM stdin;
+1	Г.Москва ул. Горьковская 16	4	6	354	Пулково
+5	г. Красноярск ул. Красноярская 36	2	3	153	Шереметьево
+6	г. Санкт-Петербург ул. Ленсовета 15	6	10	512	Внуково
+7	г. Свердловск ул. Ленина 19	2	4	132	Свердловский аэропорт
+8	г. Москва, Ленинградское шоссе 16	5	5	641	Ленинградский аэропорт
+9	г. Нью-Йорк ул. Садовая 15	5	5	340	Аэропорт им.Америки\n
+21	Москва, Пушкинская улица, 23	5	8	402	Шереметьево-2
+22	Санкт-Петербург, Ленинская улица, 56	3	2	211	Пулково-3
+23	Екатеринбург, Гагарина улица, 14	4	1	166	Кольцово
+24	Казань, Мира проспект, 37	8	3	594	Казань
+25	Новосибирск, Советская улица, 8	3	2	293	Толмачёво
+26	Волгоград, Кирова улица, 71	10	5	359	Волгоград
+27	Сочи, Садовая улица, 44	2	5	140	Сочи
+28	Ростов-на-Дону, Октябрьская улица, 29	7	9	407	Платов
+29	Самара, Заречная улица, 12	6	10	417	Курумоч
+30	Красноярск, Пушкинская улица, 6	9	7	321	Храброво
+31	Москва, Ленинская улица, 83	10	10	497	Внуково-2
+32	Санкт-Петербург, Гагарина улица, 31	9	6	503	Ржевка
+33	Екатеринбург, Мира проспект, 57	2	5	242	Бахчисарай
+34	Казань, Советская улица, 22	1	4	589	Благовещенск
+35	Новосибирск, Кирова улица, 48	6	1	591	Борец
+36	Волгоград, Садовая улица, 17	7	4	571	Чкалов
+37	Сочи, Октябрьская улица, 36	4	7	423	Домодедово
+38	Ростов-на-Дону, Заречная улица, 59	2	1	103	Дубровка
+39	Самара, Пушкинская улица, 72	8	1	401	Ейск
+40	Красноярск, Ленинская улица, 11	8	2	449	Екатеринбург
+41	Москва, Гагарина улица, 95	5	4	468	Краснодар
+42	Санкт-Петербург, Мира проспект, 25	8	8	122	Курган
+43	Екатеринбург, Советская улица, 41	9	10	498	Курск
+44	Казань, Кирова улица, 63	9	3	464	Липецк
+45	Новосибирск, Садовая улица, 33	9	8	485	Магнитогорск
+46	Волгоград, Октябрьская улица, 7	7	8	415	Мурманск
+47	Сочи, Заречная улица, 88	2	6	382	Надым
+48	Ростов-на-Дону, Пушкинская улица, 52	5	2	131	Нарьян-Мар
+49	Самара, Ленинская улица, 19	10	9	179	Нефтеюганск
+50	Красноярск, Гагарина улица, 74	6	9	523	Нижневартовск
+51	Москва, Мира проспект, 9	6	5	316	Новокузнецк
+52	Санкт-Петербург, Советская улица, 62	1	3	346	Новосибирск
+53	Екатеринбург, Кирова улица, 38	5	10	473	Омск
+54	Казань, Садовая улица, 15	3	3	352	Оренбург
+55	Новосибирск, Октябрьская улица, 91	4	1	450	Пенза
+56	Волгоград, Заречная улица, 42	6	8	515	Пермь
+57	Сочи, Пушкинская улица, 77	1	10	455	Петрозаводск
+58	Ростов-на-Дону, Ленинская улица, 64	4	2	470	Петропавловск-Камчатский
+59	Самара, Гагарина улица, 26	7	10	229	Псков
+60	Красноярск, Мира проспект, 50	9	9	368	Ростов-на-Дону
+61	Москва, Советская улица, 28	2	10	252	Ряzan
+62	Санкт-Петербург, Кирова улица, 53	8	8	293	Салехард
+63	Екатеринбург, Садовая улица, 13	3	10	342	Саратов
+64	Казань, Октябрьская улица, 69	9	5	165	Симферополь
+65	Новосибирск, Заречная улица, 45	6	8	172	Ставрополь
+66	Волгоград, Пушкинская улица, 30	3	7	402	Сургут
+67	Сочи, Ленинская улица, 8	3	5	247	Сыктывкар
+\.
+
+
+--
+-- TOC entry 3473 (class 0 OID 16509)
+-- Dependencies: 228
+-- Data for Name: Cashier; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Cashier" (service_number, fullname, post, cash_number, phone_number, email) FROM stdin;
+1	Петухов Алексей Семёнович	Младший кассир	3	\N	\N
+2	Владимир Ильин	Старший кассир	1	\N	\N
+3	Куприн Сергей Миронович	Младший кассир	4	\N	\N
+4	Владимир Ильин	Старший кассир	2	\N	\N
+5	Орджоникидзе Сергей Геннадьевич	Младший кассир	5	\N	\N
+6	Иванов Иван Иванович	Младший кассир	11	89135442216	\N
+7	Козлова Елена Васильевна	Старший кассир	47	89138765432	\N
+8	Пономарев Денис Иванович	Младший кассир	11	891354567890	\N
+9	Козлова Елена Васильевна	Старший кассир	16	89139876543	\N
+10	Кузьмина Татьяна Владимировна	Младший кассир	48	891353456789	\N
+11	Козлова Елена Васильевна	Младший кассир	28	89139876543	\N
+12	Максимов Михаил Сергеевич	Младший кассир	40	891352345678	\N
+13	Антонова Наталья Андреевна	Старший кассир	48	891355432109	\N
+14	Карпов Дмитрий Андреевич	Младший кассир	42	89139876543	\N
+15	Киселев Антон Иванович	Старший кассир	50	89138765432	\N
+16	Васильев Андрей Васильевич	Старший кассир	49	89137891234	\N
+17	Кузнецов Алексей Владимирович	Младший кассир	4	891352345678	\N
+18	Королев Игорь Вячеславович	Старший кассир	15	891358901234	\N
+19	Лебедев Андрей Михайлович	Младший кассир	57	891354567890	\N
+20	Смирнова Екатерина Андреевна	Младший кассир	35	89131234567	\N
+21	Соколова Татьяна Андреевна	Младший кассир	51	89139876543	\N
+22	Лебедев Андрей Михайлович	Старший кассир	30	891354567890	\N
+23	Никитин Максим Денисович	Младший кассир	17	89131234567	\N
+24	Смирнова Екатерина Андреевна	Младший кассир	26	891351239876	\N
+25	Горбунов Артур Сергеевич	Старший кассир	13	891355432109	\N
+26	Лебедев Андрей Михайлович	Старший кассир	7	891358901234	\N
+27	Яковлев Антон Дмитриевич	Старший кассир	9	891354567890	\N
+28	Морозов Игорь Александрович	Старший кассир	32	891355672345	\N
+29	Гончарова Мария Александровна	Младший кассир	40	891354567890	\N
+30	Васильев Андрей Васильевич	Старший кассир	40	891358901234	\N
+31	Смирнова Екатерина Андреевна	Младший кассир	11	89138765432	\N
+32	Максимов Михаил Сергеевич	Старший кассир	48	891354567890	\N
+33	Королев Игорь Вячеславович	Старший кассир	41	891354567890	\N
+34	Романова Евгения Сергеевна	Старший кассир	34	89138765432	\N
+35	Яковлев Антон Дмитриевич	Младший кассир	34	891354321098	\N
+36	Дмитриев Андрей Александрович	Младший кассир	10	891354567890	\N
+37	Рябова Маргарита Васильевна	Старший кассир	48	891352345678	\N
+38	Антонова Наталья Андреевна	Младший кассир	20	891355432109	\N
+39	Жуков Андрей Андреевич	Старший кассир	45	891358901234	\N
+40	Лебедев Андрей Михайлович	Младший кассир	43	89131234567	\N
+41	Титов Антон Валентинович	Младший кассир	32	891358901234	\N
+42	Петров Петр Петрович	Старший кассир	31	891354321098	\N
+43	Андреев Сергей Петрович	Младший кассир	16	891353210987	\N
+44	Антонова Наталья Андреевна	Младший кассир	23	89137891234	\N
+45	Гончарова Мария Александровна	Старший кассир	1	891354567890	\N
+46	Белов Владислав Михайлович	Старший кассир	16	89137891234	\N
+47	Петров Петр Петрович	Старший кассир	4	891354321098	\N
+48	Антонова Наталья Андреевна	Старший кассир	7	891354321098	\N
+49	Киселев Антон Иванович	Младший кассир	6	891355432109	\N
+50	Горбунов Артур Сергеевич	Младший кассир	4	891355672345	\N
+51	Сергеев Максим Сергеевич	Младший кассир	17	891358901234	\N
+52	Александрова Анна Александровна	Младший кассир	12	891352345678	\N
+53	Кузьмина Татьяна Владимировна	Младший кассир	4	89131234567	\N
+54	Морозов Игорь Александрович	Старший кассир	47	89139876543	\N
+55	Соколова Татьяна Андреевна	Старший кассир	20	891354321098	\N
+56	Антонова Наталья Андреевна	Младший кассир	38	891354321098	\N
+\.
+
+
+--
+-- TOC entry 3470 (class 0 OID 16498)
+-- Dependencies: 225
+-- Data for Name: Client; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Client" (paper, fullname, phone_number, email) FROM stdin;
+417534486	Петухов Семён Алексеевич	\N	\N
+418348257	Говорова Марина Михайловна	\N	\N
+416347258	Иванов Иван Иванович	\N	\N
+437511273	Герасимов Гавриил Геннадьевич	\N	\N
+415647258	Пушкин Александр Сергеевич	\N	\N
+417154136	Иванов Иван Иванович	89135482255	qwert@mail.ru
+9890189749	Егоров Антон Игоревич	891356783456	maria.goncharova@example.com
+9455009041	Зайцева Анастасия Дмитриевна	89131234567	alex.kuznetsov@example.com
+6916205248	Васильев Андрей Васильевич	89137891234	olga.pavlova@example.com
+5700065600	Андреев Сергей Петрович	891353456789	alex.kuznetsov@example.com
+7150131560	Иванов Иван Иванович	89139876543	igor.morozov@example.com
+5115429862	Гончарова Мария Александровна	891352345678	olga.pavlova@example.com
+8938879410	Кузнецов Алексей Владимирович	891352345678	igor.morozov@example.com
+5643865474	Королев Игорь Вячеславович	891355672345	sidorov@example.com
+6796142058	Сергеев Максим Сергеевич	891351239876	alex.kuznetsov@example.com
+2240009013	Пономарев Денис Иванович	89131234567	tatyana.sokolova@example.com
+4541913249	Титов Антон Валентинович	891354567890	ivanov@example.com
+9774019249	Титов Антон Валентинович	891355432109	andrey.lebedev@example.com
+1436193103	Королев Игорь Вячеславович	891355432109	alex.kuznetsov@example.com
+6075889479	Сидоров Сидор Сидорович	891351239876	denis.fedorov@example.com
+6564701090	Филиппов Алексей Денисович	89137891234	alex.kuznetsov@example.com
+8941265971	Зайцева Анастасия Дмитриевна	891354567890	olga.pavlova@example.com
+3756163640	Павлова Ольга Николаевна	891356783456	olga.pavlova@example.com
+4610892890	Афанасьева Вера Александровна	891355672345	maria.goncharova@example.com
+6228632027	Морозов Игорь Александрович	891351239876	denis.fedorov@example.com
+8539483047	Медведев Артем Валерьевич	891354321098	sidorov@example.com
+3493594363	Муравьева Анна Владимировна	891355672345	igor.morozov@example.com
+6360674731	Гончарова Мария Александровна	89131234567	denis.fedorov@example.com
+9947194351	Смирнова Екатерина Андреевна	891355672345	anastasia.zaytseva@example.com
+7490094682	Жуков Андрей Андреевич	891355672345	sergei.andreev@example.com
+6168487494	Иванов Иван Иванович	891356783456	ekaterina.smirnova@example.com
+7521428789	Королев Игорь Вячеславович	891354567890	ivanov@example.com
+5618160860	Маркова Алена Александровна	891351239876	alex.kuznetsov@example.com
+6027860917	Дмитриев Андрей Александрович	89137891234	tatyana.sokolova@example.com
+5660811116	Королев Игорь Вячеславович	891355432109	alex.kuznetsov@example.com
+9925097325	Рябова Маргарита Васильевна	89137891234	maria.goncharova@example.com
+7021781022	Муравьева Анна Владимировна	891354321098	andrey.lebedev@example.com
+1199907533	Карпов Дмитрий Андреевич	89139876543	denis.fedorov@example.com
+2543915182	Пономарев Денис Иванович	891354567890	sergei.andreev@example.com
+5889615721	Григорьев Алексей Валерьевич	89138765432	denis.fedorov@example.com
+3951129482	Ларина Анастасия Валерьевна	891358901234	max.nikitin@example.com
+6777023813	Максимов Михаил Сергеевич	891356783456	maria.goncharova@example.com
+9340895548	Ларина Анастасия Валерьевна	891355672345	denis.fedorov@example.com
+3429974310	Гончарова Мария Александровна	891355672345	ekaterina.smirnova@example.com
+5970222499	Муравьева Анна Владимировна	891353210987	maria.goncharova@example.com
+8301795863	Лазарев Денис Викторович	891355432109	alex.kuznetsov@example.com
+4185277959	Кузьмина Татьяна Владимировна	891354567890	andrey.lebedev@example.com
+8534868143	Пономарев Денис Иванович	891353456789	igor.morozov@example.com
+1635039199	Кузьмина Татьяна Владимировна	891355672345	sidorov@example.com
+6713210102	Лазарев Денис Викторович	891355432109	alex.kuznetsov@example.com
+1174260051	Гончарова Мария Александровна	891353210987	petrov@example.com
+9471767762	Федоров Денис Александрович	89139876543	tatyana.sokolova@example.com
+9176131654	Рябова Маргарита Васильевна	891354567890	maria.goncharova@example.com
+2850505402	Маркова Алена Александровна	89131234567	tatyana.sokolova@example.com
+1740355106	Маркова Алена Александровна	891354567890	denis.fedorov@example.com
+3103512383	Козлова Елена Васильевна	891355672345	denis.fedorov@example.com
+\.
+
+
+--
+-- TOC entry 3476 (class 0 OID 16568)
+-- Dependencies: 231
+-- Data for Name: Crew; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Crew" (crew_id, last_medical_examination, position_in_flight, flight_id, employee_code, examination_status) FROM stdin;
+1	2023-10-21	Стюардесса	1	1	1
+2	2023-05-17	Пилот	2	3	0
+3	2023-10-21	Пилот	2	3	1
+4	2021-03-21	position	23	32	0
+5	2022-09-06	position	22	42	0
+6	2022-02-17	position	26	19	0
+7	2022-08-21	position	52	7	0
+8	2021-09-02	position	21	34	0
+9	2022-03-24	position	42	36	1
+10	2020-12-22	position	23	7	1
+11	2020-09-25	position	27	14	0
+12	2020-03-05	position	48	53	1
+13	2021-09-16	position	37	31	0
+14	2021-08-10	position	53	2	1
+15	2022-07-15	position	37	4	0
+16	2020-07-13	position	37	12	1
+17	2022-07-04	position	5	50	1
+18	2022-03-28	position	21	37	0
+19	2021-08-09	position	4	13	0
+20	2020-04-08	position	43	10	1
+21	2020-02-13	position	24	4	0
+22	2022-01-10	position	34	13	1
+23	2020-09-17	position	18	10	1
+24	2022-10-19	position	40	28	0
+25	2022-03-09	position	33	46	1
+26	2020-11-17	position	14	41	1
+27	2021-05-23	position	28	41	0
+28	2022-12-20	position	38	31	1
+29	2020-12-07	position	10	40	0
+30	2021-10-12	position	44	39	0
+31	2020-01-20	position	5	55	0
+32	2020-06-15	position	49	46	1
+33	2020-11-08	position	1	31	0
+34	2021-12-05	position	19	33	0
+35	2021-06-28	position	25	32	1
+36	2022-12-18	position	25	40	1
+37	2021-09-03	position	16	6	1
+38	2022-03-09	position	18	10	0
+39	2020-05-10	position	12	47	0
+40	2020-08-12	position	39	40	0
+41	2022-06-23	position	43	28	1
+42	2020-09-11	position	5	54	0
+43	2020-01-21	position	29	49	1
+44	2021-12-21	position	28	24	1
+45	2021-10-01	position	52	25	1
+46	2022-12-01	position	47	42	0
+47	2022-08-08	position	19	23	1
+48	2020-08-26	position	19	44	1
+49	2022-11-13	position	10	23	0
+50	2020-11-04	position	26	20	1
+51	2021-07-21	position	10	53	1
+52	2021-08-15	position	23	11	0
+53	2021-08-20	position	14	32	1
+\.
+
+
+--
+-- TOC entry 3474 (class 0 OID 16519)
+-- Dependencies: 229
+-- Data for Name: Flight; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Flight" (flight_id, "on-board_number", schedule_id, departure_time, arrival_time, status) FROM stdin;
+1	ПУ-205	4	2023-08-25	2023-08-25	Посадка
+2	HE-1488	8	2023-07-03	2023-07-03	Посадка
+3	ХК-504	7	2023-10-15	2023-10-16	Регистрация
+4	ПД-3534	5	2023-03-29	2023-03-29	Регистрация
+5	HE-1488	4	2023-03-17	2023-03-18	Посадка окончена
+8	ХК-504	61	2023-08-25	2023-08-25	Регистрация
+9	ПУ-3894	52	2021-04-04	2022-04-11	Посадка окончена
+10	ПУ-1933	58	2022-07-01	2024-06-25	Посадка окончена
+11	ПУ-2349	82	2020-02-26	2021-02-03	Посадка
+12	ПУ-260	63	2021-03-06	2024-07-02	Регистрация
+13	ПУ-2956	13	2020-04-19	2023-05-26	Регистрация
+14	ПУ-727	12	2022-08-07	2023-10-18	Регистрация
+15	ПУ-1304	43	2020-07-23	2022-03-05	Регистрация
+16	ПУ-4995	87	2021-01-19	2023-03-14	Посадка окончена
+17	ПУ-3912	41	2023-05-10	2024-01-27	Посадка окончена
+18	ПУ-1612	56	2021-10-01	2024-05-11	Регистрация
+19	ПУ-1267	71	2020-11-24	2023-06-27	Регистрация
+20	ПУ-727	12	2022-10-26	2023-01-26	Посадка окончена
+21	ПУ-4052	84	2022-10-18	2024-02-13	Посадка
+22	ПУ-4067	79	2022-08-27	2023-03-07	Посадка
+23	ПУ-384	87	2022-12-26	2024-05-08	Посадка окончена
+24	ПУ-1667	39	2022-06-01	2023-01-21	Посадка
+25	ПУ-3907	5	2020-07-11	2021-01-20	Посадка
+26	ПУ-843	85	2020-09-08	2023-12-27	Регистрация
+27	ПУ-2664	45	2020-10-06	2023-04-01	Регистрация
+28	ПУ-3467	61	2021-08-04	2022-06-19	Регистрация
+29	ПУ-2145	43	2022-01-25	2024-08-07	Регистрация
+30	ПУ-3029	8	2023-07-17	2024-10-01	Посадка окончена
+31	ПУ-384	67	2023-08-26	2024-05-02	Посадка
+32	ПУ-2179	70	2022-02-15	2024-09-20	Регистрация
+33	ПУ-4052	68	2022-04-21	2023-05-09	Регистрация
+34	ПУ-843	8	2022-07-08	2024-04-12	Регистрация
+35	ПУ-1667	46	2020-06-14	2021-03-08	Посадка
+36	ПУ-2563	72	2022-10-17	2023-06-26	Посадка
+37	ПУ-2145	13	2020-05-25	2022-04-18	Регистрация
+38	ПУ-4644	53	2022-04-08	2023-01-19	Регистрация
+39	ПУ-2490	50	2023-02-07	2024-12-18	Посадка окончена
+40	ПУ-2520	73	2021-06-27	2022-01-27	Регистрация
+41	ПУ-3912	77	2023-05-15	2024-10-04	Регистрация
+42	ПУ-4690	57	2022-10-08	2024-04-25	Посадка
+43	ПУ-3894	44	2020-03-09	2024-12-09	Посадка
+44	ПУ-4939	71	2022-08-21	2024-03-20	Посадка окончена
+45	ПУ-1900	45	2022-02-17	2024-11-25	Регистрация
+46	ПУ-568	77	2022-12-21	2024-12-19	Посадка
+47	ПУ-2664	45	2023-02-01	2024-03-20	Регистрация
+48	ПУ-2563	53	2023-03-02	2024-08-26	Посадка окончена
+49	ДК-715	83	2021-12-01	2022-03-26	Посадка окончена
+50	ПУ-4052	70	2021-08-11	2023-10-08	Посадка
+51	ПУ-2563	63	2021-08-07	2023-08-15	Посадка
+52	ПУ-2349	81	2021-11-07	2024-10-14	Регистрация
+53	ПУ-196	45	2021-05-03	2024-02-18	Посадка окончена
+54	ПУ-1765	62	2021-03-17	2022-03-15	Посадка
+55	ПУ-4481	68	2022-12-06	2024-12-10	Посадка окончена
+56	ПУ-1266	78	2020-02-16	2022-03-08	Регистрация
+57	ПУ-843	57	2021-06-09	2022-01-04	Посадка
+58	ПУ-3538	84	2022-03-16	2024-12-12	Посадка
+59	ПУ-205	7	2023-11-12	2023-11-13	Регистрация
+61	HE-1488	6	2023-11-15	2023-11-15	Регистрация
+62	HE-1488	73	2023-11-15	2023-11-15	Регистрация
+63	ДК-715	6	2023-11-15	2023-11-15	Регистрация
+64	ДК-715	73	2023-11-15	2023-11-15	Регистрация
+65	ПУ-1933	6	2023-11-15	2023-11-15	Регистрация
+66	ПУ-1933	73	2023-11-15	2023-11-15	Регистрация
+67	ПУ-1944	73	2023-11-15	2023-11-15	Регистрация
+68	ПУ-1944	6	2023-11-15	2023-11-15	Регистрация
+69	ПУ-2349	6	2023-11-15	2023-11-15	Регистрация
+70	ПУ-2349	73	2023-11-15	2023-11-15	Регистрация
+71	ПУ-2490	73	2023-11-15	2023-11-15	Регистрация
+72	ПУ-2490	6	2023-11-15	2023-11-15	Регистрация
+73	ПУ-2663	6	2023-11-15	2023-11-15	Регистрация
+74	ПУ-2663	73	2023-11-15	2023-11-15	Регистрация
+75	ПУ-2856	73	2023-11-15	2023-11-15	Регистрация
+76	ПУ-2856	6	2023-11-15	2023-11-15	Регистрация
+77	ПУ-3538	6	2023-11-15	2023-11-15	Регистрация
+78	ПУ-3538	73	2023-11-15	2023-11-15	Регистрация
+79	ПУ-3894	73	2023-11-15	2023-11-15	Регистрация
+80	ПУ-3894	6	2023-11-15	2023-11-15	Регистрация
+81	ПУ-4052	6	2023-11-15	2023-11-15	Регистрация
+82	ПУ-4052	73	2023-11-15	2023-11-15	Регистрация
+83	ПУ-410	73	2023-11-15	2023-11-15	Регистрация
+84	ПУ-410	6	2023-11-15	2023-11-15	Регистрация
+85	ПУ-843	6	2023-11-15	2023-11-15	Регистрация
+86	ПУ-843	73	2023-11-15	2023-11-15	Регистрация
+\.
+
+
+--
+-- TOC entry 3463 (class 0 OID 16446)
+-- Dependencies: 218
+-- Data for Name: Plane; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Plane" ("on-board_number", airline_name, date_of_last_repair, production_date, model_number) FROM stdin;
+ХК-504	Россия	2005-03-17	2004-03-17	2
+ХК-505	Россия	2008-03-25	2007-03-25	3
+HE-1488	Аэрофлот	2010-12-31	2009-03-29	5
+ПУ-205	S7 AIRLINES	2005-05-15	2003-03-22	4
+ПД-3534	Победа	2005-05-16	2000-10-10	4
+ДК-715	Аэрофлот	2010-07-31	2009-03-29	11
+ПУ-3907	Победа	1996-02-05	1994-09-11	16
+ПУ-3467	Россия	1998-11-09	1996-12-09	16
+ПУ-1590	S7 AIRLINES	2002-07-12	1993-04-07	16
+ПУ-260	Уральские авиалинии	2009-03-16	2003-05-05	16
+ПУ-1667	Победа	2005-08-23	2003-09-20	16
+ПУ-4644	Уральские авиалинии	2015-01-17	2005-09-05	16
+ПУ-2490	Аэрофлот	2013-02-13	1997-08-02	16
+ПУ-1944	Аэрофлот	2015-03-08	2014-12-14	16
+ПУ-1266	Победа	2009-08-21	2004-05-03	16
+ПУ-2145	Россия	2001-08-01	1993-10-13	16
+ПУ-384	S7 AIRLINES	2021-12-20	2020-08-12	16
+ПУ-559	S7 AIRLINES	2012-05-20	2009-09-22	16
+ПУ-3912	Победа	2006-02-12	2002-11-14	16
+ПУ-410	Аэрофлот	2021-10-05	2012-03-13	16
+ПУ-1933	Аэрофлот	2019-04-11	2015-09-11	16
+ПУ-198	Победа	2003-03-09	1998-01-25	16
+ПУ-3894	Аэрофлот	2023-11-14	2014-04-13	16
+ПУ-2707	S7 AIRLINES	2022-03-16	2010-03-18	16
+ПУ-1781	S7 AIRLINES	2017-03-10	2012-07-05	16
+ПУ-4619	S7 AIRLINES	2016-01-16	2001-01-21	16
+ПУ-2349	Аэрофлот	2023-02-05	2007-05-25	16
+ПУ-2956	Уральские авиалинии	2023-01-19	2020-01-17	16
+ПУ-1304	S7 AIRLINES	2011-09-05	2006-11-08	16
+ПУ-2856	Аэрофлот	2022-05-11	2012-10-25	16
+ПУ-843	Аэрофлот	2014-12-21	2013-07-04	16
+ПУ-3538	Аэрофлот	1999-10-17	1993-09-15	16
+ПУ-241	S7 AIRLINES	2023-05-05	2002-11-26	16
+ПУ-4067	Уральские авиалинии	2022-08-22	2019-05-22	16
+ПУ-2563	S7 AIRLINES	1997-02-25	1996-03-22	16
+ПУ-2520	Победа	2023-03-02	2013-02-16	16
+ПУ-196	S7 AIRLINES	2002-04-06	1994-09-21	16
+ПУ-4481	S7 AIRLINES	2010-08-21	2005-04-22	16
+ПУ-568	Россия	2018-06-03	2000-07-22	16
+ПУ-2663	Аэрофлот	2022-04-07	2019-07-15	16
+ПУ-2664	Уральские авиалинии	2020-08-18	2001-08-02	16
+ПУ-1612	Победа	2018-11-17	2010-08-20	16
+ПУ-4052	Аэрофлот	2020-03-13	2018-04-26	16
+ПУ-4690	Уральские авиалинии	2005-10-11	1998-09-21	16
+ПУ-1267	Уральские авиалинии	2010-02-02	1995-07-05	16
+ПУ-1252	Победа	2012-06-16	2010-12-24	16
+ПУ-176	Победа	2010-03-19	1997-12-22	16
+ПУ-3029	S7 AIRLINES	2018-10-14	2017-11-24	16
+ПУ-2179	S7 AIRLINES	2007-07-19	1996-07-07	16
+ПУ-727	Россия	2018-11-15	2011-05-27	16
+ПУ-1765	S7 AIRLINES	2016-05-08	2012-02-19	16
+ПУ-3997	Победа	2012-11-16	2010-05-22	16
+ПУ-1900	Уральские авиалинии	2011-01-04	1997-03-05	16
+ПУ-132	S7 AIRLINES	2020-07-24	2012-08-03	16
+ПУ-4995	Уральские авиалинии	1996-12-27	1992-02-17	16
+ПУ-4939	S7 AIRLINES	2017-03-22	2011-10-24	16
+\.
+
+
+--
+-- TOC entry 3471 (class 0 OID 16503)
+-- Dependencies: 226
+-- Data for Name: Sales_cash; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Sales_cash" (cash_number, address) FROM stdin;
+3	г.Красноярск ул. Паровозная 9
+4	г.Москва Ленинградское шоссе 19
+6	г. Москва ул.Взлётная 15
+1	г. Санк-Петербург ул. Садовая 16
+2	г. Астрахань ул. Мира 3
+5	г. Ярославль ул. Цветочная 23\n
+7	Москва, Пушкинская улица, 23
+8	Ростов-на-Дону, Пушкинская улица, 52
+9	Красноярск, Гагарина улица, 74
+10	Новосибирск, Кирова улица, 48
+11	Сочи, Пушкинская улица, 77
+12	Москва, Советская улица, 28
+13	Москва, Мира проспект, 9
+14	Самара, Гагарина улица, 26
+15	Ростов-на-Дону, Пушкинская улица, 52
+16	Красноярск, Гагарина улица, 74
+17	Ростов-на-Дону, Ленинская улица, 64
+18	Ростов-на-Дону, Октябрьская улица, 29
+19	Екатеринбург, Кирова улица, 38
+20	Санкт-Петербург, Ленинская улица, 56
+21	Екатеринбург, Гагарина улица, 14
+22	Санкт-Петербург, Ленинская улица, 56
+23	Казань, Мира проспект, 37
+24	Новосибирск, Садовая улица, 33
+25	Москва, Гагарина улица, 95
+26	Ростов-на-Дону, Заречная улица, 59
+27	Санкт-Петербург, Ленинская улица, 56
+28	Москва, Ленинская улица, 83
+29	Волгоград, Кирова улица, 71
+30	Москва, Советская улица, 28
+31	Новосибирск, Советская улица, 8
+32	Волгоград, Садовая улица, 17
+33	Казань, Советская улица, 22
+34	Самара, Пушкинская улица, 72
+35	Новосибирск, Советская улица, 8
+36	Красноярск, Ленинская улица, 11
+37	Казань, Советская улица, 22
+38	Волгоград, Октябрьская улица, 7
+39	Казань, Мира проспект, 37
+40	Москва, Пушкинская улица, 23
+41	Новосибирск, Советская улица, 8
+42	Сочи, Пушкинская улица, 77
+43	Ростов-на-Дону, Пушкинская улица, 52
+44	Казань, Советская улица, 22
+45	Москва, Пушкинская улица, 23
+46	Красноярск, Гагарина улица, 74
+47	Красноярск, Мира проспект, 50
+48	Казань, Октябрьская улица, 69
+49	Новосибирск, Советская улица, 8
+50	Санкт-Петербург, Гагарина улица, 31
+51	Казань, Октябрьская улица, 69
+52	Самара, Пушкинская улица, 72
+53	Волгоград, Садовая улица, 17
+54	Москва, Советская улица, 28
+55	Екатеринбург, Мира проспект, 57
+56	Казань, Кирова улица, 63
+57	Ростов-на-Дону, Ленинская улица, 64
+\.
+
+
+--
+-- TOC entry 3467 (class 0 OID 16471)
+-- Dependencies: 222
+-- Data for Name: Schedule; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Schedule" (schedule_number, in_flight_time, departure_time, arrival_time, departure_airport_number, arrival_airport_number) FROM stdin;
+4	5	13:00:00+03	18:00:00+03	1	5
+5	24	12:00:00+03	12:00:00+03	1	6
+6	7	08:00:00+03	15:00:00+03	6	5
+7	4	12:00:00+03	16:00:00+03	8	1
+8	6	01:00:00+03	07:00:00+03	8	7
+12	6	13:30:00+03	19:30:00+03	1	22
+13	3	12:00:00+03	15:00:00+03	5	6
+39	13	06:00:00+03	19:00:00+03	55	21
+40	3	07:00:00+03	10:00:00+03	64	62
+41	14	22:00:00+03	12:00:00+03	9	49
+42	5	19:00:00+03	00:00:00+03	38	36
+43	8	08:00:00+03	16:00:00+03	49	45
+44	16	20:00:00+03	12:00:00+03	24	9
+45	8	13:00:00+03	21:00:00+03	44	46
+46	3	22:00:00+03	01:00:00+03	34	52
+47	12	02:00:00+03	14:00:00+03	27	25
+48	18	13:00:00+03	07:00:00+03	35	54
+49	12	08:00:00+03	20:00:00+03	65	25
+50	12	17:00:00+03	05:00:00+03	34	24
+51	9	21:00:00+03	06:00:00+03	30	8
+52	10	10:00:00+03	20:00:00+03	43	31
+53	10	10:00:00+03	20:00:00+03	37	35
+54	7	18:00:00+03	01:00:00+03	61	22
+55	21	23:00:00+03	20:00:00+03	57	7
+56	16	22:00:00+03	14:00:00+03	41	61
+57	10	04:00:00+03	14:00:00+03	26	35
+58	16	19:00:00+03	11:00:00+03	33	28
+59	7	06:00:00+03	13:00:00+03	30	56
+60	19	18:00:00+03	13:00:00+03	50	45
+61	15	17:00:00+03	08:00:00+03	26	47
+62	7	16:00:00+03	23:00:00+03	28	29
+63	10	12:00:00+03	22:00:00+03	45	35
+64	8	22:00:00+03	06:00:00+03	47	46
+65	13	05:00:00+03	18:00:00+03	64	25
+66	10	09:00:00+03	19:00:00+03	9	8
+67	7	23:00:00+03	06:00:00+03	62	36
+68	7	20:00:00+03	03:00:00+03	49	45
+69	19	20:00:00+03	15:00:00+03	42	48
+70	18	13:00:00+03	07:00:00+03	9	53
+71	13	14:00:00+03	03:00:00+03	60	65
+72	11	01:00:00+03	12:00:00+03	31	21
+73	19	13:00:00+03	08:00:00+03	6	54
+74	21	06:00:00+03	03:00:00+03	45	65
+75	22	01:00:00+03	23:00:00+03	47	63
+76	20	03:00:00+03	23:00:00+03	45	27
+77	10	04:00:00+03	14:00:00+03	53	1
+78	3	03:00:00+03	06:00:00+03	29	59
+79	15	12:00:00+03	03:00:00+03	66	34
+80	5	07:00:00+03	12:00:00+03	5	63
+81	20	19:00:00+03	15:00:00+03	40	54
+82	13	08:00:00+03	21:00:00+03	59	27
+83	10	20:00:00+03	06:00:00+03	62	48
+84	6	21:00:00+03	03:00:00+03	51	54
+85	9	05:00:00+03	14:00:00+03	47	9
+86	23	20:00:00+03	19:00:00+03	58	63
+87	3	13:00:00+03	16:00:00+03	37	65
+88	7	01:00:00+03	08:00:00+03	25	59
+89	6	12:00:00+03	18:00:00+03	5	1
+\.
+
+
+--
+-- TOC entry 3479 (class 0 OID 16585)
+-- Dependencies: 234
+-- Data for Name: Ticket; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Ticket" (ticket_number, flight_id, schedule_id, paper, service_number, registration_status, seat, price, seat_type, purchase_type) FROM stdin;
+1	2	7	416347258	2	В обработке	15	15000	эконом	Онлайн
+5	1	51	416347258	2	В обработке	15	15000	эконом	Онлайн
+9	49	5	8539483047	55	В обработке	6	13284	люкс	Онлайн
+10	16	62	1174260051	2	В обработке	19	17951	бизнес	Онлайн
+11	35	78	5618160860	13	В обработке	11	34306	эконом	Онлайн
+12	53	65	6075889479	46	В обработке	9	47281	эконом	Офлайн
+13	9	55	6168487494	31	Зарегистрирован	6	24173	эконом	Онлайн
+14	9	5	2240009013	32	В обработке	9	47788	эконом	Онлайн
+15	51	70	8534868143	53	Зарегистрирован	4	47694	люкс	Онлайн
+16	19	71	5970222499	13	В обработке	6	31849	люкс	Офлайн
+17	31	72	7150131560	10	Зарегистрирован	6	26905	люкс	Онлайн
+18	37	88	5889615721	10	Зарегистрирован	15	26197	люкс	Офлайн
+19	45	49	1436193103	27	Зарегистрирован	13	35319	эконом	Онлайн
+20	32	6	416347258	27	Зарегистрирован	20	28765	люкс	Онлайн
+21	13	83	2240009013	16	В обработке	15	47510	бизнес	Онлайн
+22	28	83	8539483047	40	В обработке	7	8331	эконом	Онлайн
+23	22	64	4541913249	30	В обработке	14	6282	эконом	Онлайн
+24	46	67	5643865474	52	В обработке	3	7886	люкс	Офлайн
+25	10	85	7521428789	38	Зарегистрирован	1	20737	бизнес	Онлайн
+26	16	54	8539483047	18	В обработке	8	33964	люкс	Онлайн
+27	40	83	3103512383	18	Зарегистрирован	12	47807	люкс	Офлайн
+28	48	54	8301795863	8	В обработке	8	22315	эконом	Онлайн
+29	54	81	4185277959	30	Зарегистрирован	19	25156	бизнес	Офлайн
+30	1	87	6564701090	38	Зарегистрирован	16	8058	бизнес	Онлайн
+31	13	67	9340895548	21	В обработке	2	30132	эконом	Онлайн
+32	34	52	9176131654	46	В обработке	9	30274	люкс	Офлайн
+33	41	65	9890189749	41	Зарегистрирован	7	28698	бизнес	Онлайн
+34	58	63	1436193103	50	Зарегистрирован	10	11632	люкс	Офлайн
+35	22	66	6713210102	32	В обработке	11	49733	бизнес	Онлайн
+36	25	56	1436193103	9	Зарегистрирован	18	15695	люкс	Офлайн
+37	58	66	1740355106	14	В обработке	19	31063	эконом	Офлайн
+38	25	67	7021781022	51	В обработке	18	25989	люкс	Онлайн
+39	10	72	6796142058	15	В обработке	2	48466	люкс	Онлайн
+40	49	64	9340895548	1	В обработке	14	5478	бизнес	Онлайн
+41	30	51	8938879410	12	В обработке	6	34020	люкс	Офлайн
+42	57	50	416347258	25	В обработке	6	42538	люкс	Онлайн
+43	23	40	7490094682	10	Зарегистрирован	5	44019	люкс	Офлайн
+44	16	68	9340895548	21	В обработке	19	28434	люкс	Онлайн
+45	22	75	6075889479	30	В обработке	20	44581	эконом	Онлайн
+46	32	62	3103512383	22	В обработке	9	12278	бизнес	Офлайн
+47	41	12	9774019249	40	Зарегистрирован	3	45735	люкс	Онлайн
+48	27	49	418348257	10	В обработке	11	12711	люкс	Онлайн
+49	24	41	9471767762	33	Зарегистрирован	14	16674	бизнес	Онлайн
+50	19	42	4541913249	31	Зарегистрирован	3	20243	бизнес	Офлайн
+51	44	83	6027860917	50	Зарегистрирован	10	42221	эконом	Офлайн
+52	40	68	3951129482	54	Зарегистрирован	11	23563	люкс	Офлайн
+53	24	65	6777023813	5	Зарегистрирован	8	5712	бизнес	Офлайн
+54	33	77	7521428789	34	Зарегистрирован	7	32994	бизнес	Офлайн
+55	16	39	8941265971	9	Зарегистрирован	1	19027	бизнес	Офлайн
+56	51	4	2240009013	38	В обработке	11	5826	бизнес	Офлайн
+57	46	40	2543915182	55	Зарегистрирован	14	18701	эконом	Онлайн
+58	46	39	5700065600	4	Зарегистрирован	15	30078	люкс	Онлайн
+2	1	4	415647258	1	Зарегистрирован	13	15000	эконом	Онлайн
+\.
+
+
+--
+-- TOC entry 3469 (class 0 OID 16483)
+-- Dependencies: 224
+-- Data for Name: Transit_boarding; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Transit_boarding" ("Transit_number", schedule_id, departure_time, arrival_time, in_flight_time, departure_airport_number, arrival_airpor_number) FROM stdin;
+1	4	13:00:00+00	16:00:00+00	3	1	6
+2	4	16:00:00+00	18:00:00+00	2	6	5
+3	5	12:00:00+00	16:00:00+00	4	1	7
+4	5	16:00:00+00	20:00:00+00	4	7	8
+5	5	20:00:00+00	12:00:00+00	16	8	6
+6	86	12:00:00+03	15:00:00+03	3	5	1
+61	61	00:00:00+03	09:00:00+03	9	65	8
+62	68	09:00:00+03	22:00:00+03	13	29	8
+63	55	20:00:00+03	02:00:00+03	6	8	41
+64	74	14:00:00+03	00:00:00+03	10	36	59
+65	73	21:00:00+03	09:00:00+03	12	46	1
+66	47	04:00:00+03	13:00:00+03	9	38	64
+67	62	01:00:00+03	20:00:00+03	19	58	37
+68	55	01:00:00+03	23:00:00+03	22	61	24
+69	60	00:00:00+03	11:00:00+03	11	55	23
+70	53	19:00:00+03	07:00:00+03	12	34	23
+71	53	10:00:00+03	18:00:00+03	8	33	48
+72	79	11:00:00+03	21:00:00+03	10	51	46
+73	67	18:00:00+03	18:00:00+03	24	23	9
+74	52	22:00:00+03	22:00:00+03	24	33	30
+75	6	01:00:00+03	04:00:00+03	3	36	42
+76	78	06:00:00+03	01:00:00+03	19	33	6
+77	54	09:00:00+03	22:00:00+03	13	44	48
+78	53	18:00:00+03	09:00:00+03	15	6	31
+79	78	18:00:00+03	00:00:00+03	6	26	57
+80	81	21:00:00+03	05:00:00+03	8	47	48
+81	8	06:00:00+03	13:00:00+03	7	47	31
+82	48	16:00:00+03	16:00:00+03	24	54	42
+83	47	21:00:00+03	16:00:00+03	19	31	22
+84	74	18:00:00+03	00:00:00+03	6	26	42
+85	69	10:00:00+03	13:00:00+03	3	32	31
+86	44	01:00:00+03	20:00:00+03	19	55	31
+87	7	08:00:00+03	16:00:00+03	8	29	45
+88	77	23:00:00+03	05:00:00+03	6	5	66
+89	87	19:00:00+03	08:00:00+03	13	55	54
+90	65	16:00:00+03	13:00:00+03	21	24	32
+91	56	15:00:00+03	18:00:00+03	3	38	64
+92	71	02:00:00+03	23:00:00+03	21	28	63
+93	57	05:00:00+03	12:00:00+03	7	39	42
+94	68	22:00:00+03	10:00:00+03	12	42	31
+95	67	02:00:00+03	12:00:00+03	10	54	7
+96	59	08:00:00+03	13:00:00+03	5	44	49
+97	85	07:00:00+03	03:00:00+03	20	29	6
+98	12	15:00:00+03	01:00:00+03	10	9	55
+99	41	05:00:00+03	22:00:00+03	17	6	54
+100	60	03:00:00+03	23:00:00+03	20	40	35
+101	83	14:00:00+03	04:00:00+03	14	38	67
+102	12	21:00:00+03	12:00:00+03	15	26	1
+103	59	23:00:00+03	13:00:00+03	14	34	29
+104	57	08:00:00+03	00:00:00+03	16	55	9
+105	71	00:00:00+03	00:00:00+03	24	56	47
+106	42	10:00:00+03	08:00:00+03	22	66	48
+107	84	10:00:00+03	00:00:00+03	14	39	33
+108	61	21:00:00+03	06:00:00+03	9	40	33
+109	84	02:00:00+03	22:00:00+03	20	29	67
+110	84	08:00:00+03	13:00:00+03	5	25	35
+\.
+
+
+--
+-- TOC entry 3488 (class 0 OID 0)
+-- Dependencies: 232
+-- Name: Airline_employee_employee_code_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Airline_employee_employee_code_seq"', 55, true);
+
+
+--
+-- TOC entry 3489 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: Airport_airport_number_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Airport_airport_number_seq"', 67, true);
+
+
+--
+-- TOC entry 3490 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: Cashier_service_number_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Cashier_service_number_seq"', 56, true);
+
+
+--
+-- TOC entry 3491 (class 0 OID 0)
+-- Dependencies: 230
+-- Name: Crew_crew_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Crew_crew_id_seq"', 53, true);
+
+
+--
+-- TOC entry 3492 (class 0 OID 0)
+-- Dependencies: 235
+-- Name: Flight_flight_number_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Flight_flight_number_seq"', 86, true);
+
+
+--
+-- TOC entry 3493 (class 0 OID 0)
+-- Dependencies: 236
+-- Name: Sales_cash_cash_number_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Sales_cash_cash_number_seq"', 57, true);
+
+
+--
+-- TOC entry 3494 (class 0 OID 0)
+-- Dependencies: 233
+-- Name: Ticket_ticket_number_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Ticket_ticket_number_seq"', 58, true);
+
+
+--
+-- TOC entry 3495 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: Transit_boarding_Transit_number_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Transit_boarding_Transit_number_seq"', 110, true);
+
+
+--
+-- TOC entry 3496 (class 0 OID 0)
+-- Dependencies: 216
+-- Name: aircraft_model_model_number_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.aircraft_model_model_number_seq', 16, true);
+
+
+--
+-- TOC entry 3497 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: schedule_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.schedule_id_seq', 89, true);
+
+
+--
+-- TOC entry 3271 (class 2606 OID 16717)
+-- Name: Airline_employee Airline_employees_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Airline_employee"
+    ADD CONSTRAINT "Airline_employees_pkey" PRIMARY KEY (employee_code);
+
+
+--
+-- TOC entry 3269 (class 2606 OID 16426)
+-- Name: Airlline Airline_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Airlline"
+    ADD CONSTRAINT "Airline_pkey" PRIMARY KEY (airline_name);
+
+
+--
+-- TOC entry 3279 (class 2606 OID 16469)
+-- Name: Airport Airport_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Airport"
+    ADD CONSTRAINT "Airport_pkey" PRIMARY KEY (airport_number);
+
+
+--
+-- TOC entry 3291 (class 2606 OID 16513)
+-- Name: Cashier Cashier_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Cashier"
+    ADD CONSTRAINT "Cashier_pkey" PRIMARY KEY (service_number);
+
+
+--
+-- TOC entry 3287 (class 2606 OID 16744)
+-- Name: Client Client_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Client"
+    ADD CONSTRAINT "Client_pkey" PRIMARY KEY (paper);
+
+
+--
+-- TOC entry 3295 (class 2606 OID 16572)
+-- Name: Crew Crew_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Crew"
+    ADD CONSTRAINT "Crew_pkey" PRIMARY KEY (crew_id);
+
+
+--
+-- TOC entry 3261 (class 2606 OID 16704)
+-- Name: Flight Data_is_correct; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Flight"
+    ADD CONSTRAINT "Data_is_correct" CHECK ((departure_time <= arrival_time)) NOT VALID;
+
+
+--
+-- TOC entry 3293 (class 2606 OID 16523)
+-- Name: Flight Flight_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Flight"
+    ADD CONSTRAINT "Flight_pkey" PRIMARY KEY (flight_id);
+
+
+--
+-- TOC entry 3262 (class 2606 OID 16733)
+-- Name: Flight Flight_status_check; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Flight"
+    ADD CONSTRAINT "Flight_status_check" CHECK (((status)::text = ANY ((ARRAY['Регистрация'::character varying, 'Посадка'::character varying, 'Посадка окончена'::character varying])::text[]))) NOT VALID;
+
+
+--
+-- TOC entry 3277 (class 2606 OID 16450)
+-- Name: Plane Plane_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Plane"
+    ADD CONSTRAINT "Plane_pkey" PRIMARY KEY ("on-board_number");
+
+
+--
+-- TOC entry 3289 (class 2606 OID 16507)
+-- Name: Sales_cash Sales_cash_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Sales_cash"
+    ADD CONSTRAINT "Sales_cash_pkey" PRIMARY KEY (cash_number);
+
+
+--
+-- TOC entry 3297 (class 2606 OID 16729)
+-- Name: Ticket Ticket_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Ticket"
+    ADD CONSTRAINT "Ticket_pkey" PRIMARY KEY (ticket_number);
+
+
+--
+-- TOC entry 3285 (class 2606 OID 16736)
+-- Name: Transit_boarding Transit_boarding_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Transit_boarding"
+    ADD CONSTRAINT "Transit_boarding_pkey" PRIMARY KEY ("Transit_number");
+
+
+--
+-- TOC entry 3273 (class 2606 OID 16445)
+-- Name: Aircraft_model aircraft_model_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Aircraft_model"
+    ADD CONSTRAINT aircraft_model_pkey PRIMARY KEY (model_number);
+
+
+--
+-- TOC entry 3281 (class 2606 OID 16700)
+-- Name: Airport airport_name_is_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Airport"
+    ADD CONSTRAINT airport_name_is_unique UNIQUE (airport_name);
+
+
+--
+-- TOC entry 3258 (class 2606 OID 16755)
+-- Name: Transit_boarding airports_are_correct; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Transit_boarding"
+    ADD CONSTRAINT airports_are_correct CHECK ((departure_airport_number <> arrival_airpor_number)) NOT VALID;
+
+
+--
+-- TOC entry 3252 (class 2606 OID 16703)
+-- Name: Airport capacity_of_the_waiting_room_not_negative; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Airport"
+    ADD CONSTRAINT capacity_of_the_waiting_room_not_negative CHECK ((capacity_of_the_waiting_room >= 0)) NOT VALID;
+
+
+--
+-- TOC entry 3264 (class 2606 OID 16756)
+-- Name: Ticket check_price; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Ticket"
+    ADD CONSTRAINT check_price CHECK ((price >= (0)::numeric)) NOT VALID;
+
+
+--
+-- TOC entry 3251 (class 2606 OID 16705)
+-- Name: Plane data_is_correct; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Plane"
+    ADD CONSTRAINT data_is_correct CHECK ((production_date <= date_of_last_repair)) NOT VALID;
+
+
+--
+-- TOC entry 3255 (class 2606 OID 16754)
+-- Name: Schedule departure_and_arrival_isnt_equal; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Schedule"
+    ADD CONSTRAINT departure_and_arrival_isnt_equal CHECK ((departure_airport_number <> arrival_airport_number)) NOT VALID;
+
+
+--
+-- TOC entry 3247 (class 2606 OID 16697)
+-- Name: Airline_employee flight_time_in_hours_not_negative; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Airline_employee"
+    ADD CONSTRAINT flight_time_in_hours_not_negative CHECK ((flight_time_in_hours >= 0)) NOT VALID;
+
+
+--
+-- TOC entry 3248 (class 2606 OID 16695)
+-- Name: Aircraft_model fuel_consumption_not_negative; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Aircraft_model"
+    ADD CONSTRAINT fuel_consumption_not_negative CHECK ((fuel_consumption >= 0)) NOT VALID;
+
+
+--
+-- TOC entry 3256 (class 2606 OID 16709)
+-- Name: Schedule in_flight_time_not_negative; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Schedule"
+    ADD CONSTRAINT in_flight_time_not_negative CHECK ((in_flight_time >= 0)) NOT VALID;
+
+
+--
+-- TOC entry 3259 (class 2606 OID 16711)
+-- Name: Transit_boarding in_flight_time_not_negative; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Transit_boarding"
+    ADD CONSTRAINT in_flight_time_not_negative CHECK ((in_flight_time >= 0)) NOT VALID;
+
+
+--
+-- TOC entry 3249 (class 2606 OID 16696)
+-- Name: Aircraft_model load_capacity_not_negative; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Aircraft_model"
+    ADD CONSTRAINT load_capacity_not_negative CHECK ((load_capacity >= 0)) NOT VALID;
+
+
+--
+-- TOC entry 3246 (class 2606 OID 16698)
+-- Name: Airlline number_of_employees_not_negative; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Airlline"
+    ADD CONSTRAINT number_of_employees_not_negative CHECK ((number_of_employees >= 0)) NOT VALID;
+
+
+--
+-- TOC entry 3253 (class 2606 OID 16702)
+-- Name: Airport number_of_ladders_not_negative; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Airport"
+    ADD CONSTRAINT number_of_ladders_not_negative CHECK ((number_of_ladders >= 0)) NOT VALID;
+
+
+--
+-- TOC entry 3254 (class 2606 OID 16701)
+-- Name: Airport number_of_lanes_not_negative; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Airport"
+    ADD CONSTRAINT number_of_lanes_not_negative CHECK ((number_of_lanes >= 0)) NOT VALID;
+
+
+--
+-- TOC entry 3250 (class 2606 OID 16694)
+-- Name: Aircraft_model number_of_seats_not_negative; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Aircraft_model"
+    ADD CONSTRAINT number_of_seats_not_negative CHECK ((number_of_seats >= 0)) NOT VALID;
+
+
+--
+-- TOC entry 3265 (class 2606 OID 16734)
+-- Name: Ticket purchase_type_check; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Ticket"
+    ADD CONSTRAINT purchase_type_check CHECK (((purchase_type)::text = ANY ((ARRAY['Онлайн'::character varying, 'Офлайн'::character varying])::text[]))) NOT VALID;
+
+
+--
+-- TOC entry 3266 (class 2606 OID 16731)
+-- Name: Ticket registration_status_check; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Ticket"
+    ADD CONSTRAINT registration_status_check CHECK (((registration_status)::text = ANY ((ARRAY['В обработке'::character varying, 'Зарегистрирован'::character varying])::text[]))) NOT VALID;
+
+
+--
+-- TOC entry 3283 (class 2606 OID 16476)
+-- Name: Schedule schedule_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Schedule"
+    ADD CONSTRAINT schedule_pkey PRIMARY KEY (schedule_number);
+
+
+--
+-- TOC entry 3267 (class 2606 OID 16715)
+-- Name: Ticket seat_type; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Ticket"
+    ADD CONSTRAINT seat_type CHECK (((seat_type)::text = ANY ((ARRAY['бизнес'::character varying, 'эконом'::character varying, 'люкс'::character varying])::text[]))) NOT VALID;
+
+
+--
+-- TOC entry 3263 (class 2606 OID 16713)
+-- Name: Crew status_check; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Crew"
+    ADD CONSTRAINT status_check CHECK ((examination_status = ANY (ARRAY[1, 0]))) NOT VALID;
+
+
+--
+-- TOC entry 3257 (class 2606 OID 16710)
+-- Name: Schedule time_is_correct; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Schedule"
+    ADD CONSTRAINT time_is_correct CHECK (((departure_time + (make_time(in_flight_time, 0, (0.0)::double precision))::interval) = arrival_time)) NOT VALID;
+
+
+--
+-- TOC entry 3260 (class 2606 OID 16712)
+-- Name: Transit_boarding time_is_correct; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."Transit_boarding"
+    ADD CONSTRAINT time_is_correct CHECK (((departure_time + (make_time(in_flight_time, 0, (0.0)::double precision))::interval) = arrival_time)) NOT VALID;
+
+
+--
+-- TOC entry 3275 (class 2606 OID 16693)
+-- Name: Aircraft_model type_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Aircraft_model"
+    ADD CONSTRAINT type_unique UNIQUE (type);
+
+
+--
+-- TOC entry 3299 (class 2606 OID 16451)
+-- Name: Plane airline_name_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Plane"
+    ADD CONSTRAINT airline_name_fkey FOREIGN KEY (airline_name) REFERENCES public."Airlline"(airline_name);
+
+
+--
+-- TOC entry 3303 (class 2606 OID 16493)
+-- Name: Transit_boarding airport_number_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Transit_boarding"
+    ADD CONSTRAINT airport_number_fkey FOREIGN KEY (departure_airport_number) REFERENCES public."Airport"(airport_number);
+
+
+--
+-- TOC entry 3301 (class 2606 OID 16644)
+-- Name: Schedule airport_number_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Schedule"
+    ADD CONSTRAINT airport_number_fkey FOREIGN KEY (departure_airport_number) REFERENCES public."Airport"(airport_number) NOT VALID;
+
+
+--
+-- TOC entry 3302 (class 2606 OID 16649)
+-- Name: Schedule airport_number_fkey2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Schedule"
+    ADD CONSTRAINT airport_number_fkey2 FOREIGN KEY (arrival_airport_number) REFERENCES public."Airport"(airport_number) NOT VALID;
+
+
+--
+-- TOC entry 3304 (class 2606 OID 16678)
+-- Name: Transit_boarding airport_number_fkey2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Transit_boarding"
+    ADD CONSTRAINT airport_number_fkey2 FOREIGN KEY (arrival_airpor_number) REFERENCES public."Airport"(airport_number) NOT VALID;
+
+
+--
+-- TOC entry 3306 (class 2606 OID 16514)
+-- Name: Cashier cash_number_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Cashier"
+    ADD CONSTRAINT cash_number_fkey FOREIGN KEY (cash_number) REFERENCES public."Sales_cash"(cash_number);
+
+
+--
+-- TOC entry 3309 (class 2606 OID 16723)
+-- Name: Crew employee_code_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Crew"
+    ADD CONSTRAINT employee_code_fkey FOREIGN KEY (employee_code) REFERENCES public."Airline_employee"(employee_code) NOT VALID;
+
+
+--
+-- TOC entry 3298 (class 2606 OID 16718)
+-- Name: Airline_employee fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Airline_employee"
+    ADD CONSTRAINT fkey FOREIGN KEY (airline_name) REFERENCES public."Airlline"(airline_name) NOT VALID;
+
+
+--
+-- TOC entry 3310 (class 2606 OID 16573)
+-- Name: Crew flight_number_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Crew"
+    ADD CONSTRAINT flight_number_fkey FOREIGN KEY (flight_id) REFERENCES public."Flight"(flight_id);
+
+
+--
+-- TOC entry 3311 (class 2606 OID 16590)
+-- Name: Ticket flight_number_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Ticket"
+    ADD CONSTRAINT flight_number_fkey FOREIGN KEY (flight_id) REFERENCES public."Flight"(flight_id);
+
+
+--
+-- TOC entry 3300 (class 2606 OID 16456)
+-- Name: Plane model_number; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Plane"
+    ADD CONSTRAINT model_number FOREIGN KEY (model_number) REFERENCES public."Aircraft_model"(model_number) NOT VALID;
+
+
+--
+-- TOC entry 3307 (class 2606 OID 16524)
+-- Name: Flight on-board_number_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Flight"
+    ADD CONSTRAINT "on-board_number_fkey" FOREIGN KEY ("on-board_number") REFERENCES public."Plane"("on-board_number");
+
+
+--
+-- TOC entry 3312 (class 2606 OID 16770)
+-- Name: Ticket paper_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Ticket"
+    ADD CONSTRAINT paper_fkey FOREIGN KEY (paper) REFERENCES public."Client"(paper);
+
+
+--
+-- TOC entry 3305 (class 2606 OID 16488)
+-- Name: Transit_boarding schedule_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Transit_boarding"
+    ADD CONSTRAINT schedule_id_fkey FOREIGN KEY (schedule_id) REFERENCES public."Schedule"(schedule_number);
+
+
+--
+-- TOC entry 3308 (class 2606 OID 16529)
+-- Name: Flight schedule_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Flight"
+    ADD CONSTRAINT schedule_id_fkey FOREIGN KEY (schedule_id) REFERENCES public."Schedule"(schedule_number);
+
+
+--
+-- TOC entry 3313 (class 2606 OID 16595)
+-- Name: Ticket schedule_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Ticket"
+    ADD CONSTRAINT schedule_id_fkey FOREIGN KEY (schedule_id) REFERENCES public."Schedule"(schedule_number);
+
+
+--
+-- TOC entry 3314 (class 2606 OID 16631)
+-- Name: Ticket service_number_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Ticket"
+    ADD CONSTRAINT service_number_fkey FOREIGN KEY (service_number) REFERENCES public."Cashier"(service_number) NOT VALID;
+
+
+-- Completed on 2023-11-10 15:08:11
+
+--
+-- PostgreSQL database dump complete
+--
+
