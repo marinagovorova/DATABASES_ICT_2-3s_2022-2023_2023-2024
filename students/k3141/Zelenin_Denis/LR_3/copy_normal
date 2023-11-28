@@ -1,0 +1,651 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 14.9
+-- Dumped by pg_dump version 14.9
+
+-- Started on 2023-10-27 15:29:28
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 221 (class 1255 OID 16549)
+-- Name: set_or_order_id(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.set_or_order_id() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.order_id = 'or' || NEXTVAL('or_id_sequence');
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.set_or_order_id() OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 212 (class 1259 OID 16428)
+-- Name: car; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.car (
+    car_id character varying(150) NOT NULL,
+    price integer NOT NULL,
+    state_number character varying NOT NULL,
+    last_date_to date NOT NULL,
+    model_name character varying NOT NULL,
+    brand character varying,
+    year_of_manafactured integer NOT NULL,
+    country character varying,
+    own character varying NOT NULL,
+    CONSTRAINT check_manufactured_year CHECK ((year_of_manafactured >= 2010)),
+    CONSTRAINT check_price_positive CHECK ((price > 0))
+);
+
+
+ALTER TABLE public.car OWNER TO postgres;
+
+--
+-- TOC entry 209 (class 1259 OID 16400)
+-- Name: client; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.client (
+    client_id character varying(255) NOT NULL,
+    client_phone_number bigint NOT NULL,
+    advertising character varying
+);
+
+
+ALTER TABLE public.client OWNER TO postgres;
+
+--
+-- TOC entry 214 (class 1259 OID 16447)
+-- Name: employee; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.employee (
+    service_number integer NOT NULL,
+    phone_number character varying(20),
+    full_name character varying NOT NULL,
+    employee_address character varying NOT NULL,
+    fk_id character varying,
+    CONSTRAINT check_phone_number_format CHECK (((phone_number)::text ~ '^[0-9]{10}$'::text))
+);
+
+
+ALTER TABLE public.employee OWNER TO postgres;
+
+--
+-- TOC entry 213 (class 1259 OID 16442)
+-- Name: jop_title; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.jop_title (
+    employee_experience character varying(10),
+    id character varying(20) NOT NULL,
+    employee_category character varying(40),
+    CONSTRAINT check_age_format CHECK (((employee_experience)::text ~ '^\d+\s+(лет|года)$'::text))
+);
+
+
+ALTER TABLE public.jop_title OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 16548)
+-- Name: or_id_sequence; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.or_id_sequence
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.or_id_sequence OWNER TO postgres;
+
+--
+-- TOC entry 216 (class 1259 OID 16476)
+-- Name: order_; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.order_ (
+    order_id character varying NOT NULL,
+    distance integer DEFAULT 0 NOT NULL,
+    card_date character varying NOT NULL,
+    start_point character varying NOT NULL,
+    payment_type character varying NOT NULL,
+    fk_car_id character varying,
+    fk_rate_id integer,
+    fk_card_number bigint,
+    fk_client_id character varying,
+    fk_service_number integer,
+    fk_shift_code character varying,
+    end_point character varying NOT NULL
+);
+
+
+ALTER TABLE public.order_ OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 16547)
+-- Name: order_id; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.order_id
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.order_id OWNER TO postgres;
+
+--
+-- TOC entry 210 (class 1259 OID 16407)
+-- Name: payment_method; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.payment_method (
+    card_number bigint NOT NULL,
+    payment_system character varying(150) NOT NULL,
+    validity date NOT NULL,
+    fk_client_id character varying(255),
+    CONSTRAINT check_payment_system CHECK (((payment_system)::text = ANY ((ARRAY['visa'::character varying, 'masterCard'::character varying, 'мир'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.payment_method OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 16543)
+-- Name: rate_id; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.rate_id
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.rate_id OWNER TO postgres;
+
+--
+-- TOC entry 211 (class 1259 OID 16423)
+-- Name: rate; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.rate (
+    rate_id integer DEFAULT nextval('public.rate_id'::regclass) NOT NULL,
+    penality_for_waiting integer DEFAULT 0,
+    base_price integer NOT NULL,
+    car_id character varying
+);
+
+
+ALTER TABLE public.rate OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 16541)
+-- Name: shift_code_sequence; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.shift_code_sequence
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.shift_code_sequence OWNER TO postgres;
+
+--
+-- TOC entry 215 (class 1259 OID 16459)
+-- Name: work_schedule; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.work_schedule (
+    shift_code character varying DEFAULT nextval('public.shift_code_sequence'::regclass) NOT NULL,
+    start_of_shift date NOT NULL,
+    end_of_shift date NOT NULL,
+    weekend date,
+    work_format character varying,
+    fk_car_id character varying NOT NULL,
+    fk_service_number integer NOT NULL
+);
+
+
+ALTER TABLE public.work_schedule OWNER TO postgres;
+
+--
+-- TOC entry 3381 (class 0 OID 16428)
+-- Dependencies: 212
+-- Data for Name: car; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.car (car_id, price, state_number, last_date_to, model_name, brand, year_of_manafactured, country, own) FROM stdin;
+C1	25000	AB123CD	2023-10-15	Camry	Toyota	2019	Japan	taxi
+C2	28000	XY789ZA	2023-09-25	Civic	Honda	2018	Japan	taxi
+C3	30000	ZZ456XY	2023-11-05	Accord	Honda	2020	Japan	taxi
+C4	35000	JK321LM	2023-08-12	3 Series	BMW	2017	Germany	taxi
+C5	40000	MM111NN	2023-12-01	A4	Audi	2021	Germany	taxi
+C6	27000	PL777OP	2023-07-18	Fusion	Ford	2016	USA	taxi
+C7	32000	AA222BB	2023-06-20	Altima	Nissan	2019	Japan	частная
+C8	29000	CC333DD	2023-09-10	Optima	Kia	2017	South Korea	частная 
+C9	26000	DD444EE	2023-08-05	Impreza	Subaru	2020	Japan	частная
+C10	31000	EE555FF	2023-10-30	Civic	Honda	2018	Japan	taxi
+\.
+
+
+--
+-- TOC entry 3378 (class 0 OID 16400)
+-- Dependencies: 209
+-- Data for Name: client; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.client (client_id, client_phone_number, advertising) FROM stdin;
+C1	1234567890	Проблемы с оплатой
+C2	1987654321	
+C3	1122334455	
+C4	9876543210	
+C5	6543210987	Потерянный предмет в такси
+C6	5435350543	
+C7	89817656505	
+C8	8539298439	
+C9	4392424893	
+C10	9434939204	
+\.
+
+
+--
+-- TOC entry 3383 (class 0 OID 16447)
+-- Dependencies: 214
+-- Data for Name: employee; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.employee (service_number, phone_number, full_name, employee_address, fk_id) FROM stdin;
+3681	1234567890	Иванов Иван Иванович	ул. Пушкина, 1	11
+3682	9876543210	Петров Петр Петрович	ул. Лермонтова, 2	12
+3683	1112233445	Сидоров Сидор Сидорович	ул. Толстого, 3	4
+3684	5556667778	Кузнецова Анна Владимировна	ул. Гоголя, 4	1
+3685	4443332221	Павлов Павел Павлович	ул. Чехова, 5	6
+3686	7778889990	Михайлов Михаил Михайлович	ул. Достоевского, 6	2
+3687	9990001112	Орлова Ольга Анатольевна	ул. Тургенева, 7	5
+3688	1213141516	Григорьев Григорий Григорьевич	ул. Шекспира, 8	11
+3689	1718192021	Николаев Николай Николаевич	ул. Достоевского, 9	12
+36810	2324252627	Федоров Федор Федорович	ул. Пастернака, 10	2
+\.
+
+
+--
+-- TOC entry 3382 (class 0 OID 16442)
+-- Dependencies: 213
+-- Data for Name: jop_title; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.jop_title (employee_experience, id, employee_category) FROM stdin;
+2 года	10	Сервисный работник
+3 лет	2	Старший диспетчер
+4 лет	3	Менеджер
+2 лет	4	Администратор
+4 лет	5	Старший администратор
+2 лет	6	Технический специалист
+4 лет	7	Инструктор
+6 лет	9	Старший менеджер
+5 лет	1	Водитель 2 категории 
+1 года	8	Механик
+1 года	11	Водитель 1 категории
+15 лет	12	Водитель 3 категории
+\.
+
+
+--
+-- TOC entry 3385 (class 0 OID 16476)
+-- Dependencies: 216
+-- Data for Name: order_; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.order_ (order_id, distance, card_date, start_point, payment_type, fk_car_id, fk_rate_id, fk_card_number, fk_client_id, fk_service_number, fk_shift_code, end_point) FROM stdin;
+or11	5	2023-10-26	Улица Ленина, 123	Наличные	C1	1	4156025011921310	C5	3681	1	Улица Гагарина, 45
+or12	4	2023-10-27	Улица Пушкина, 67	Карта	C1	1	4293027718376115	C10	3681	1	Улица Чехова, 89
+or13	7	2023-10-28	Улица Толстого, 21	Наличные	C3	3	4330943363667464	C7	3684	3	Улица Достоевского, 14
+or14	5	2023-10-29	Улица Герцена, 37	Карта	C4	4	4449178559155484	C8	3688	5	Улица Лермонтова, 56
+or15	7	2023-10-30	Улица Пастернака, 98	Наличные	C5	5	4465991831387584	C4	3689	4	Улица Булгакова, 72
+or16	4	2023-10-31	Улица Шолохова, 5	Карта	C6	6	4576580834247303	C9	3685	6	Улица Солженицына, 19
+or17	4	2023-11-01	Улица Ахматовой, 33	Наличные	C1	1	4621965225399430	C6	3681	7	Улица Бродского, 78
+or18	2	2023-11-02	Улица Пастернака, 10	Карта	C7	7	4649963217198504	C3	36810	8	Улица Маяковского, 55
+or19	7	2023-11-03	Улица Гоголя, 29	Наличные	C8	8	4804374615104832	C1	3681	9	Улица Чайковского, 17
+or20	4	2023-11-04	Улица Дюма, 94	Карта	C10	9	4863642573169460	C2	3687	10	Улица Гюго, 7
+\.
+
+
+--
+-- TOC entry 3379 (class 0 OID 16407)
+-- Dependencies: 210
+-- Data for Name: payment_method; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.payment_method (card_number, payment_system, validity, fk_client_id) FROM stdin;
+4804374615104832	visa	2026-05-01	C1
+4863642573169460	visa	2026-09-01	C2
+4649963217198504	visa	2028-01-01	C3
+4465991831387584	visa	2029-04-01	C4
+4156025011921310	visa	2024-04-01	C5
+4621965225399430	visa	2024-11-01	C6
+4330943363667464	visa	2024-06-01	C7
+4449178559155484	visa	2025-12-01	C8
+4576580834247303	visa	2026-08-01	C9
+4293027718376115	visa	2026-02-01	C10
+\.
+
+
+--
+-- TOC entry 3380 (class 0 OID 16423)
+-- Dependencies: 211
+-- Data for Name: rate; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.rate (rate_id, penality_for_waiting, base_price, car_id) FROM stdin;
+1	60	400	C1
+2	0	550	C2
+3	0	480	C3
+4	0	490	C4
+5	110	510	C5
+6	140	520	C6
+7	160	530	C7
+8	125	495	C8
+9	135	505	C9
+10	145	515	C10
+\.
+
+
+--
+-- TOC entry 3384 (class 0 OID 16459)
+-- Dependencies: 215
+-- Data for Name: work_schedule; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.work_schedule (shift_code, start_of_shift, end_of_shift, weekend, work_format, fk_car_id, fk_service_number) FROM stdin;
+1	2023-10-26	2023-10-26	\N	2/2	C1	3681
+2	2023-10-27	2023-10-27	\N	2/2	C1	3681
+5	2023-10-30	2023-10-30	\N	2/2	C2	3686
+6	2023-10-30	2023-11-01	\N	5/2	C10	3687
+7	2023-11-01	2023-11-01	\N	2/2	C4	3688
+8	2023-11-02	2023-11-02	\N	5/2	C5	3689
+9	2023-11-02	2023-11-03	\N	2/2	C7	36810
+10	2023-11-03	2023-11-05	2023-11-03	5/2	C8	3683
+3	2023-10-28	2023-10-28	2023-10-29	2/2	C3	3684
+4	2023-10-28	2023-10-29	2023-10-30	5/2	C6	3685
+\.
+
+
+--
+-- TOC entry 3395 (class 0 OID 0)
+-- Dependencies: 220
+-- Name: or_id_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.or_id_sequence', 20, true);
+
+
+--
+-- TOC entry 3396 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: order_id; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.order_id', 1, false);
+
+
+--
+-- TOC entry 3397 (class 0 OID 0)
+-- Dependencies: 218
+-- Name: rate_id; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.rate_id', 10, true);
+
+
+--
+-- TOC entry 3398 (class 0 OID 0)
+-- Dependencies: 217
+-- Name: shift_code_sequence; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.shift_code_sequence', 10, true);
+
+
+--
+-- TOC entry 3214 (class 2606 OID 16434)
+-- Name: car Car_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.car
+    ADD CONSTRAINT "Car_pkey" PRIMARY KEY (car_id);
+
+
+--
+-- TOC entry 3220 (class 2606 OID 16453)
+-- Name: employee Employee_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.employee
+    ADD CONSTRAINT "Employee_pkey" PRIMARY KEY (service_number);
+
+
+--
+-- TOC entry 3218 (class 2606 OID 16446)
+-- Name: jop_title Jop_title_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.jop_title
+    ADD CONSTRAINT "Jop_title_pkey" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3212 (class 2606 OID 16427)
+-- Name: rate Rate_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.rate
+    ADD CONSTRAINT "Rate_pkey" PRIMARY KEY (rate_id);
+
+
+--
+-- TOC entry 3224 (class 2606 OID 16465)
+-- Name: work_schedule Work schedule_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.work_schedule
+    ADD CONSTRAINT "Work schedule_pkey" PRIMARY KEY (shift_code);
+
+
+--
+-- TOC entry 3206 (class 2606 OID 16579)
+-- Name: client client_phone_number; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.client
+    ADD CONSTRAINT client_phone_number UNIQUE (client_phone_number) INCLUDE (client_phone_number);
+
+
+--
+-- TOC entry 3226 (class 2606 OID 16482)
+-- Name: order_ order_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_
+    ADD CONSTRAINT order_pkey PRIMARY KEY (order_id);
+
+
+--
+-- TOC entry 3210 (class 2606 OID 16530)
+-- Name: payment_method pk_card_number; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.payment_method
+    ADD CONSTRAINT pk_card_number PRIMARY KEY (card_number);
+
+
+--
+-- TOC entry 3208 (class 2606 OID 16406)
+-- Name: client pk_client_id; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.client
+    ADD CONSTRAINT pk_client_id PRIMARY KEY (client_id);
+
+
+--
+-- TOC entry 3222 (class 2606 OID 16576)
+-- Name: employee uk_service_number; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.employee
+    ADD CONSTRAINT uk_service_number UNIQUE (service_number);
+
+
+--
+-- TOC entry 3216 (class 2606 OID 16565)
+-- Name: car uk_state_number; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.car
+    ADD CONSTRAINT uk_state_number UNIQUE (state_number);
+
+
+--
+-- TOC entry 3238 (class 2620 OID 16550)
+-- Name: order_ set_or_order_id_trigger; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER set_or_order_id_trigger BEFORE INSERT ON public.order_ FOR EACH ROW EXECUTE FUNCTION public.set_or_order_id();
+
+
+--
+-- TOC entry 3228 (class 2606 OID 16437)
+-- Name: rate fk_car_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.rate
+    ADD CONSTRAINT fk_car_id FOREIGN KEY (car_id) REFERENCES public.car(car_id) NOT VALID;
+
+
+--
+-- TOC entry 3230 (class 2606 OID 16466)
+-- Name: work_schedule fk_car_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.work_schedule
+    ADD CONSTRAINT fk_car_id FOREIGN KEY (fk_car_id) REFERENCES public.car(car_id) NOT VALID;
+
+
+--
+-- TOC entry 3232 (class 2606 OID 16483)
+-- Name: order_ fk_car_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_
+    ADD CONSTRAINT fk_car_id FOREIGN KEY (fk_car_id) REFERENCES public.car(car_id) NOT VALID;
+
+
+--
+-- TOC entry 3237 (class 2606 OID 16551)
+-- Name: order_ fk_card_number; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_
+    ADD CONSTRAINT fk_card_number FOREIGN KEY (fk_card_number) REFERENCES public.payment_method(card_number) NOT VALID;
+
+
+--
+-- TOC entry 3227 (class 2606 OID 16418)
+-- Name: payment_method fk_client_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.payment_method
+    ADD CONSTRAINT fk_client_id FOREIGN KEY (fk_client_id) REFERENCES public.client(client_id) NOT VALID;
+
+
+--
+-- TOC entry 3234 (class 2606 OID 16498)
+-- Name: order_ fk_client_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_
+    ADD CONSTRAINT fk_client_id FOREIGN KEY (fk_client_id) REFERENCES public.client(client_id) NOT VALID;
+
+
+--
+-- TOC entry 3229 (class 2606 OID 16454)
+-- Name: employee fk_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.employee
+    ADD CONSTRAINT fk_id FOREIGN KEY (fk_id) REFERENCES public.jop_title(id) NOT VALID;
+
+
+--
+-- TOC entry 3233 (class 2606 OID 16488)
+-- Name: order_ fk_rate_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_
+    ADD CONSTRAINT fk_rate_id FOREIGN KEY (fk_rate_id) REFERENCES public.rate(rate_id) NOT VALID;
+
+
+--
+-- TOC entry 3231 (class 2606 OID 16471)
+-- Name: work_schedule fk_service_number; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.work_schedule
+    ADD CONSTRAINT fk_service_number FOREIGN KEY (fk_service_number) REFERENCES public.employee(service_number) NOT VALID;
+
+
+--
+-- TOC entry 3236 (class 2606 OID 16508)
+-- Name: order_ fk_service_number; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_
+    ADD CONSTRAINT fk_service_number FOREIGN KEY (fk_service_number) REFERENCES public.employee(service_number) NOT VALID;
+
+
+--
+-- TOC entry 3235 (class 2606 OID 16503)
+-- Name: order_ fk_shift_code; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_
+    ADD CONSTRAINT fk_shift_code FOREIGN KEY (fk_shift_code) REFERENCES public.work_schedule(shift_code) NOT VALID;
+
+
+-- Completed on 2023-10-27 15:29:29
+
+--
+-- PostgreSQL database dump complete
+--
+
