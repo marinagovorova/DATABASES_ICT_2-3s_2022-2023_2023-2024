@@ -1,0 +1,452 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 16.0
+-- Dumped by pg_dump version 16.0
+
+-- Started on 2023-10-26 00:56:25 MSK
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 3663 (class 1262 OID 16398)
+-- Name: pashahurs; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE pashahurs WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'C';
+
+
+ALTER DATABASE pashahurs OWNER TO postgres;
+
+\connect pashahurs
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 221 (class 1259 OID 16464)
+-- Name: carriage; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.carriage (
+    carriage_id integer NOT NULL,
+    train_id integer NOT NULL,
+    carriage_type character varying(50) NOT NULL
+);
+
+
+ALTER TABLE public.carriage OWNER TO postgres;
+
+--
+-- TOC entry 215 (class 1259 OID 16418)
+-- Name: passenger; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.passenger (
+    passenger_id integer NOT NULL,
+    passport_date_of_birth date NOT NULL,
+    passport_identification_number character varying(20),
+    passport_number character varying(20),
+    patronymic character varying(100),
+    first_name character varying(100),
+    last_name character varying(100),
+    CONSTRAINT passenger_id CHECK ((passenger_id > 0))
+);
+
+
+ALTER TABLE public.passenger OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 16456)
+-- Name: schedule; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.schedule (
+    schedule_id integer NOT NULL,
+    departure_time date NOT NULL,
+    added_train_id integer,
+    train_type character varying(20) NOT NULL,
+    train_status character varying(50) NOT NULL,
+    station_name_to character varying(100) NOT NULL,
+    station_name_from character varying(100) NOT NULL,
+    train_name character varying(100) NOT NULL,
+    CONSTRAINT schedule_id CHECK ((schedule_id > 0))
+);
+
+
+ALTER TABLE public.schedule OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 16442)
+-- Name: seat; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.seat (
+    seat_id integer NOT NULL,
+    carriage_id integer NOT NULL,
+    locked_status boolean NOT NULL,
+    CONSTRAINT seat_id CHECK ((seat_id > 0))
+);
+
+
+ALTER TABLE public.seat OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 16474)
+-- Name: stop; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.stop (
+    stop_id integer NOT NULL,
+    stop_type character varying(100) NOT NULL,
+    location character varying(100) NOT NULL,
+    stop_name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.stop OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 16481)
+-- Name: stop_point; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.stop_point (
+    stop_point_id integer NOT NULL,
+    train_id integer NOT NULL,
+    arrival_time timestamp with time zone NOT NULL,
+    parking_time time with time zone NOT NULL,
+    departure_time time with time zone NOT NULL,
+    stop_name character varying(100),
+    stop_id integer NOT NULL
+);
+
+
+ALTER TABLE public.stop_point OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 16434)
+-- Name: ticket; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ticket (
+    ticket_id integer NOT NULL,
+    passenger_id integer NOT NULL,
+    ticket_office_id integer NOT NULL,
+    price integer NOT NULL,
+    seat_id integer NOT NULL,
+    station_name_to character varying(100) NOT NULL,
+    station_name_from character varying(100) NOT NULL,
+    ticket_status character varying(100) NOT NULL,
+    CONSTRAINT price CHECK ((price > 0))
+);
+
+
+ALTER TABLE public.ticket OWNER TO postgres;
+
+--
+-- TOC entry 216 (class 1259 OID 16426)
+-- Name: ticket_office; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ticket_office (
+    ticket_office_id integer NOT NULL,
+    stop_name character varying(100),
+    address character varying(100),
+    CONSTRAINT ticket_office_id CHECK ((ticket_office_id > 0))
+);
+
+
+ALTER TABLE public.ticket_office OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 16448)
+-- Name: train; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.train (
+    train_id integer NOT NULL,
+    shedule_id integer NOT NULL,
+    departure_date date NOT NULL,
+    arrival_date date NOT NULL,
+    train_status character varying(100),
+    CONSTRAINT train_id CHECK ((train_id > 0))
+);
+
+
+ALTER TABLE public.train OWNER TO postgres;
+
+--
+-- TOC entry 3655 (class 0 OID 16464)
+-- Dependencies: 221
+-- Data for Name: carriage; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.carriage VALUES (1, 1, 'Economy') ON CONFLICT DO NOTHING;
+INSERT INTO public.carriage VALUES (2, 1, 'Business') ON CONFLICT DO NOTHING;
+INSERT INTO public.carriage VALUES (3, 2, 'Economy') ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 3649 (class 0 OID 16418)
+-- Dependencies: 215
+-- Data for Name: passenger; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.passenger VALUES (1, '1990-01-01', 'ID123456', 'P123456', 'Ivanovich', 'Ivan', 'Ivanov') ON CONFLICT DO NOTHING;
+INSERT INTO public.passenger VALUES (2, '1985-05-05', 'ID654321', 'P654321', 'Petrovich', 'Petr', 'Petrov') ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 3654 (class 0 OID 16456)
+-- Dependencies: 220
+-- Data for Name: schedule; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.schedule VALUES (1, '2023-11-01', NULL, 'Express', 'On Time', 'StationB', 'StationA', 'TrainX') ON CONFLICT DO NOTHING;
+INSERT INTO public.schedule VALUES (2, '2023-11-02', NULL, 'Normal', 'On Time', 'StationC', 'StationA', 'TrainY') ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 3652 (class 0 OID 16442)
+-- Dependencies: 218
+-- Data for Name: seat; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.seat VALUES (1, 1, false) ON CONFLICT DO NOTHING;
+INSERT INTO public.seat VALUES (2, 1, true) ON CONFLICT DO NOTHING;
+INSERT INTO public.seat VALUES (3, 2, false) ON CONFLICT DO NOTHING;
+INSERT INTO public.seat VALUES (4, 3, false) ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 3656 (class 0 OID 16474)
+-- Dependencies: 222
+-- Data for Name: stop; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.stop VALUES (1, 'Major', 'CityA', 'StopA') ON CONFLICT DO NOTHING;
+INSERT INTO public.stop VALUES (2, 'Minor', 'CityB', 'StopB') ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 3657 (class 0 OID 16481)
+-- Dependencies: 223
+-- Data for Name: stop_point; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.stop_point VALUES (1, 1, '2023-11-01 08:00:00+03', '00:30:00+03', '08:30:00+03', 'StopA', 1) ON CONFLICT DO NOTHING;
+INSERT INTO public.stop_point VALUES (2, 1, '2023-11-01 10:00:00+03', '00:20:00+03', '10:20:00+03', 'StopB', 2) ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 3651 (class 0 OID 16434)
+-- Dependencies: 217
+-- Data for Name: ticket; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.ticket VALUES (1, 1, 1, 100, 1, 'StationB', 'StationA', 'Booked') ON CONFLICT DO NOTHING;
+INSERT INTO public.ticket VALUES (2, 2, 1, 150, 3, 'StationC', 'StationA', 'Booked') ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 3650 (class 0 OID 16426)
+-- Dependencies: 216
+-- Data for Name: ticket_office; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.ticket_office VALUES (1, 'StopA', 'StreetA, CityA') ON CONFLICT DO NOTHING;
+INSERT INTO public.ticket_office VALUES (2, 'StopB', 'StreetB, CityB') ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 3653 (class 0 OID 16448)
+-- Dependencies: 219
+-- Data for Name: train; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.train VALUES (1, 1, '2023-11-01', '2023-11-01', 'On Time') ON CONFLICT DO NOTHING;
+INSERT INTO public.train VALUES (2, 2, '2023-11-02', '2023-11-02', 'On Time') ON CONFLICT DO NOTHING;
+
+
+--
+-- TOC entry 3493 (class 2606 OID 16470)
+-- Name: carriage carriage_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.carriage
+    ADD CONSTRAINT carriage_pkey PRIMARY KEY (carriage_id);
+
+
+--
+-- TOC entry 3481 (class 2606 OID 16425)
+-- Name: passenger passenger_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.passenger
+    ADD CONSTRAINT passenger_pkey PRIMARY KEY (passenger_id);
+
+
+--
+-- TOC entry 3491 (class 2606 OID 16463)
+-- Name: schedule schedule_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.schedule
+    ADD CONSTRAINT schedule_pkey PRIMARY KEY (schedule_id);
+
+
+--
+-- TOC entry 3487 (class 2606 OID 16447)
+-- Name: seat seat_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seat
+    ADD CONSTRAINT seat_pkey PRIMARY KEY (seat_id);
+
+
+--
+-- TOC entry 3495 (class 2606 OID 16480)
+-- Name: stop stop_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stop
+    ADD CONSTRAINT stop_pkey PRIMARY KEY (stop_id);
+
+
+--
+-- TOC entry 3497 (class 2606 OID 16487)
+-- Name: stop_point stop_point_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stop_point
+    ADD CONSTRAINT stop_point_pkey PRIMARY KEY (stop_point_id);
+
+
+--
+-- TOC entry 3483 (class 2606 OID 16433)
+-- Name: ticket_office ticket_office_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket_office
+    ADD CONSTRAINT ticket_office_pkey PRIMARY KEY (ticket_office_id);
+
+
+--
+-- TOC entry 3485 (class 2606 OID 16441)
+-- Name: ticket ticket_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket
+    ADD CONSTRAINT ticket_pkey PRIMARY KEY (ticket_id);
+
+
+--
+-- TOC entry 3489 (class 2606 OID 16455)
+-- Name: train train_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.train
+    ADD CONSTRAINT train_pkey PRIMARY KEY (train_id);
+
+
+--
+-- TOC entry 3503 (class 2606 OID 16508)
+-- Name: carriage carriage_train_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.carriage
+    ADD CONSTRAINT carriage_train_id_fkey FOREIGN KEY (train_id) REFERENCES public.train(train_id) NOT VALID;
+
+
+--
+-- TOC entry 3501 (class 2606 OID 16503)
+-- Name: seat seat_carriage_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seat
+    ADD CONSTRAINT seat_carriage_id_fkey FOREIGN KEY (carriage_id) REFERENCES public.carriage(carriage_id) NOT VALID;
+
+
+--
+-- TOC entry 3504 (class 2606 OID 16523)
+-- Name: stop_point stop_point_stop_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stop_point
+    ADD CONSTRAINT stop_point_stop_id_fkey FOREIGN KEY (stop_id) REFERENCES public.stop(stop_id) NOT VALID;
+
+
+--
+-- TOC entry 3505 (class 2606 OID 16518)
+-- Name: stop_point stop_point_train_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stop_point
+    ADD CONSTRAINT stop_point_train_id_fkey FOREIGN KEY (train_id) REFERENCES public.train(train_id) NOT VALID;
+
+
+--
+-- TOC entry 3498 (class 2606 OID 16488)
+-- Name: ticket ticket_passenger_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket
+    ADD CONSTRAINT ticket_passenger_id_fkey FOREIGN KEY (passenger_id) REFERENCES public.passenger(passenger_id) NOT VALID;
+
+
+--
+-- TOC entry 3499 (class 2606 OID 16498)
+-- Name: ticket ticket_seat_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket
+    ADD CONSTRAINT ticket_seat_id_fkey FOREIGN KEY (seat_id) REFERENCES public.seat(seat_id) NOT VALID;
+
+
+--
+-- TOC entry 3500 (class 2606 OID 16493)
+-- Name: ticket ticket_ticket_office_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket
+    ADD CONSTRAINT ticket_ticket_office_id_fkey FOREIGN KEY (ticket_office_id) REFERENCES public.ticket_office(ticket_office_id) NOT VALID;
+
+
+--
+-- TOC entry 3502 (class 2606 OID 16513)
+-- Name: train train_shedule_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.train
+    ADD CONSTRAINT train_shedule_id_fkey FOREIGN KEY (shedule_id) REFERENCES public.schedule(schedule_id) NOT VALID;
+
+
+-- Completed on 2023-10-26 00:56:25 MSK
+
+--
+-- PostgreSQL database dump complete
+--
+
