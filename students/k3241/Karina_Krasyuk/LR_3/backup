@@ -1,0 +1,1223 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 16.0
+-- Dumped by pg_dump version 16.0
+
+-- Started on 2023-11-10 17:03:03
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 4926 (class 1262 OID 16731)
+-- Name: PublishingHouseOfComputerLiterature; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE "PublishingHouseOfComputerLiterature" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'Russian_Russia.1251';
+
+
+ALTER DATABASE "PublishingHouseOfComputerLiterature" OWNER TO postgres;
+
+\connect "PublishingHouseOfComputerLiterature"
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 6 (class 2615 OID 16732)
+-- Name: complit; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA complit;
+
+
+ALTER SCHEMA complit OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 216 (class 1259 OID 16733)
+-- Name: account; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit.account (
+    id bigint NOT NULL,
+    date_of_issue date NOT NULL,
+    type character varying(20) NOT NULL,
+    account_number bigint NOT NULL,
+    payment_status character varying(20) NOT NULL,
+    order_id bigint NOT NULL,
+    amount numeric(20,2) NOT NULL
+);
+
+
+ALTER TABLE complit.account OWNER TO postgres;
+
+--
+-- TOC entry 4927 (class 0 OID 0)
+-- Dependencies: 216
+-- Name: TABLE account; Type: COMMENT; Schema: complit; Owner: postgres
+--
+
+COMMENT ON TABLE complit.account IS 'счёт';
+
+
+--
+-- TOC entry 217 (class 1259 OID 16736)
+-- Name: adjustment_of_the_tr; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit.adjustment_of_the_tr (
+    employee_id bigint NOT NULL,
+    publication_id bigint NOT NULL,
+    editor_status character varying(20) NOT NULL,
+    id bigint NOT NULL
+);
+
+
+ALTER TABLE complit.adjustment_of_the_tr OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 16739)
+-- Name: author; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit.author (
+    id bigint NOT NULL,
+    username character varying(70) NOT NULL,
+    email character varying(70) NOT NULL
+);
+
+
+ALTER TABLE complit.author OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 16742)
+-- Name: authorship; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit.authorship (
+    order_by_list integer NOT NULL,
+    book_id bigint NOT NULL,
+    author_id bigint NOT NULL,
+    number_in_the_list integer NOT NULL
+);
+
+
+ALTER TABLE complit.authorship OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 16745)
+-- Name: belongs; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit.belongs (
+    book_id bigint NOT NULL,
+    book_category_id bigint NOT NULL,
+    status character varying(10) NOT NULL,
+    id bigint NOT NULL
+);
+
+
+ALTER TABLE complit.belongs OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 16748)
+-- Name: book; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit.book (
+    id bigint NOT NULL,
+    name character varying(70) NOT NULL,
+    year_of_writing integer NOT NULL
+);
+
+
+ALTER TABLE complit.book OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 16751)
+-- Name: book_category; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit.book_category (
+    id bigint NOT NULL,
+    name character varying(100)
+);
+
+
+ALTER TABLE complit.book_category OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 16754)
+-- Name: circulation; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit.circulation (
+    id bigint NOT NULL,
+    date date NOT NULL,
+    quantity integer NOT NULL,
+    remaining integer NOT NULL,
+    status character varying(20) NOT NULL,
+    retail_price numeric(20,2) NOT NULL,
+    publication_id bigint NOT NULL
+);
+
+
+ALTER TABLE complit.circulation OWNER TO postgres;
+
+--
+-- TOC entry 4928 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: TABLE circulation; Type: COMMENT; Schema: complit; Owner: postgres
+--
+
+COMMENT ON TABLE complit.circulation IS 'Тираж';
+
+
+--
+-- TOC entry 224 (class 1259 OID 16757)
+-- Name: customer; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit.customer (
+    id bigint NOT NULL,
+    username character varying(70) NOT NULL,
+    address character varying(70) NOT NULL,
+    email character varying(70) NOT NULL,
+    phone_number character varying(50) NOT NULL
+);
+
+
+ALTER TABLE complit.customer OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 16760)
+-- Name: employee; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit.employee (
+    id bigint NOT NULL,
+    username character varying(70) NOT NULL,
+    email character varying(70) NOT NULL,
+    position_id bigint,
+    phone_number character varying(50) NOT NULL
+);
+
+
+ALTER TABLE complit.employee OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 16763)
+-- Name: making_an_order; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit.making_an_order (
+    id bigint NOT NULL,
+    ready_status character varying(20) NOT NULL,
+    order_id bigint NOT NULL,
+    circulation_id bigint NOT NULL,
+    quantity integer NOT NULL
+);
+
+
+ALTER TABLE complit.making_an_order OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 16766)
+-- Name: order; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit."order" (
+    id bigint NOT NULL,
+    date_of_execution date NOT NULL,
+    period_of_execution integer NOT NULL,
+    payment_status character varying(20) NOT NULL,
+    number_of_copies bigint NOT NULL,
+    contract_date date NOT NULL,
+    contract_number bigint NOT NULL,
+    customer_id bigint,
+    employee_id bigint,
+    act_number bigint NOT NULL,
+    date_of_the_act date NOT NULL
+);
+
+
+ALTER TABLE complit."order" OWNER TO postgres;
+
+--
+-- TOC entry 228 (class 1259 OID 16769)
+-- Name: position; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit."position" (
+    id bigint NOT NULL,
+    title_of_the_position character varying(70) NOT NULL,
+    salary numeric(20,2) NOT NULL,
+    category character varying(70) NOT NULL
+);
+
+
+ALTER TABLE complit."position" OWNER TO postgres;
+
+--
+-- TOC entry 4929 (class 0 OID 0)
+-- Dependencies: 228
+-- Name: TABLE "position"; Type: COMMENT; Schema: complit; Owner: postgres
+--
+
+COMMENT ON TABLE complit."position" IS 'Должность';
+
+
+--
+-- TOC entry 229 (class 1259 OID 16772)
+-- Name: publication; Type: TABLE; Schema: complit; Owner: postgres
+--
+
+CREATE TABLE complit.publication (
+    id bigint NOT NULL,
+    type character varying(20) NOT NULL,
+    number_of_pages integer NOT NULL,
+    book_id bigint NOT NULL,
+    availability_of_illustrations character varying(5) NOT NULL,
+    start_year integer NOT NULL,
+    isbn character varying(70) NOT NULL
+);
+
+
+ALTER TABLE complit.publication OWNER TO postgres;
+
+--
+-- TOC entry 4930 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: TABLE publication; Type: COMMENT; Schema: complit; Owner: postgres
+--
+
+COMMENT ON TABLE complit.publication IS 'издание';
+
+
+--
+-- TOC entry 4907 (class 0 OID 16733)
+-- Dependencies: 216
+-- Data for Name: account; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit.account (id, date_of_issue, type, account_number, payment_status, order_id, amount) FROM stdin;
+473	2020-06-12	Savings	140166	paid	321	1738.00
+742	2023-06-06	Savings	880930	paid	283	68762.00
+141	2023-10-21	Business	269741	not paid	255	13057.00
+53	2021-09-12	Savings	897661	paid	526	75759.00
+673	2023-02-01	Checking	153555	paid	894	42519.00
+293	2021-01-18	Checking	375902	not paid	847	87015.00
+420	2020-09-03	Checking	454096	paid	255	61897.00
+175	2023-01-14	Savings	259799	paid	578	34910.00
+170	2020-08-10	Business	548075	paid	640	53520.00
+815	2020-12-24	Business	915978	not paid	847	97764.00
+778	2022-11-10	Business	536214	not paid	684	90579.00
+158	2023-08-20	Savings	540408	paid	526	25405.00
+470	2023-04-29	Checking	901295	not paid	832	4261.00
+234	2020-07-07	Savings	409859	not paid	800	98454.00
+752	2021-12-01	Savings	473705	paid	629	59848.00
+117	2020-12-24	Savings	194992	paid	810	63014.00
+267	2023-06-10	Savings	362913	paid	321	17647.00
+208	2023-03-09	Business	320323	paid	667	76704.00
+133	2021-02-13	Savings	720618	not paid	640	45217.00
+596	2023-06-20	Savings	218221	not paid	78	76848.00
+\.
+
+
+--
+-- TOC entry 4908 (class 0 OID 16736)
+-- Dependencies: 217
+-- Data for Name: adjustment_of_the_tr; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit.adjustment_of_the_tr (employee_id, publication_id, editor_status, id) FROM stdin;
+29	230	main	1
+211	991	main	2
+780	267	not main	3
+\.
+
+
+--
+-- TOC entry 4909 (class 0 OID 16739)
+-- Dependencies: 218
+-- Data for Name: author; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit.author (id, username, email) FROM stdin;
+776	Michael Hunt	spencerdebbie@example.net
+508	Michael Taylor	loriowens@example.net
+592	John Johnson	rhernandez@example.net
+984	Michael Clark	clarence01@example.net
+222	Patricia Simpson	lbrown@example.net
+377	Isaac Collins	llin@example.com
+89	Ricky Santos	nicoletorres@example.net
+422	Michelle Richardson	jamesstewart@example.org
+778	Seth Craig	sethclayton@example.net
+163	Steven Tyler	rbrady@example.com
+884	Jonathan Howard	shannongeorge@example.org
+241	Danielle Mercado	michaelkeller@example.net
+853	Jeffery Terrell	hgarcia@example.org
+921	John Fisher	christophernguyen@example.com
+56	Shane James	fitzpatrickjennifer@example.org
+593	Samuel Hughes	melendezsarah@example.net
+29	Bridget Mitchell	jennifer22@example.org
+242	Gabriela Campos	markherrera@example.net
+591	Tina Taylor	mbrown@example.net
+706	Erik Rangel	gbates@example.net
+167	Shawn Mendess	mendess@gmail.com
+596	Camila Mendess	cami084@gmail.com
+\.
+
+
+--
+-- TOC entry 4910 (class 0 OID 16742)
+-- Dependencies: 219
+-- Data for Name: authorship; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit.authorship (order_by_list, book_id, author_id, number_in_the_list) FROM stdin;
+5	608	884	62
+19	184	778	94
+76	298	884	32
+6	969	593	44
+9	204	242	37
+57	184	778	66
+66	881	984	29
+87	877	241	56
+39	366	29	76
+53	204	591	4
+41	668	592	64
+7	257	167	5
+43	739	596	91
+\.
+
+
+--
+-- TOC entry 4911 (class 0 OID 16745)
+-- Dependencies: 220
+-- Data for Name: belongs; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit.belongs (book_id, book_category_id, status, id) FROM stdin;
+366	13	true	1
+741	2	true	2
+826	6	false	3
+941	20	true	4
+826	17	false	5
+103	5	false	6
+257	9	true	7
+969	12	false	8
+35	21	true	9
+748	16	false	10
+35	6	false	11
+458	11	true	12
+204	3	true	13
+407	2	false	14
+941	4	true	15
+668	4	false	16
+739	16	false	17
+741	18	true	18
+376	14	true	19
+458	19	true	20
+\.
+
+
+--
+-- TOC entry 4912 (class 0 OID 16748)
+-- Dependencies: 221
+-- Data for Name: book; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit.book (id, name, year_of_writing) FROM stdin;
+969	Virtual asymmetric toolset	1984
+35	Multi-channeled neutral neural-net	1928
+458	Realigned value-added open system	1964
+366	Optional maximized middleware	1986
+877	Synergistic dynamic Internet solution	1921
+298	Balanced real-time software	1975
+407	Optional asynchronous collaboration	1925
+941	Universal upward-trending toolset	1950
+161	Polarized coherent time-frame	1916
+741	Persistent global infrastructure	1963
+881	Integrated uniform benchmark	1993
+103	Adaptive system-worthy interface	1924
+815	De-engineered composite Graphic Interface	1983
+204	Vision-oriented 3rdgeneration parallelism	1969
+608	Multi-layered context-sensitive superstructure	1932
+376	Inverse interactive open system	2013
+748	Visionary asynchronous leverage	1996
+668	Phased systemic orchestration	2009
+826	Distributed radical strategy	1989
+184	Configurable executive forecast	1984
+974	Databases in our life	2023
+257	Programming in real life	2019
+739	Programming in 5 steps	2023
+\.
+
+
+--
+-- TOC entry 4913 (class 0 OID 16751)
+-- Dependencies: 222
+-- Data for Name: book_category; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit.book_category (id, name) FROM stdin;
+1	Drama
+2	Comedy
+3	Action movie
+4	Fiction
+5	Horrors
+6	Thriller
+7	Adventures
+8	Fantasy
+9	Melodrama
+10	Crime
+11	Documentary
+12	Cartoon
+13	Romance
+14	Historical
+15	Science fiction
+16	Western
+17	Musical
+18	Family
+19	Sport
+20	Military
+21	Databases
+22	Programming languagess
+\.
+
+
+--
+-- TOC entry 4914 (class 0 OID 16754)
+-- Dependencies: 223
+-- Data for Name: circulation; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit.circulation (id, date, quantity, remaining, status, retail_price, publication_id) FROM stdin;
+163	2021-10-19	95	574	completed	15018.00	227
+322	2020-09-17	588	145	active	41086.00	917
+800	2023-04-21	517	852	completed	27982.00	803
+306	2023-06-15	510	365	in process	63380.00	247
+417	2020-02-01	42	657	in process	96927.00	706
+228	2022-12-22	255	136	completed	74066.00	531
+978	2022-03-18	123	224	in process	44268.00	832
+875	2020-11-29	478	582	completed	75940.00	256
+328	2023-01-31	997	113	in process	607.00	219
+70	2020-07-16	364	548	completed	54491.00	722
+317	2022-07-15	144	729	completed	20125.00	227
+903	2021-05-08	711	139	active	85251.00	55
+79	2021-06-10	754	687	completed	81059.00	943
+304	2020-04-11	307	947	in process	94288.00	256
+91	2020-07-10	737	192	completed	49679.00	943
+697	2023-03-04	654	300	in process	57827.00	917
+690	2023-06-25	86	463	active	33273.00	706
+197	2021-10-09	453	977	in process	11695.00	271
+95	2023-10-16	858	720	completed	3735.00	917
+422	2020-01-30	827	357	in process	85496.00	943
+\.
+
+
+--
+-- TOC entry 4915 (class 0 OID 16757)
+-- Dependencies: 224
+-- Data for Name: customer; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit.customer (id, username, address, email, phone_number) FROM stdin;
+851	Shawna Stout	4750 Jaclyn Plains Apt. 490\nNew Charlesborough, OH 90135	stephaniemccoy@example.net	+9(815)-718-19-44
+868	Rhonda Hughes	2122 Brown Mill Apt. 006\nNorth Kevin, CT 43868	steven29@example.net	+4(172)-431-19-11
+303	Alan Evans	248 Miller Point Apt. 911\nOscarfurt, MI 44711	zmartinez@example.net	+4(183)-423-37-82
+592	Travis Mack	249 Moore Port Apt. 844\nNorth Janet, VT 72170	kellybrian@example.net	+5(600)-104-38-22
+559	Jonathan Smith	Unit 0207 Box 4847\nDPO AA 99523	lnichols@example.com	+9(231)-162-95-35
+677	Kim Wilson	461 Flores Spurs Suite 838\nSouth Jenniferview, ND 82189	wnewman@example.org	+1(653)-171-17-96
+784	Jessica Beck	162 Medina Park\nTimbury, DE 12206	marshdanielle@example.net	+4(499)-306-31-28
+26	Patrick Delgado	69614 Smith Street\nMartinburgh, CT 99623	cherylhernandez@example.com	+1(783)-348-47-57
+190	Mark Mcdonald	PSC 5387, Box 5797\nAPO AA 82606	stephenlynn@example.net	+5(582)-376-37-75
+290	Jason Montgomery	3095 Stephanie Centers\nCynthiamouth, IA 15574	jasonweaver@example.com	+5(116)-294-63-52
+880	Shawn Whitaker	7590 Bishop Radial Apt. 942\nWest Raymond, NH 68526	pamelamitchell@example.com	+6(556)-774-58-87
+326	Joshua Johnson	312 Diana Springs\nPort Michael, OH 30274	qchavez@example.com	+6(323)-358-30-19
+185	Lori Norton	01234 Teresa Lake Suite 239\nGomezville, MS 34718	lisabeck@example.net	+6(134)-660-49-48
+822	Nathan Gilmore	32827 Wells Points Apt. 892\nPort Jessicamouth, WV 16023	ivaughn@example.net	+4(475)-912-38-17
+997	Marie Daugherty	218 Valencia View\nNorth Michaelstad, NE 31057	amandahunt@example.com	+3(607)-440-53-25
+459	Sydney Hardy	07374 Lee Views\nLake Austin, GA 36591	westmichael@example.org	+1(181)-669-23-93
+431	Christina Allen	08489 Vazquez Land\nStonemouth, AS 73892	mgonzalez@example.org	+8(796)-601-43-27
+810	Kelli Key	809 Parsons Points Suite 370\nNorth Emily, CO 94540	lisa57@example.net	+2(344)-880-13-71
+962	Dylan Thompson	6919 Larry Pines\nNorth Michaelbury, UT 44073	garciadiane@example.org	+6(720)-834-36-70
+204	Harold Adams	9998 Melissa Turnpike\nDavidfurt, OR 28807	carolyncallahan@example.org	+5(116)-760-36-36
+\.
+
+
+--
+-- TOC entry 4916 (class 0 OID 16760)
+-- Dependencies: 225
+-- Data for Name: employee; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit.employee (id, username, email, position_id, phone_number) FROM stdin;
+306	Natalie Henry	thomaselizabeth@example.org	16	+9(238)-437-40-58
+384	Yvonne Gonzalez	jacob88@example.org	15	+6(480)-199-27-59
+900	Robert Brown	jasminewyatt@example.org	19	+5(435)-219-66-88
+765	Dave Johnson	veronicasanders@example.net	11	+3(903)-365-51-59
+92	Kimberly Fry	lowelisa@example.org	6	+1(512)-771-13-27
+809	Elizabeth Flores	torresnoah@example.org	12	+7(165)-524-51-79
+29	Marie May	joseph87@example.com	18	+8(757)-122-89-80
+689	Ashley Wilson	csullivan@example.net	16	+7(245)-747-44-20
+451	Beth Hill	morenotimothy@example.net	3	+4(640)-339-12-62
+493	Maria Acosta	emilyowens@example.org	14	+8(195)-641-89-27
+263	Rachel Clark	meyersjustin@example.net	5	+7(642)-693-69-38
+364	Victor Reynolds	connieacosta@example.org	7	+7(977)-947-38-42
+222	William Garcia	robinsonoscar@example.net	7	+6(591)-987-67-75
+670	Kimberly Howell	jjones@example.org	14	+6(534)-653-80-64
+211	Devin Serrano	lsmith@example.org	7	+4(501)-478-96-57
+252	Joshua Garcia	andrewmartinez@example.org	12	+4(716)-419-39-34
+304	Joseph Steele	christopher70@example.net	9	+4(145)-132-77-95
+912	Catherine Cruz	joybond@example.net	2	+7(289)-476-21-91
+780	Rodney Brown	whitedrew@example.net	18	+1(573)-967-71-83
+244	Vanessa Greer	albertpreston@example.com	16	+6(997)-133-84-99
+\.
+
+
+--
+-- TOC entry 4917 (class 0 OID 16763)
+-- Dependencies: 226
+-- Data for Name: making_an_order; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit.making_an_order (id, ready_status, order_id, circulation_id, quantity) FROM stdin;
+1	not ready	142	328	27
+2	not ready	847	306	96
+3	in process	283	79	13
+4	in process	321	95	86
+5	not ready	667	417	97
+6	in process	894	70	91
+7	in process	894	317	75
+8	is ready	629	197	24
+9	is ready	78	800	77
+10	in process	894	875	84
+11	not ready	78	70	13
+12	is ready	847	91	1
+13	in process	283	322	36
+14	not ready	667	304	28
+15	is ready	640	70	40
+16	in process	255	690	89
+17	is ready	800	197	6
+18	is ready	810	328	31
+19	in process	629	875	21
+20	in process	578	79	83
+\.
+
+
+--
+-- TOC entry 4918 (class 0 OID 16766)
+-- Dependencies: 227
+-- Data for Name: order; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit."order" (id, date_of_execution, period_of_execution, payment_status, number_of_copies, contract_date, contract_number, customer_id, employee_id, act_number, date_of_the_act) FROM stdin;
+640	2020-01-28	188	paid	83	2020-10-24	8663	185	244	364	2022-07-13
+800	2023-06-16	7	paid	44	2021-03-19	4462	868	765	917	2022-10-27
+241	2022-06-20	10	not paid	23	2023-10-18	7640	822	211	904	2021-08-10
+321	2022-12-09	209	not paid	44	2020-08-03	7998	190	780	812	2020-03-18
+78	2021-08-13	37	paid	86	2020-10-02	1196	290	306	192	2020-06-12
+847	2023-04-13	23	not paid	89	2023-08-20	6505	26	912	350	2020-05-02
+832	2020-11-22	42	paid	39	2023-06-24	4476	459	92	953	2022-03-19
+283	2021-10-12	227	paid	45	2022-12-01	6536	559	263	602	2021-03-07
+894	2021-01-28	137	not paid	56	2022-11-16	1389	810	263	550	2022-02-18
+255	2023-04-01	330	paid	28	2020-10-03	1473	303	304	414	2021-10-12
+973	2021-09-08	128	paid	94	2023-09-09	1090	784	92	825	2020-03-15
+526	2022-09-17	239	paid	62	2023-04-01	1576	677	304	302	2023-03-05
+485	2022-08-14	222	not paid	97	2022-07-11	1528	851	765	746	2020-03-30
+684	2022-07-27	258	not paid	99	2021-01-04	1145	592	689	658	2022-09-26
+629	2022-02-16	23	paid	62	2021-02-07	8902	185	252	271	2021-01-27
+578	2022-12-17	259	not paid	73	2022-09-22	6766	962	92	527	2020-05-30
+237	2021-04-16	201	not paid	41	2020-07-31	3362	880	306	641	2021-11-19
+810	2020-06-27	135	paid	64	2022-08-13	9368	810	900	852	2022-01-05
+142	2020-06-10	185	paid	86	2023-04-25	7910	822	912	144	2021-02-03
+667	2022-05-12	165	paid	77	2022-04-24	8527	677	780	544	2022-03-14
+\.
+
+
+--
+-- TOC entry 4919 (class 0 OID 16769)
+-- Dependencies: 228
+-- Data for Name: position; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit."position" (id, title_of_the_position, salary, category) FROM stdin;
+1	Designer	56528.00	Category1
+2	Editor	58923.00	Category1
+3	Designer	36914.00	Category1
+4	Proofreader	48719.00	Category3
+5	Proofreader	79308.00	Category3
+6	Designer	96348.00	Category3
+7	Author	56809.00	Category2
+8	Proofreader	83135.00	Category1
+9	Designer	52860.00	Category2
+10	Technical Writer	79810.00	Category2
+11	Editor	87499.00	Category1
+12	Editor	36397.00	Category2
+13	Proofreader	69241.00	Category2
+14	Proofreader	33968.00	Category2
+15	Publisher	38545.00	Category1
+16	Designer	87495.00	Category3
+17	Editor	33564.00	Category3
+18	Technical Writer	96990.00	Category1
+19	Author	69227.00	Category2
+20	Author	89868.00	Category1
+\.
+
+
+--
+-- TOC entry 4920 (class 0 OID 16772)
+-- Dependencies: 229
+-- Data for Name: publication; Type: TABLE DATA; Schema: complit; Owner: postgres
+--
+
+COPY complit.publication (id, type, number_of_pages, book_id, availability_of_illustrations, start_year, isbn) FROM stdin;
+832	magazine	231	184	yes	1962	978-0-14-759737-3
+406	electronic edition	471	668	no	1920	978-1-182-85715-6
+752	electronic edition	288	668	no	2001	978-1-01-686819-8
+803	newspaper	69	826	no	1919	978-1-64440-096-8
+943	electronic edition	281	881	yes	1995	978-1-4018-0501-2
+543	book	293	366	no	1915	978-0-12-297474-8
+247	book	212	458	yes	1916	978-0-86631-800-6
+705	book	485	741	no	1914	978-1-65329-682-8
+256	magazine	49	407	yes	1995	978-0-619-84474-5
+55	newspaper	179	741	yes	1947	978-0-420-41046-7
+271	book	55	184	no	1920	978-1-66789-950-3
+531	magazine	25	748	yes	2021	978-0-476-41669-7
+331	electronic edition	30	407	yes	1975	978-0-251-21998-7
+230	book	181	668	no	2000	978-0-464-60999-5
+706	electronic edition	192	741	no	1949	978-0-12-213566-8
+722	newspaper	99	366	yes	2007	978-1-384-82001-9
+219	magazine	488	35	no	2022	978-0-653-34316-7
+917	magazine	64	877	yes	1957	978-0-7600-0979-6
+267	newspaper	197	668	no	1978	978-1-77216-366-7
+227	newspaper	297	748	no	1913	978-1-919191-90-4
+991	book	293	974	yes	2023	978-3-64740-096-9
+\.
+
+
+--
+-- TOC entry 4705 (class 2606 OID 16776)
+-- Name: account account_account_number_key; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.account
+    ADD CONSTRAINT account_account_number_key UNIQUE (account_number);
+
+
+--
+-- TOC entry 4686 (class 2606 OID 16902)
+-- Name: account account_amount_check; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.account
+    ADD CONSTRAINT account_amount_check CHECK ((amount > (0)::numeric)) NOT VALID;
+
+
+--
+-- TOC entry 4707 (class 2606 OID 16778)
+-- Name: account account_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.account
+    ADD CONSTRAINT account_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4709 (class 2606 OID 16920)
+-- Name: adjustment_of_the_tr adjustment_of_the_tr_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.adjustment_of_the_tr
+    ADD CONSTRAINT adjustment_of_the_tr_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4711 (class 2606 OID 16782)
+-- Name: author author_email_key; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.author
+    ADD CONSTRAINT author_email_key UNIQUE (email);
+
+
+--
+-- TOC entry 4713 (class 2606 OID 16784)
+-- Name: author author_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.author
+    ADD CONSTRAINT author_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4715 (class 2606 OID 16786)
+-- Name: authorship authorship_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.authorship
+    ADD CONSTRAINT authorship_pkey PRIMARY KEY (order_by_list);
+
+
+--
+-- TOC entry 4717 (class 2606 OID 16918)
+-- Name: belongs belongs_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.belongs
+    ADD CONSTRAINT belongs_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4721 (class 2606 OID 16790)
+-- Name: book_category book_category_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.book_category
+    ADD CONSTRAINT book_category_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4719 (class 2606 OID 16792)
+-- Name: book book_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.book
+    ADD CONSTRAINT book_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4725 (class 2606 OID 16794)
+-- Name: circulation circulation_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.circulation
+    ADD CONSTRAINT circulation_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4727 (class 2606 OID 16796)
+-- Name: customer customer_email_key; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.customer
+    ADD CONSTRAINT customer_email_key UNIQUE (email);
+
+
+--
+-- TOC entry 4729 (class 2606 OID 16798)
+-- Name: customer customer_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.customer
+    ADD CONSTRAINT customer_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4733 (class 2606 OID 16801)
+-- Name: employee employee_email_key; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.employee
+    ADD CONSTRAINT employee_email_key UNIQUE (email);
+
+
+--
+-- TOC entry 4735 (class 2606 OID 16803)
+-- Name: employee employee_phone_number_key; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.employee
+    ADD CONSTRAINT employee_phone_number_key UNIQUE (phone_number);
+
+
+--
+-- TOC entry 4737 (class 2606 OID 16805)
+-- Name: employee employee_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.employee
+    ADD CONSTRAINT employee_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4701 (class 2606 OID 16806)
+-- Name: publication illustrations; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.publication
+    ADD CONSTRAINT illustrations CHECK (((availability_of_illustrations)::text = ANY (ARRAY[('yes'::character varying)::text, ('no'::character varying)::text]))) NOT VALID;
+
+
+--
+-- TOC entry 4739 (class 2606 OID 16808)
+-- Name: making_an_order making_an_order_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.making_an_order
+    ADD CONSTRAINT making_an_order_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4723 (class 2606 OID 16810)
+-- Name: book_category name; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.book_category
+    ADD CONSTRAINT name UNIQUE (name);
+
+
+--
+-- TOC entry 4690 (class 2606 OID 16907)
+-- Name: authorship number; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.authorship
+    ADD CONSTRAINT number CHECK ((number_in_the_list > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4691 (class 2606 OID 16906)
+-- Name: authorship order; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.authorship
+    ADD CONSTRAINT "order" CHECK ((order_by_list > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4741 (class 2606 OID 16812)
+-- Name: order order_contract_number_key; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit."order"
+    ADD CONSTRAINT order_contract_number_key UNIQUE (contract_number);
+
+
+--
+-- TOC entry 4743 (class 2606 OID 16814)
+-- Name: order order_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit."order"
+    ADD CONSTRAINT order_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4702 (class 2606 OID 16905)
+-- Name: publication pages; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.publication
+    ADD CONSTRAINT pages CHECK ((number_of_pages > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4698 (class 2606 OID 16815)
+-- Name: order payment; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit."order"
+    ADD CONSTRAINT payment CHECK (((payment_status)::text = ANY (ARRAY[('paid'::character varying)::text, ('not paid'::character varying)::text]))) NOT VALID;
+
+
+--
+-- TOC entry 4687 (class 2606 OID 16816)
+-- Name: account payment_st; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.account
+    ADD CONSTRAINT payment_st CHECK (((payment_status)::text = ANY (ARRAY[('paid'::character varying)::text, ('not paid'::character varying)::text]))) NOT VALID;
+
+
+--
+-- TOC entry 4731 (class 2606 OID 16818)
+-- Name: customer phone_number_key; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.customer
+    ADD CONSTRAINT phone_number_key UNIQUE (phone_number);
+
+
+--
+-- TOC entry 4745 (class 2606 OID 16820)
+-- Name: position position_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit."position"
+    ADD CONSTRAINT position_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4693 (class 2606 OID 16909)
+-- Name: circulation price; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.circulation
+    ADD CONSTRAINT price CHECK ((retail_price > (0)::numeric)) NOT VALID;
+
+
+--
+-- TOC entry 4747 (class 2606 OID 16822)
+-- Name: publication publication_isbn_key; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.publication
+    ADD CONSTRAINT publication_isbn_key UNIQUE (isbn);
+
+
+--
+-- TOC entry 4749 (class 2606 OID 16824)
+-- Name: publication publication_pkey; Type: CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.publication
+    ADD CONSTRAINT publication_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4696 (class 2606 OID 16825)
+-- Name: making_an_order quantity; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.making_an_order
+    ADD CONSTRAINT quantity CHECK ((quantity > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4694 (class 2606 OID 16908)
+-- Name: circulation quantity; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.circulation
+    ADD CONSTRAINT quantity CHECK ((quantity > 0)) NOT VALID;
+
+
+--
+-- TOC entry 4699 (class 2606 OID 16910)
+-- Name: order r1; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit."order"
+    ADD CONSTRAINT r1 CHECK ((date_of_execution > contract_date)) NOT VALID;
+
+
+--
+-- TOC entry 4697 (class 2606 OID 16826)
+-- Name: making_an_order ready; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.making_an_order
+    ADD CONSTRAINT ready CHECK (((ready_status)::text = ANY (ARRAY[('not ready'::character varying)::text, ('in process'::character varying)::text, ('is ready'::character varying)::text]))) NOT VALID;
+
+
+--
+-- TOC entry 4700 (class 2606 OID 16827)
+-- Name: position salary_check; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit."position"
+    ADD CONSTRAINT salary_check CHECK ((salary > (0)::numeric)) NOT VALID;
+
+
+--
+-- TOC entry 4695 (class 2606 OID 16828)
+-- Name: circulation status; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.circulation
+    ADD CONSTRAINT status CHECK (((status)::text = ANY (ARRAY[('active'::character varying)::text, ('in process'::character varying)::text, ('completed'::character varying)::text]))) NOT VALID;
+
+
+--
+-- TOC entry 4692 (class 2606 OID 16829)
+-- Name: belongs status; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.belongs
+    ADD CONSTRAINT status CHECK (((status)::text = ANY (ARRAY[('true'::character varying)::text, ('false'::character varying)::text]))) NOT VALID;
+
+
+--
+-- TOC entry 4689 (class 2606 OID 16921)
+-- Name: adjustment_of_the_tr status; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.adjustment_of_the_tr
+    ADD CONSTRAINT status CHECK (((editor_status)::text = ANY (ARRAY[('main'::character varying)::text, ('not main'::character varying)::text]))) NOT VALID;
+
+
+--
+-- TOC entry 4703 (class 2606 OID 16830)
+-- Name: publication type; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.publication
+    ADD CONSTRAINT type CHECK (((type)::text = ANY (ARRAY[('magazine'::character varying)::text, ('newspaper'::character varying)::text, ('book'::character varying)::text, ('electronic edition'::character varying)::text]))) NOT VALID;
+
+
+--
+-- TOC entry 4688 (class 2606 OID 16831)
+-- Name: account type; Type: CHECK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE complit.account
+    ADD CONSTRAINT type CHECK (((type)::text = ANY (ARRAY[('Savings'::character varying)::text, ('Checking'::character varying)::text, ('Business'::character varying)::text]))) NOT VALID;
+
+
+--
+-- TOC entry 4753 (class 2606 OID 16832)
+-- Name: authorship author_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.authorship
+    ADD CONSTRAINT author_fkey FOREIGN KEY (author_id) REFERENCES complit.author(id) NOT VALID;
+
+
+--
+-- TOC entry 4755 (class 2606 OID 16837)
+-- Name: belongs book_category_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.belongs
+    ADD CONSTRAINT book_category_fkey FOREIGN KEY (book_category_id) REFERENCES complit.book_category(id) NOT VALID;
+
+
+--
+-- TOC entry 4763 (class 2606 OID 16842)
+-- Name: publication book_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.publication
+    ADD CONSTRAINT book_fkey FOREIGN KEY (book_id) REFERENCES complit.book(id) NOT VALID;
+
+
+--
+-- TOC entry 4756 (class 2606 OID 16847)
+-- Name: belongs book_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.belongs
+    ADD CONSTRAINT book_fkey FOREIGN KEY (book_id) REFERENCES complit.book(id) NOT VALID;
+
+
+--
+-- TOC entry 4754 (class 2606 OID 16852)
+-- Name: authorship book_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.authorship
+    ADD CONSTRAINT book_fkey FOREIGN KEY (book_id) REFERENCES complit.book(id) NOT VALID;
+
+
+--
+-- TOC entry 4759 (class 2606 OID 16857)
+-- Name: making_an_order circulation_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.making_an_order
+    ADD CONSTRAINT circulation_fkey FOREIGN KEY (circulation_id) REFERENCES complit.circulation(id) NOT VALID;
+
+
+--
+-- TOC entry 4761 (class 2606 OID 16862)
+-- Name: order customer_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit."order"
+    ADD CONSTRAINT customer_fkey FOREIGN KEY (customer_id) REFERENCES complit.customer(id) NOT VALID;
+
+
+--
+-- TOC entry 4751 (class 2606 OID 16867)
+-- Name: adjustment_of_the_tr employee_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.adjustment_of_the_tr
+    ADD CONSTRAINT employee_fkey FOREIGN KEY (employee_id) REFERENCES complit.employee(id) NOT VALID;
+
+
+--
+-- TOC entry 4762 (class 2606 OID 16872)
+-- Name: order employee_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit."order"
+    ADD CONSTRAINT employee_fkey FOREIGN KEY (employee_id) REFERENCES complit.employee(id) NOT VALID;
+
+
+--
+-- TOC entry 4750 (class 2606 OID 16877)
+-- Name: account order_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.account
+    ADD CONSTRAINT order_fkey FOREIGN KEY (order_id) REFERENCES complit."order"(id) NOT VALID;
+
+
+--
+-- TOC entry 4760 (class 2606 OID 16882)
+-- Name: making_an_order order_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.making_an_order
+    ADD CONSTRAINT order_fkey FOREIGN KEY (order_id) REFERENCES complit."order"(id) NOT VALID;
+
+
+--
+-- TOC entry 4758 (class 2606 OID 16887)
+-- Name: employee position_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.employee
+    ADD CONSTRAINT position_fkey FOREIGN KEY (position_id) REFERENCES complit."position"(id) NOT VALID;
+
+
+--
+-- TOC entry 4757 (class 2606 OID 16892)
+-- Name: circulation publication_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.circulation
+    ADD CONSTRAINT publication_fkey FOREIGN KEY (publication_id) REFERENCES complit.publication(id) NOT VALID;
+
+
+--
+-- TOC entry 4752 (class 2606 OID 16897)
+-- Name: adjustment_of_the_tr publication_fkey; Type: FK CONSTRAINT; Schema: complit; Owner: postgres
+--
+
+ALTER TABLE ONLY complit.adjustment_of_the_tr
+    ADD CONSTRAINT publication_fkey FOREIGN KEY (publication_id) REFERENCES complit.publication(id) NOT VALID;
+
+
+-- Completed on 2023-11-10 17:03:04
+
+--
+-- PostgreSQL database dump complete
+--
+
