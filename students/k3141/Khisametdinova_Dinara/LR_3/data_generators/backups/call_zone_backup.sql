@@ -1,0 +1,15 @@
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (1, 'Svalbard & Jan Mayen Islands', '48', 'Liberia', 'Johnport');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (2, 'Iceland', '83', 'Jersey', 'Lake Tashafort');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (3, 'Northern Mariana Islands', '8', 'Peru', 'East Ryan');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (4, 'Cyprus', '47', 'Norfolk Island', 'Christopherchester');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (5, 'Albania', '21', 'Svalbard & Jan Mayen Islands', 'New Curtiston');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (6, 'Liechtenstein', '6', 'Germany', 'Jamesville');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (7, 'Svalbard & Jan Mayen Islands', '41', 'Guinea-Bissau', 'New Alisha');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (8, 'Zimbabwe', '12', 'Jordan', 'North Sheilamouth');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (9, 'Norway', '49', 'Nigeria', 'Holmesburgh');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (10, 'Poland', '9', 'Ghana', 'Stacyport');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (11, 'Trinidad and Tobago', '66', 'Bolivia', 'South Allisonview');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (12, 'Togo', '7', 'Chile', 'Franklinhaven');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (13, 'Azerbaijan', '90', 'Bangladesh', 'Waltersshire');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (14, 'United States Minor Outlying Islands', '52', 'Northern Mariana Islands', 'New Jonathan');
+INSERT INTO "call_zone" ("call_zone_id", "country", "cost_per_minute_call_zone", "region", "city") VALUES (15, 'Faroe Islands', '56', 'Jersey', 'Lake Monica');
