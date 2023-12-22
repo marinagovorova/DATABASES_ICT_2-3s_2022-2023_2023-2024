@@ -1,0 +1,438 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 16.0
+-- Dumped by pg_dump version 16.0
+
+-- Started on 2023-10-26 06:53:41
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 222 (class 1259 OID 16420)
+-- Name: passenger; Type: TABLE; Schema: public; Owner: postgres
+--
+-- Создаём таблицу для пассажиров 
+CREATE TABLE public.passenger (
+    id integer NOT NULL,
+    full_name character varying(25) NOT NULL,
+    birth_date date NOT NULL,
+    passport_num integer NOT NULL,
+    birth_place character varying NOT NULL
+);
+
+
+ALTER TABLE public.passenger OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 16417)
+-- Name: seats; Type: TABLE; Schema: public; Owner: postgres
+--
+-- Создаём таблицу для мест
+CREATE TABLE public.seats (
+    id integer NOT NULL,
+    wagon_code integer NOT NULL,
+    wagon integer NOT NULL,
+    seat_type character varying NOT NULL,
+    occupancy_status character varying NOT NULL
+);
+
+
+ALTER TABLE public.seats OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 16411)
+-- Name: station; Type: TABLE; Schema: public; Owner: postgres
+--
+--Создаём таюлицу для станций
+CREATE TABLE public.station (
+    id integer NOT NULL,
+    station_name character varying(25) NOT NULL,
+    station_adress character varying NOT NULL,
+    station_type character varying NOT NULL,
+    station_coordinates integer NOT NULL
+);
+
+
+ALTER TABLE public.station OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 16408)
+-- Name: stnumber; Type: TABLE; Schema: public; Owner: postgres
+--
+-- Создаём таблицы для номеров станций
+CREATE TABLE public.stnumber (
+    id integer NOT NULL,
+    station integer NOT NULL,
+    trip integer NOT NULL,
+    trip_id integer NOT NULL,
+    invoice_number integer NOT NULL
+);
+
+
+ALTER TABLE public.stnumber OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 16414)
+-- Name: ticket; Type: TABLE; Schema: public; Owner: postgres
+--
+-- Создаём таблицу для билетов
+CREATE TABLE public.ticket (
+    id integer NOT NULL,
+    passenger integer NOT NULL,
+    seats integer NOT NULL,
+    ticket_price integer NOT NULL,
+    "sale_date " date NOT NULL,
+    ticket_status character varying NOT NULL,
+    ticket_wagon_num integer NOT NULL,
+    seat_id integer NOT NULL,
+    dep_station character varying NOT NULL,
+    dest_station character varying NOT NULL,
+    passenger_id integer NOT NULL
+);
+
+
+ALTER TABLE public.ticket OWNER TO postgres;
+
+--
+-- TOC entry 215 (class 1259 OID 16399)
+-- Name: train; Type: TABLE; Schema: public; Owner: postgres
+--
+-- Создаём таблицу для поездов
+CREATE TABLE public.train (
+    id integer NOT NULL,
+    train_name character varying(35) NOT NULL,
+    train_type character varying(10) NOT NULL,
+    depature_time date NOT NULL,
+    arrival_time date NOT NULL,
+    travel_time date NOT NULL
+);
+
+
+ALTER TABLE public.train OWNER TO postgres;
+
+--
+-- TOC entry 216 (class 1259 OID 16402)
+-- Name: trip; Type: TABLE; Schema: public; Owner: postgres
+--
+-- Создаём таблицу для рейса
+CREATE TABLE public.trip (
+    id integer NOT NULL,
+    train integer NOT NULL,
+    departure_date date NOT NULL,
+    arrival_date date NOT NULL,
+    status character varying
+);
+
+
+ALTER TABLE public.trip OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 16405)
+-- Name: wagon; Type: TABLE; Schema: public; Owner: postgres
+--
+-- Создаём таблицу для вагонов
+CREATE TABLE public.wagon (
+    id integer NOT NULL,
+    wtype integer NOT NULL,
+    trip integer NOT NULL,
+    wagon_number integer NOT NULL,
+    wagon_code character varying NOT NULL
+);
+
+
+ALTER TABLE public.wagon OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 16423)
+-- Name: wtype; Type: TABLE; Schema: public; Owner: postgres
+--
+-- Создаём таблицу для типов вагона
+CREATE TABLE public.wtype (
+    id integer NOT NULL,
+    wagon_name character varying(25) NOT NULL,
+    seats_total integer NOT NULL
+);
+
+
+ALTER TABLE public.wtype OWNER TO postgres;
+
+--
+-- TOC entry 4898 (class 0 OID 16420)
+-- Dependencies: 222
+-- Data for Name: passenger; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.passenger (id, full_name, birth_date, passport_num, birth_place) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4897 (class 0 OID 16417)
+-- Dependencies: 221
+-- Data for Name: seats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.seats (id, wagon_code, wagon, seat_type, occupancy_status) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4895 (class 0 OID 16411)
+-- Dependencies: 219
+-- Data for Name: station; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.station (id, station_name, station_adress, station_type, station_coordinates) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4894 (class 0 OID 16408)
+-- Dependencies: 218
+-- Data for Name: stnumber; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.stnumber (id, station, trip, trip_id, invoice_number) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4896 (class 0 OID 16414)
+-- Dependencies: 220
+-- Data for Name: ticket; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.ticket (id, passenger, seats, ticket_price, "sale_date ", ticket_status, ticket_wagon_num, seat_id, dep_station, dest_station, passenger_id) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4891 (class 0 OID 16399)
+-- Dependencies: 215
+-- Data for Name: train; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.train (id, train_name, train_type, depature_time, arrival_time, travel_time) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4892 (class 0 OID 16402)
+-- Dependencies: 216
+-- Data for Name: trip; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trip (id, train, departure_date, arrival_date, status) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4893 (class 0 OID 16405)
+-- Dependencies: 217
+-- Data for Name: wagon; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.wagon (id, wtype, trip, wagon_number, wagon_code) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4899 (class 0 OID 16423)
+-- Dependencies: 223
+-- Data for Name: wtype; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.wtype (id, wagon_name, seats_total) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4735 (class 2606 OID 16431)
+-- Name: passenger idpassenger; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.passenger
+    ADD CONSTRAINT idpassenger PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4733 (class 2606 OID 16433)
+-- Name: seats idseat; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seats
+    ADD CONSTRAINT idseat PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4729 (class 2606 OID 16435)
+-- Name: station idstation; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.station
+    ADD CONSTRAINT idstation PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4727 (class 2606 OID 16437)
+-- Name: stnumber idstnumber; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stnumber
+    ADD CONSTRAINT idstnumber PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4731 (class 2606 OID 16439)
+-- Name: ticket idticket; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket
+    ADD CONSTRAINT idticket PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4721 (class 2606 OID 16429)
+-- Name: train idtrain; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.train
+    ADD CONSTRAINT idtrain PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4723 (class 2606 OID 16441)
+-- Name: trip idtrip; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trip
+    ADD CONSTRAINT idtrip PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4725 (class 2606 OID 16443)
+-- Name: wagon idwagon; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.wagon
+    ADD CONSTRAINT idwagon PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4739 (class 2606 OID 16445)
+-- Name: wtype idwtype; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.wtype
+    ADD CONSTRAINT idwtype PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4719 (class 2606 OID 16516)
+-- Name: wtype seats_total ; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.wtype
+    ADD CONSTRAINT "seats_total " CHECK ((seats_total <= 50)) NOT VALID;
+
+
+--
+-- TOC entry 4737 (class 2606 OID 16503)
+-- Name: passenger uniquepassenger; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.passenger
+    ADD CONSTRAINT uniquepassenger UNIQUE (passport_num);
+
+
+--
+-- TOC entry 4747 (class 2606 OID 16462)
+-- Name: seats fkseats; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seats
+    ADD CONSTRAINT fkseats FOREIGN KEY (wagon) REFERENCES public.wagon(id) NOT VALID;
+
+
+--
+-- TOC entry 4743 (class 2606 OID 16482)
+-- Name: stnumber fkstnumber1; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stnumber
+    ADD CONSTRAINT fkstnumber1 FOREIGN KEY (station) REFERENCES public.station(id) NOT VALID;
+
+
+--
+-- TOC entry 4744 (class 2606 OID 16487)
+-- Name: stnumber fkstnumber2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stnumber
+    ADD CONSTRAINT fkstnumber2 FOREIGN KEY (trip) REFERENCES public.trip(id) NOT VALID;
+
+
+--
+-- TOC entry 4745 (class 2606 OID 16492)
+-- Name: ticket fkticket1; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket
+    ADD CONSTRAINT fkticket1 FOREIGN KEY (passenger) REFERENCES public.passenger(id) NOT VALID;
+
+
+--
+-- TOC entry 4746 (class 2606 OID 16497)
+-- Name: ticket fkticket2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket
+    ADD CONSTRAINT fkticket2 FOREIGN KEY (seats) REFERENCES public.seats(id) NOT VALID;
+
+
+--
+-- TOC entry 4740 (class 2606 OID 16477)
+-- Name: trip fktrip; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trip
+    ADD CONSTRAINT fktrip FOREIGN KEY (train) REFERENCES public.train(id) NOT VALID;
+
+
+--
+-- TOC entry 4741 (class 2606 OID 16467)
+-- Name: wagon fkwagon1; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.wagon
+    ADD CONSTRAINT fkwagon1 FOREIGN KEY (wtype) REFERENCES public.wtype(id) NOT VALID;
+
+
+--
+-- TOC entry 4742 (class 2606 OID 16472)
+-- Name: wagon fkwagon2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.wagon
+    ADD CONSTRAINT fkwagon2 FOREIGN KEY (trip) REFERENCES public.trip(id) NOT VALID;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
