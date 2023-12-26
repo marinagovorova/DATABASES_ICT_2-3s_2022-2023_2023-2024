@@ -1,0 +1,675 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 15.4
+-- Dumped by pg_dump version 15.4
+
+-- Started on 2023-10-26 22:53:54 MSK
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 2 (class 3079 OID 16384)
+-- Name: adminpack; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS adminpack WITH SCHEMA pg_catalog;
+
+
+--
+-- TOC entry 3691 (class 0 OID 0)
+-- Dependencies: 2
+-- Name: EXTENSION adminpack; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION adminpack IS 'administrative functions for PostgreSQL';
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 219 (class 1259 OID 16650)
+-- Name: Автомобиль; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Автомобиль" (
+    "Госномер" integer NOT NULL,
+    "Страна производителя" character varying(30),
+    "Стоимость" integer,
+    "Год выпуска" date,
+    "Дата_ТО" date,
+    "Пробег" integer,
+    "Марка, модель" character varying(30),
+    CONSTRAINT "Автомобиль_Госномер_check" CHECK ((("Госномер" > 0) AND (length((("Госномер")::character varying)::text) <= 25))),
+    CONSTRAINT "Автомобиль_Марка, модель_check" CHECK ((length(("Марка, модель")::text) <= 25)),
+    CONSTRAINT "Автомобиль_Пробег_check" CHECK ((("Пробег" >= 0) AND ("Пробег" <= 120000))),
+    CONSTRAINT "Автомобиль_Стоимость_check" CHECK (("Стоимость" > 0)),
+    CONSTRAINT "Автомобиль_Страна производите_check" CHECK ((length(("Страна производителя")::text) <= 30))
+);
+
+
+ALTER TABLE public."Автомобиль" OWNER TO postgres;
+
+--
+-- TOC entry 215 (class 1259 OID 16529)
+-- Name: Выход_на_работу; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Выход_на_работу" (
+    "Код_смены" integer NOT NULL,
+    "Госномер" integer,
+    "id_графика" integer,
+    id integer
+);
+
+
+ALTER TABLE public."Выход_на_работу" OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 16685)
+-- Name: График_работы; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."График_работы" (
+    "id_графика" integer NOT NULL,
+    "Конец работы" timestamp without time zone,
+    "Начало работы" timestamp without time zone,
+    "модель" character varying(50),
+    CONSTRAINT "График работы_Конец работы_check" CHECK (((EXTRACT(hour FROM "Конец работы") <= (23)::numeric) AND (EXTRACT(hour FROM "Конец работы") >= (10)::numeric))),
+    CONSTRAINT "График работы_Начало работы_check" CHECK ((EXTRACT(hour FROM "Начало работы") >= (10)::numeric)),
+    CONSTRAINT "График работы_модель_check" CHECK ((length(("модель")::text) <= 30))
+);
+
+
+ALTER TABLE public."График_работы" OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 16607)
+-- Name: Должность; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Должность" (
+    "Код" integer NOT NULL,
+    "Название" character varying(25),
+    "Категория" character varying(2),
+    CONSTRAINT "Должность_Категория_check" CHECK ((("Категория")::text = ANY ((ARRAY['A'::character varying, 'B'::character varying, 'C'::character varying, 'C1'::character varying, 'D'::character varying, 'D1'::character varying])::text[]))),
+    CONSTRAINT "Должность_Название_check" CHECK ((length(("Название")::text) <= 25))
+);
+
+
+ALTER TABLE public."Должность" OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 16713)
+-- Name: Заказ; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Заказ" (
+    "Код_заказа" integer NOT NULL,
+    "Расстояние" integer,
+    "Тип_машины" character varying(255),
+    "Данные_карты" bigint,
+    "Время_посадки" time without time zone,
+    "Время_высадки" time without time zone,
+    "Время_фактической_посадки" time without time zone,
+    "id_клиента" integer,
+    "Код_смены" integer,
+    "номер_карты" integer,
+    "Код_тарифа" integer,
+    id integer,
+    CONSTRAINT "Заказ_Время_высадки_check" CHECK ((EXTRACT(hour FROM "Время_высадки") > (0)::numeric)),
+    CONSTRAINT "Заказ_Время_посадки_check" CHECK ((EXTRACT(hour FROM "Время_посадки") > (0)::numeric)),
+    CONSTRAINT "Заказ_Время_фактической_посадк_check" CHECK ((EXTRACT(hour FROM "Время_фактической_посадки") > (0)::numeric)),
+    CONSTRAINT "Заказ_Данные_карты_check" CHECK (("Данные_карты" < '100000000000000000'::bigint)),
+    CONSTRAINT "Заказ_Тип_машины_check" CHECK ((length(("Тип_машины")::text) < 255)),
+    CONSTRAINT "Заказ_номер_карты_check" CHECK (("номер_карты" < '10000000000'::bigint))
+);
+
+
+ALTER TABLE public."Заказ" OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 16712)
+-- Name: Заказ_Код_заказа_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."Заказ_Код_заказа_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public."Заказ_Код_заказа_seq" OWNER TO postgres;
+
+--
+-- TOC entry 3692 (class 0 OID 0)
+-- Dependencies: 222
+-- Name: Заказ_Код_заказа_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."Заказ_Код_заказа_seq" OWNED BY public."Заказ"."Код_заказа";
+
+
+--
+-- TOC entry 216 (class 1259 OID 16597)
+-- Name: Клиент; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Клиент" (
+    "id_клиента" integer NOT NULL,
+    "Номер_телефона" character varying(25),
+    "Рекламация" character varying(35),
+    CONSTRAINT "Клиент_Номер_телефона_check" CHECK ((length(("Номер_телефона")::text) <= 25)),
+    CONSTRAINT "Клиент_Рекламация_check" CHECK ((length(("Рекламация")::text) <= 35))
+);
+
+
+ALTER TABLE public."Клиент" OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 16693)
+-- Name: Модель; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Модель" (
+    "Марка_модель" character varying NOT NULL,
+    "Технические_характеристики" character varying(255)
+);
+
+
+ALTER TABLE public."Модель" OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 16614)
+-- Name: Сотрудник; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Сотрудник" (
+    id integer NOT NULL,
+    "Код" integer,
+    "ФИО" character varying(25),
+    CONSTRAINT "Сотрудник_Телефон_check" CHECK ((("Код" > 0) AND (length(("Код")::text) <= 25))),
+    CONSTRAINT "Сотрудник_ФИО_check" CHECK (((length(("ФИО")::text) > 0) AND (length(("ФИО")::text) <= 25)))
+);
+
+
+ALTER TABLE public."Сотрудник" OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 16796)
+-- Name: Способы_оплаты; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Способы_оплаты" (
+    "Номер_карты" integer NOT NULL,
+    "платежная_система" character varying(255),
+    "id_клиента" integer,
+    CONSTRAINT "Способы_оплаты_платежная_систе_check" CHECK ((length(("платежная_система")::text) <= 255))
+);
+
+
+ALTER TABLE public."Способы_оплаты" OWNER TO postgres;
+
+--
+-- TOC entry 224 (class 1259 OID 16732)
+-- Name: Тариф; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Тариф" (
+    "Код_тарифа" integer NOT NULL,
+    "Наименование" character varying(30),
+    "заработная_плата_водителя" integer,
+    "Цена_за_км" integer,
+    "id_графика" integer,
+    CONSTRAINT "Тариф_Наименование_check" CHECK ((length(("Наименование")::text) <= 30)),
+    CONSTRAINT "Тариф_заработная_плата_водител_check" CHECK (("заработная_плата_водителя" <= 250000))
+);
+
+
+ALTER TABLE public."Тариф" OWNER TO postgres;
+
+--
+-- TOC entry 3476 (class 2604 OID 16716)
+-- Name: Заказ Код_заказа; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Заказ" ALTER COLUMN "Код_заказа" SET DEFAULT nextval('public."Заказ_Код_заказа_seq"'::regclass);
+
+
+--
+-- TOC entry 3679 (class 0 OID 16650)
+-- Dependencies: 219
+-- Data for Name: Автомобиль; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Автомобиль" ("Госномер", "Страна производителя", "Стоимость", "Год выпуска", "Дата_ТО", "Пробег", "Марка, модель") FROM stdin;
+123456	USA	25000	2000-01-15	2022-05-20	80000	Toyota Camry
+789012	Germany	35000	2015-07-10	2022-08-30	60000	BMW 3 Series
+345678	Japan	28000	2018-03-05	2022-10-12	45000	Honda Civic
+901234	South Korea	30000	2019-11-22	2022-09-18	55000	Hyundai Elantra
+567890	Germany	40000	2017-09-30	2022-11-05	70000	Audi A4
+234567	Japan	32000	2016-04-12	2022-07-25	90000	Nissan Altima
+890123	USA	27000	2014-12-08	2022-12-14	100000	Chevrolet Malibu
+456789	Germany	38000	2019-06-18	2022-06-03	65000	Mercedes-Benz C-Class
+123890	Japan	26000	2013-08-24	2022-04-28	110000	Mazda 6
+678901	South Korea	29000	2012-05-03	2022-03-17	95000	Kia Optima
+\.
+
+
+--
+-- TOC entry 3675 (class 0 OID 16529)
+-- Dependencies: 215
+-- Data for Name: Выход_на_работу; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Выход_на_работу" ("Код_смены", "Госномер", "id_графика", id) FROM stdin;
+1	123456	1	1
+2	789012	2	2
+3	345678	1	3
+4	901234	3	4
+5	567890	2	5
+6	234567	3	6
+7	890123	1	7
+8	456789	2	8
+9	123890	3	9
+10	678901	1	10
+\.
+
+
+--
+-- TOC entry 3680 (class 0 OID 16685)
+-- Dependencies: 220
+-- Data for Name: График_работы; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."График_работы" ("id_графика", "Конец работы", "Начало работы", "модель") FROM stdin;
+1	2023-10-26 20:00:00	2023-10-26 10:00:00	Mercedes-Benz C-Class
+2	2023-10-26 22:00:00	2023-10-26 10:00:00	BMW 3 Series
+3	2023-10-26 23:00:00	2023-10-26 10:00:00	Audi A4
+4	2023-10-26 21:30:00	2023-10-26 10:00:00	Toyota Camry
+5	2023-10-26 20:45:00	2023-10-26 10:00:00	Honda Civic
+6	2023-10-26 22:15:00	2023-10-26 10:00:00	Nissan Altima
+7	2023-10-26 23:00:00	2023-10-26 10:00:00	Hyundai Elantra
+8	2023-10-26 22:45:00	2023-10-26 10:00:00	Kia Optima
+9	2023-10-26 20:30:00	2023-10-26 10:00:00	Chevrolet Malibu
+10	2023-10-26 22:30:00	2023-10-26 10:00:00	Mazda 6
+\.
+
+
+--
+-- TOC entry 3677 (class 0 OID 16607)
+-- Dependencies: 217
+-- Data for Name: Должность; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Должность" ("Код", "Название", "Категория") FROM stdin;
+1	Сотрудник 1	A
+2	Сотрудник 2	B
+3	Сотрудник 3	C1
+4	Сотрудник 4	C
+5	Сотрудник 5	B
+6	Сотрудник 6	B
+7	Сотрудник 7	C
+8	Сотрудник 8	D1
+9	Сотрудник 9	D
+10	Сотрудник 10	D
+\.
+
+
+--
+-- TOC entry 3683 (class 0 OID 16713)
+-- Dependencies: 223
+-- Data for Name: Заказ; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Заказ" ("Код_заказа", "Расстояние", "Тип_машины", "Данные_карты", "Время_посадки", "Время_высадки", "Время_фактической_посадки", "id_клиента", "Код_смены", "номер_карты", "Код_тарифа", id) FROM stdin;
+1	15	Седан	1234567890123456	10:30:00	11:15:00	11:20:00	1	101	7890	1	101
+2	25	Минивэн	2345678901234567	11:00:00	12:30:00	12:40:00	2	102	8901	2	102
+3	10	Хэтчбек	3456789012345678	12:45:00	13:15:00	13:20:00	3	103	9012	3	103
+4	30	Седан	4567890123456789	14:00:00	15:30:00	15:40:00	4	104	9123	1	104
+5	20	Кроссовер	5678901234567890	16:00:00	17:30:00	17:45:00	5	105	9234	2	105
+6	18	Минивэн	6789012345678901	18:15:00	19:00:00	19:10:00	6	106	9345	3	106
+7	22	Хэтчбек	7890123456789012	20:30:00	21:15:00	21:25:00	7	107	9456	1	107
+8	28	Седан	8901234567890123	21:45:00	22:30:00	22:40:00	8	108	9567	2	108
+9	14	Кроссовер	9012345678901234	09:30:00	10:00:00	10:10:00	9	109	9678	3	109
+10	16	Седан	1234567890987654	08:00:00	08:45:00	08:50:00	10	110	9789	1	110
+\.
+
+
+--
+-- TOC entry 3676 (class 0 OID 16597)
+-- Dependencies: 216
+-- Data for Name: Клиент; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Клиент" ("id_клиента", "Номер_телефона", "Рекламация") FROM stdin;
+1	798182034	Проблемы с оплатой
+2	798193249	Долгое ожидание
+3	791143244	Неудобный автомобиль
+4	798243235	Неприятное обслуживание
+5	799423425	Неопытный водитель
+6	790042345	Потерянный предмет в такси
+7	798234352	Грязный салон
+8	79384553	Отмена заказа без уведомления
+9	79113425	Проблемы с GPS
+10	7853452	Некорректный маршрут
+\.
+
+
+--
+-- TOC entry 3681 (class 0 OID 16693)
+-- Dependencies: 221
+-- Data for Name: Модель; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Модель" ("Марка_модель", "Технические_характеристики") FROM stdin;
+Audi A4	Двигатель: бензиновый, объем 2.0 л, мощность 190 л.с.; Трансмиссия: автоматическая, 7-ступенчатая; Привод: передний; Расход топлива: город 9.8 л/100 км, трасса 6.4 л/100 км
+Toyota Camry	Двигатель: гибридный, объем 2.5 л, мощность 208 л.с.; Трансмиссия: автоматическая, вариатор; Привод: передний; Расход топлива: город 5.3 л/100 км, трасса 5.8 л/100 км
+BMW 3 Series	Двигатель: бензиновый, объем 2.0 л, мощность 255 л.с.; Трансмиссия: автоматическая, 8-ступенчатая; Привод: задний; Расход топлива: город 8.8 л/100 км, трасса 6.3 л/100 км
+Mercedes-Benz C-Class	Двигатель: бензиновый, объем 2.0 л, мощность 255 л.с.; Трансмиссия: автоматическая, 9-ступенчатая; Привод: задний; Расход топлива: город 9.4 л/100 км, трасса 6.3 л/100 км
+Honda Accord	Двигатель: бензиновый, объем 1.5 л, мощность 192 л.с.; Трансмиссия: вариатор; Привод: передний; Расход топлива: город 7.8 л/100 км, трасса 6.3 л/100 км
+Volkswagen Passat	Двигатель: бензиновый, объем 2.0 л, мощность 174 л.с.; Трансмиссия: автоматическая, 6-ступенчатая; Привод: передний; Расход топлива: город 10.7 л/100 км, трасса 7.3 л/100 км
+Ford Fusion	Двигатель: гибридный, объем 2.0 л, мощность 188 л.с.; Трансмиссия: вариатор; Привод: передний; Расход топлива: город 5.5 л/100 км, трасса 5.7 л/100 км
+Chevrolet Malibu	Двигатель: бензиновый, объем 1.5 л, мощность 160 л.с.; Трансмиссия: автоматическая, 6-ступенчатая; Привод: передний; Расход топлива: город 8.1 л/100 км, трасса 5.7 л/100 км
+Nissan Altima	Двигатель: бензиновый, объем 2.5 л, мощность 188 л.с.; Трансмиссия: вариатор; Привод: передний; Расход топлива: город 8.7 л/100 км, трасса 6.3 л/100 км
+Hyundai Sonata	Двигатель: бензиновый, объем 2.5 л, мощность 191 л.с.; Трансмиссия: автоматическая, 8-ступенчатая; Привод: передний; Расход топлива: город 8.8 л/100 км, трасса 6.5 л/100 км
+\.
+
+
+--
+-- TOC entry 3678 (class 0 OID 16614)
+-- Dependencies: 218
+-- Data for Name: Сотрудник; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Сотрудник" (id, "Код", "ФИО") FROM stdin;
+1	7981457	Иван Иванов
+2	7911593	Петр Петров
+3	7900352	Анна Сидорова
+4	7922168	Сергей Сергеев
+5	7955321	Мария Павлова
+6	7985523	Алексей Федоров
+7	7811923	Ольга Козлова
+8	7923485	Дмитрий Васильев
+9	7954039	Наталья Алексеева
+10	7800432	Евгений Никитин
+\.
+
+
+--
+-- TOC entry 3685 (class 0 OID 16796)
+-- Dependencies: 225
+-- Data for Name: Способы_оплаты; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Способы_оплаты" ("Номер_карты", "платежная_система", "id_клиента") FROM stdin;
+1111111	Visa	1
+2222222	MasterCard	2
+3333333	American Express	3
+4444444	Discover	4
+5555555	Visa	5
+6666666	MasterCard	6
+7777777	American Express	7
+8888888	Discover	8
+9999999	Visa	9
+1010101	MasterCard	10
+\.
+
+
+--
+-- TOC entry 3684 (class 0 OID 16732)
+-- Dependencies: 224
+-- Data for Name: Тариф; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."Тариф" ("Код_тарифа", "Наименование", "заработная_плата_водителя", "Цена_за_км", "id_графика") FROM stdin;
+1	Стандартный	200000	30	1
+2	Эконом	180000	25	2
+3	Комфорт	220000	35	1
+4	Премиум	250000	40	2
+5	Элитный	240000	50	1
+6	VIP	230000	55	2
+7	Лимузин	250000	60	1
+8	Минивэн	220000	35	2
+9	Грузовой	200000	20	1
+10	Экспресс	210000	30	2
+\.
+
+
+--
+-- TOC entry 3693 (class 0 OID 0)
+-- Dependencies: 222
+-- Name: Заказ_Код_заказа_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."Заказ_Код_заказа_seq"', 1, false);
+
+
+--
+-- TOC entry 3509 (class 2606 OID 16701)
+-- Name: Автомобиль Автомобиль_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Автомобиль"
+    ADD CONSTRAINT "Автомобиль_pkey" PRIMARY KEY ("Госномер");
+
+
+--
+-- TOC entry 3501 (class 2606 OID 16533)
+-- Name: Выход_на_работу Выход на работу_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Выход_на_работу"
+    ADD CONSTRAINT "Выход на работу_pkey" PRIMARY KEY ("Код_смены");
+
+
+--
+-- TOC entry 3511 (class 2606 OID 16692)
+-- Name: График_работы График работы_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."График_работы"
+    ADD CONSTRAINT "График работы_pkey" PRIMARY KEY ("id_графика");
+
+
+--
+-- TOC entry 3505 (class 2606 OID 16613)
+-- Name: Должность Должность_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Должность"
+    ADD CONSTRAINT "Должность_pkey" PRIMARY KEY ("Код");
+
+
+--
+-- TOC entry 3515 (class 2606 OID 16724)
+-- Name: Заказ Заказ_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Заказ"
+    ADD CONSTRAINT "Заказ_pkey" PRIMARY KEY ("Код_заказа");
+
+
+--
+-- TOC entry 3503 (class 2606 OID 16603)
+-- Name: Клиент Клиент_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Клиент"
+    ADD CONSTRAINT "Клиент_pkey" PRIMARY KEY ("id_клиента");
+
+
+--
+-- TOC entry 3513 (class 2606 OID 16699)
+-- Name: Модель Модель_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Модель"
+    ADD CONSTRAINT "Модель_pkey" PRIMARY KEY ("Марка_модель");
+
+
+--
+-- TOC entry 3507 (class 2606 OID 16620)
+-- Name: Сотрудник Сотрудник_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Сотрудник"
+    ADD CONSTRAINT "Сотрудник_pkey" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3519 (class 2606 OID 16801)
+-- Name: Способы_оплаты Способы_оплаты_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Способы_оплаты"
+    ADD CONSTRAINT "Способы_оплаты_pkey" PRIMARY KEY ("Номер_карты");
+
+
+--
+-- TOC entry 3517 (class 2606 OID 16738)
+-- Name: Тариф Тариф_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Тариф"
+    ADD CONSTRAINT "Тариф_pkey" PRIMARY KEY ("Код_тарифа");
+
+
+--
+-- TOC entry 3524 (class 2606 OID 16702)
+-- Name: Автомобиль Автомобиль_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Автомобиль"
+    ADD CONSTRAINT "Автомобиль_fkey" FOREIGN KEY ("Марка, модель") REFERENCES public."Модель"("Марка_модель") NOT VALID;
+
+
+--
+-- TOC entry 3520 (class 2606 OID 16807)
+-- Name: Выход_на_работу Выход на работу_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Выход_на_работу"
+    ADD CONSTRAINT "Выход на работу_fkey1" FOREIGN KEY ("Госномер") REFERENCES public."Автомобиль"("Госномер") NOT VALID;
+
+
+--
+-- TOC entry 3521 (class 2606 OID 16812)
+-- Name: Выход_на_работу Выход на работу_fkey2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Выход_на_работу"
+    ADD CONSTRAINT "Выход на работу_fkey2" FOREIGN KEY ("id_графика") REFERENCES public."График_работы"("id_графика") NOT VALID;
+
+
+--
+-- TOC entry 3522 (class 2606 OID 16817)
+-- Name: Выход_на_работу Выход на работу_fkey3; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Выход_на_работу"
+    ADD CONSTRAINT "Выход на работу_fkey3" FOREIGN KEY (id) REFERENCES public."Сотрудник"(id) NOT VALID;
+
+
+--
+-- TOC entry 3525 (class 2606 OID 16822)
+-- Name: График_работы График_работы_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."График_работы"
+    ADD CONSTRAINT "График_работы_fkey" FOREIGN KEY ("модель") REFERENCES public."Модель"("Марка_модель") NOT VALID;
+
+
+--
+-- TOC entry 3526 (class 2606 OID 16827)
+-- Name: Заказ Заказ_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Заказ"
+    ADD CONSTRAINT "Заказ_fkey1" FOREIGN KEY ("id_клиента") REFERENCES public."Клиент"("id_клиента") NOT VALID;
+
+
+--
+-- TOC entry 3527 (class 2606 OID 16832)
+-- Name: Заказ Заказ_fkey2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Заказ"
+    ADD CONSTRAINT "Заказ_fkey2" FOREIGN KEY ("Код_смены") REFERENCES public."Выход_на_работу"("Код_смены") NOT VALID;
+
+
+--
+-- TOC entry 3528 (class 2606 OID 16837)
+-- Name: Заказ Заказ_fkey3; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Заказ"
+    ADD CONSTRAINT "Заказ_fkey3" FOREIGN KEY ("номер_карты") REFERENCES public."Способы_оплаты"("Номер_карты") NOT VALID;
+
+
+--
+-- TOC entry 3529 (class 2606 OID 16842)
+-- Name: Заказ Заказ_fkey4; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Заказ"
+    ADD CONSTRAINT "Заказ_fkey4" FOREIGN KEY ("Код_тарифа") REFERENCES public."Тариф"("Код_тарифа") NOT VALID;
+
+
+--
+-- TOC entry 3530 (class 2606 OID 16847)
+-- Name: Заказ Заказ_fkey5; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Заказ"
+    ADD CONSTRAINT "Заказ_fkey5" FOREIGN KEY (id) REFERENCES public."Сотрудник"(id) NOT VALID;
+
+
+--
+-- TOC entry 3523 (class 2606 OID 16852)
+-- Name: Сотрудник Сотрудник_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Сотрудник"
+    ADD CONSTRAINT "Сотрудник_fkey" FOREIGN KEY ("Код") REFERENCES public."Должность"("Код") NOT VALID;
+
+
+--
+-- TOC entry 3532 (class 2606 OID 16802)
+-- Name: Способы_оплаты Способы_оплаты_id_клиента_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Способы_оплаты"
+    ADD CONSTRAINT "Способы_оплаты_id_клиента_fkey" FOREIGN KEY ("id_клиента") REFERENCES public."Клиент"("id_клиента");
+
+
+--
+-- TOC entry 3531 (class 2606 OID 16857)
+-- Name: Тариф Тариф_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Тариф"
+    ADD CONSTRAINT "Тариф_fkey" FOREIGN KEY ("id_графика") REFERENCES public."График_работы"("id_графика") NOT VALID;
+
+
+-- Completed on 2023-10-26 22:53:54 MSK
+
+--
+-- PostgreSQL database dump complete
+--
+
