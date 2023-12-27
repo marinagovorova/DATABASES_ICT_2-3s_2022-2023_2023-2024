@@ -1,0 +1,1574 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 15.1 (Debian 15.1-1.pgdg110+1)
+-- Dumped by pg_dump version 16.0
+
+-- Started on 2023-12-27 17:13:26 MSK
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 3453 (class 1262 OID 16388)
+-- Name: Taxi_service; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE "Taxi_service" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.utf8';
+
+
+ALTER DATABASE "Taxi_service" OWNER TO postgres;
+
+\connect "Taxi_service"
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 6 (class 2615 OID 16393)
+-- Name: taxi; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA taxi;
+
+
+ALTER SCHEMA taxi OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 224 (class 1259 OID 16436)
+-- Name: car_model; Type: TABLE; Schema: taxi; Owner: postgres
+--
+
+CREATE TABLE taxi.car_model (
+    id bigint NOT NULL,
+    brand character varying NOT NULL,
+    model character varying NOT NULL,
+    cost bigint NOT NULL,
+    country character varying NOT NULL,
+    tariff_id bigint
+);
+
+
+ALTER TABLE taxi.car_model OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 16435)
+-- Name: car_model_id_seq; Type: SEQUENCE; Schema: taxi; Owner: postgres
+--
+
+CREATE SEQUENCE taxi.car_model_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE taxi.car_model_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3454 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: car_model_id_seq; Type: SEQUENCE OWNED BY; Schema: taxi; Owner: postgres
+--
+
+ALTER SEQUENCE taxi.car_model_id_seq OWNED BY taxi.car_model.id;
+
+
+--
+-- TOC entry 226 (class 1259 OID 16443)
+-- Name: cars; Type: TABLE; Schema: taxi; Owner: postgres
+--
+
+CREATE TABLE taxi.cars (
+    id bigint NOT NULL,
+    specifications character varying NOT NULL,
+    maintenance_date date NOT NULL,
+    license_plate character(7) NOT NULL,
+    mileage bigint NOT NULL,
+    manufacture_year date NOT NULL,
+    car_model_id bigint NOT NULL,
+    employee_id bigint NOT NULL
+);
+
+
+ALTER TABLE taxi.cars OWNER TO postgres;
+
+--
+-- TOC entry 3455 (class 0 OID 0)
+-- Dependencies: 226
+-- Name: COLUMN cars.mileage; Type: COMMENT; Schema: taxi; Owner: postgres
+--
+
+COMMENT ON COLUMN taxi.cars.mileage IS 'km';
+
+
+--
+-- TOC entry 225 (class 1259 OID 16442)
+-- Name: cars_id_seq; Type: SEQUENCE; Schema: taxi; Owner: postgres
+--
+
+CREATE SEQUENCE taxi.cars_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE taxi.cars_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3456 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: cars_id_seq; Type: SEQUENCE OWNED BY; Schema: taxi; Owner: postgres
+--
+
+ALTER SEQUENCE taxi.cars_id_seq OWNED BY taxi.cars.id;
+
+
+--
+-- TOC entry 216 (class 1259 OID 16398)
+-- Name: client; Type: TABLE; Schema: taxi; Owner: postgres
+--
+
+CREATE TABLE taxi.client (
+    id bigint NOT NULL,
+    firstname character varying(127) NOT NULL,
+    surname character varying(127) NOT NULL,
+    patronymic character varying(127),
+    phone_number character(11) NOT NULL
+);
+
+
+ALTER TABLE taxi.client OWNER TO postgres;
+
+--
+-- TOC entry 215 (class 1259 OID 16397)
+-- Name: client_id_seq; Type: SEQUENCE; Schema: taxi; Owner: postgres
+--
+
+CREATE SEQUENCE taxi.client_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE taxi.client_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3457 (class 0 OID 0)
+-- Dependencies: 215
+-- Name: client_id_seq; Type: SEQUENCE OWNED BY; Schema: taxi; Owner: postgres
+--
+
+ALTER SEQUENCE taxi.client_id_seq OWNED BY taxi.client.id;
+
+
+--
+-- TOC entry 222 (class 1259 OID 16427)
+-- Name: employee; Type: TABLE; Schema: taxi; Owner: postgres
+--
+
+CREATE TABLE taxi.employee (
+    id bigint NOT NULL,
+    adress character varying NOT NULL,
+    firstname character varying(127) NOT NULL,
+    surname character varying(127) NOT NULL,
+    patronymic character varying(127),
+    passport_number character(10) NOT NULL,
+    phone_number character(11) NOT NULL,
+    position_id bigint NOT NULL
+);
+
+
+ALTER TABLE taxi.employee OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 16426)
+-- Name: employee_id_seq; Type: SEQUENCE; Schema: taxi; Owner: postgres
+--
+
+CREATE SEQUENCE taxi.employee_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE taxi.employee_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3458 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: employee_id_seq; Type: SEQUENCE OWNED BY; Schema: taxi; Owner: postgres
+--
+
+ALTER SEQUENCE taxi.employee_id_seq OWNED BY taxi.employee.id;
+
+
+--
+-- TOC entry 233 (class 1259 OID 25148)
+-- Name: employee_shedule; Type: TABLE; Schema: taxi; Owner: postgres
+--
+
+CREATE TABLE taxi.employee_shedule (
+    id bigint NOT NULL,
+    work_schedule_id bigint NOT NULL,
+    employee_id bigint NOT NULL,
+    at_work boolean NOT NULL
+);
+
+
+ALTER TABLE taxi.employee_shedule OWNER TO postgres;
+
+--
+-- TOC entry 234 (class 1259 OID 25151)
+-- Name: employee_shedule_id_seq; Type: SEQUENCE; Schema: taxi; Owner: postgres
+--
+
+CREATE SEQUENCE taxi.employee_shedule_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE taxi.employee_shedule_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3459 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: employee_shedule_id_seq; Type: SEQUENCE OWNED BY; Schema: taxi; Owner: postgres
+--
+
+ALTER SEQUENCE taxi.employee_shedule_id_seq OWNED BY taxi.employee_shedule.id;
+
+
+--
+-- TOC entry 232 (class 1259 OID 16530)
+-- Name: orders; Type: TABLE; Schema: taxi; Owner: postgres
+--
+
+CREATE TABLE taxi.orders (
+    id bigint NOT NULL,
+    adress_from character varying NOT NULL,
+    adress_to character varying NOT NULL,
+    loading_time character varying NOT NULL,
+    unloading_time character varying NOT NULL,
+    payment_type character varying NOT NULL,
+    employee_driver_id bigint NOT NULL,
+    client_id bigint NOT NULL,
+    tariff_id bigint NOT NULL,
+    employee_operator_id bigint NOT NULL,
+    payment_card_id bigint NOT NULL,
+    planning_load_time character varying,
+    planning_unload_time character varying
+);
+
+
+ALTER TABLE taxi.orders OWNER TO postgres;
+
+--
+-- TOC entry 231 (class 1259 OID 16529)
+-- Name: orders_id_seq; Type: SEQUENCE; Schema: taxi; Owner: postgres
+--
+
+CREATE SEQUENCE taxi.orders_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE taxi.orders_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3460 (class 0 OID 0)
+-- Dependencies: 231
+-- Name: orders_id_seq; Type: SEQUENCE OWNED BY; Schema: taxi; Owner: postgres
+--
+
+ALTER SEQUENCE taxi.orders_id_seq OWNED BY taxi.orders.id;
+
+
+--
+-- TOC entry 218 (class 1259 OID 16405)
+-- Name: payment_card; Type: TABLE; Schema: taxi; Owner: postgres
+--
+
+CREATE TABLE taxi.payment_card (
+    id bigint NOT NULL,
+    card_number character(16) NOT NULL,
+    client_id bigint NOT NULL
+);
+
+
+ALTER TABLE taxi.payment_card OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 16404)
+-- Name: payment_card_id_seq; Type: SEQUENCE; Schema: taxi; Owner: postgres
+--
+
+CREATE SEQUENCE taxi.payment_card_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE taxi.payment_card_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3461 (class 0 OID 0)
+-- Dependencies: 217
+-- Name: payment_card_id_seq; Type: SEQUENCE OWNED BY; Schema: taxi; Owner: postgres
+--
+
+ALTER SEQUENCE taxi.payment_card_id_seq OWNED BY taxi.payment_card.id;
+
+
+--
+-- TOC entry 220 (class 1259 OID 16418)
+-- Name: position; Type: TABLE; Schema: taxi; Owner: postgres
+--
+
+CREATE TABLE taxi."position" (
+    id bigint NOT NULL,
+    name character varying NOT NULL
+);
+
+
+ALTER TABLE taxi."position" OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 16417)
+-- Name: position_id_seq; Type: SEQUENCE; Schema: taxi; Owner: postgres
+--
+
+CREATE SEQUENCE taxi.position_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE taxi.position_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3462 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: position_id_seq; Type: SEQUENCE OWNED BY; Schema: taxi; Owner: postgres
+--
+
+ALTER SEQUENCE taxi.position_id_seq OWNED BY taxi."position".id;
+
+
+--
+-- TOC entry 228 (class 1259 OID 16479)
+-- Name: tariff; Type: TABLE; Schema: taxi; Owner: postgres
+--
+
+CREATE TABLE taxi.tariff (
+    id bigint NOT NULL,
+    name character varying NOT NULL,
+    base_cost bigint NOT NULL
+);
+
+
+ALTER TABLE taxi.tariff OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 16478)
+-- Name: tariff_id_seq; Type: SEQUENCE; Schema: taxi; Owner: postgres
+--
+
+CREATE SEQUENCE taxi.tariff_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE taxi.tariff_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3463 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: tariff_id_seq; Type: SEQUENCE OWNED BY; Schema: taxi; Owner: postgres
+--
+
+ALTER SEQUENCE taxi.tariff_id_seq OWNED BY taxi.tariff.id;
+
+
+--
+-- TOC entry 230 (class 1259 OID 16511)
+-- Name: work_schedule; Type: TABLE; Schema: taxi; Owner: postgres
+--
+
+CREATE TABLE taxi.work_schedule (
+    id bigint NOT NULL,
+    days_per_week character varying NOT NULL,
+    time_of_day character varying NOT NULL,
+    start_time time without time zone NOT NULL,
+    end_time time without time zone NOT NULL
+);
+
+
+ALTER TABLE taxi.work_schedule OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 16510)
+-- Name: work_schedule_id_seq; Type: SEQUENCE; Schema: taxi; Owner: postgres
+--
+
+CREATE SEQUENCE taxi.work_schedule_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE taxi.work_schedule_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3464 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: work_schedule_id_seq; Type: SEQUENCE OWNED BY; Schema: taxi; Owner: postgres
+--
+
+ALTER SEQUENCE taxi.work_schedule_id_seq OWNED BY taxi.work_schedule.id;
+
+
+--
+-- TOC entry 3226 (class 2604 OID 16439)
+-- Name: car_model id; Type: DEFAULT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.car_model ALTER COLUMN id SET DEFAULT nextval('taxi.car_model_id_seq'::regclass);
+
+
+--
+-- TOC entry 3227 (class 2604 OID 16446)
+-- Name: cars id; Type: DEFAULT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.cars ALTER COLUMN id SET DEFAULT nextval('taxi.cars_id_seq'::regclass);
+
+
+--
+-- TOC entry 3222 (class 2604 OID 16401)
+-- Name: client id; Type: DEFAULT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.client ALTER COLUMN id SET DEFAULT nextval('taxi.client_id_seq'::regclass);
+
+
+--
+-- TOC entry 3225 (class 2604 OID 16430)
+-- Name: employee id; Type: DEFAULT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.employee ALTER COLUMN id SET DEFAULT nextval('taxi.employee_id_seq'::regclass);
+
+
+--
+-- TOC entry 3231 (class 2604 OID 25152)
+-- Name: employee_shedule id; Type: DEFAULT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.employee_shedule ALTER COLUMN id SET DEFAULT nextval('taxi.employee_shedule_id_seq'::regclass);
+
+
+--
+-- TOC entry 3230 (class 2604 OID 16533)
+-- Name: orders id; Type: DEFAULT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.orders ALTER COLUMN id SET DEFAULT nextval('taxi.orders_id_seq'::regclass);
+
+
+--
+-- TOC entry 3223 (class 2604 OID 16408)
+-- Name: payment_card id; Type: DEFAULT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.payment_card ALTER COLUMN id SET DEFAULT nextval('taxi.payment_card_id_seq'::regclass);
+
+
+--
+-- TOC entry 3224 (class 2604 OID 16421)
+-- Name: position id; Type: DEFAULT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi."position" ALTER COLUMN id SET DEFAULT nextval('taxi.position_id_seq'::regclass);
+
+
+--
+-- TOC entry 3228 (class 2604 OID 16482)
+-- Name: tariff id; Type: DEFAULT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.tariff ALTER COLUMN id SET DEFAULT nextval('taxi.tariff_id_seq'::regclass);
+
+
+--
+-- TOC entry 3229 (class 2604 OID 16514)
+-- Name: work_schedule id; Type: DEFAULT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.work_schedule ALTER COLUMN id SET DEFAULT nextval('taxi.work_schedule_id_seq'::regclass);
+
+
+--
+-- TOC entry 3437 (class 0 OID 16436)
+-- Dependencies: 224
+-- Data for Name: car_model; Type: TABLE DATA; Schema: taxi; Owner: postgres
+--
+
+INSERT INTO taxi.car_model (id, brand, model, cost, country, tariff_id) VALUES (1, 'toyota', 'silvia s15', 1000000, 'Japan', 1);
+INSERT INTO taxi.car_model (id, brand, model, cost, country, tariff_id) VALUES (2, 'subaru', 'impreza', 900000, 'Japan', 1);
+INSERT INTO taxi.car_model (id, brand, model, cost, country, tariff_id) VALUES (3, 'mitsubishi', 'lancer', 700000, 'Japan', 1);
+INSERT INTO taxi.car_model (id, brand, model, cost, country, tariff_id) VALUES (4, 'BMW', 'X6', 1500000, 'Germany', 1);
+INSERT INTO taxi.car_model (id, brand, model, cost, country, tariff_id) VALUES (5, 'VAZ', '21083', 240000, 'Russia', 1);
+INSERT INTO taxi.car_model (id, brand, model, cost, country, tariff_id) VALUES (6, 'toyota', 'celica', 650000, 'Japan', 1);
+INSERT INTO taxi.car_model (id, brand, model, cost, country, tariff_id) VALUES (7, 'Nissan', 'SkyLine', 450000, 'Japan', 1);
+INSERT INTO taxi.car_model (id, brand, model, cost, country, tariff_id) VALUES (8, 'peugot', '206', 600000, 'France', 1);
+INSERT INTO taxi.car_model (id, brand, model, cost, country, tariff_id) VALUES (9, 'mercedes', 's-class', 4500000, 'Germany', 2);
+
+
+--
+-- TOC entry 3439 (class 0 OID 16443)
+-- Dependencies: 226
+-- Data for Name: cars; Type: TABLE DATA; Schema: taxi; Owner: postgres
+--
+
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (1, 'Motor 1.8l; Manual', '2020-10-09', 'Я497ЧЗ ', 264051, '2001-10-01', 1, 1);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (2, 'Motor 2.2l; Manual', '2023-12-27', 'Ш433ЖР ', 231002, '2007-11-20', 2, 2);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (3, 'Motor 2.2l; Manual', '2023-12-07', 'П745ЛИ ', 81633, '2010-01-12', 3, 3);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (4, 'Motor 2.5l; Manual', '2021-01-21', 'Р970СЖ ', 194755, '2011-10-06', 5, 4);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (5, 'Motor 2.2l; Manual', '2021-08-09', 'Я216ВЩ ', 286013, '2021-08-29', 5, 19);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (6, 'Motor 2.2l; Manual', '2023-09-11', 'К495ЫД ', 292149, '2020-01-21', 1, 20);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (7, 'Motor 1.5l; Manual', '2020-09-14', 'А448ИХ ', 138794, '2015-12-04', 3, 21);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (8, 'Motor 2.2l; Manual', '2021-11-24', 'Х687КИ ', 339800, '2005-06-15', 4, 22);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (9, 'Motor 1.6l; Manual', '2022-04-21', 'Е768ЧЯ ', 183275, '2021-02-08', 2, 24);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (10, 'Motor 1.5l; Manual', '2022-10-01', 'Ы540ЩШ ', 138753, '2008-01-01', 3, 23);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (11, 'Motor 2.0l; Manual', '2021-05-10', 'Щ959АЙ ', 320633, '2003-06-30', 6, 24);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (12, 'Motor 1.9l; Manual', '2020-08-19', 'Ж133ЧЭ ', 233572, '2012-10-03', 6, 25);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (13, 'Motor 2.1l; Manual', '2022-11-20', 'Р970ЧО ', 192667, '2000-05-13', 6, 26);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (14, 'Motor 1.5l; Manual', '2021-08-18', 'К161ВЭ ', 105459, '2011-01-19', 7, 27);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (15, 'Motor 2.2l; Manual', '2021-08-25', 'Ш577РК ', 244624, '2012-05-17', 7, 28);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (16, 'Motor 1.9l; Manual', '2020-03-25', 'З751ГО ', 229424, '2017-11-26', 9, 29);
+INSERT INTO taxi.cars (id, specifications, maintenance_date, license_plate, mileage, manufacture_year, car_model_id, employee_id) VALUES (17, 'Motor 1.7l; Manual', '2021-08-22', 'Е648ХЗ ', 248532, '2000-01-05', 9, 30);
+
+
+--
+-- TOC entry 3429 (class 0 OID 16398)
+-- Dependencies: 216
+-- Data for Name: client; Type: TABLE DATA; Schema: taxi; Owner: postgres
+--
+
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (1, 'Богданов', 'Аверкий', 'Егорович', '70545283392');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (2, 'Силина', 'Октябрина', 'Вадимовна', '79858127980');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (3, 'Костин', 'Тарас', 'Артёмович', '72172094192');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (4, 'Марфа', 'Аркадьевна', 'Рыбакова', '79123857961');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (5, 'Шубин', 'Ладимир', 'Федосьевич', '74238990696');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (6, 'Харлампий', 'Дорофеевич', 'Юдин', '78007578773');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (7, 'Ия', 'Викторовна', 'Петухова', '72312708491');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (8, 'Кузнецов', 'Спиридон', 'Авдеевич', '76203396212');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (9, 'Жанна', 'Александровна', 'Сафонова', '77922459834');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (10, 'Зоя', 'Филипповна', 'Петухова', '75203759362');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (11, 'Зинаида', 'Сергеевна', 'Маркова', '72795062025');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (12, 'Терентьев', 'Порфирий', 'Тарасович', '74976331288');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (13, 'Симонова', 'Вера', 'Богдановна', '75077882112');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (14, 'Лукьян', 'Власович', 'Прохоров', '71988430787');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (15, 'Таисия', 'Петровна', 'Селиверстова', '76125922509');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (16, 'Петров', 'Эраст', 'Иосипович', '71251477424');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (17, 'Родионова', 'Валерия', 'Павловна', '76311497379');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (18, 'г-жа', 'Савина', 'Агафья', '77253842359');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (19, 'Кудряшов', 'Евстафий', 'Абрамович', '72980645198');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (20, 'Станислав', 'Жоресович', 'Шашков', '71153489708');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (21, 'Данилов', 'Захар', 'Харлампович', '76762304135');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (22, 'Цветков', 'Светозар', 'Владленович', '73508985627');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (23, 'Герасимова', 'Юлия', 'Богдановна', '79923681989');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (24, 'Вышеслав', 'Филатович', 'Мельников', '71553996421');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (25, 'Ипатий', 'Харламович', 'Кулагин', '76678417973');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (26, 'Беляков', 'Кирилл', 'Дмитриевич', '77586148767');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (27, 'Пестов', 'Иннокентий', 'Евсеевич', '73519117672');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (28, 'Орехова', 'Евдокия', 'Артемовна', '76959581804');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (29, 'Гурьева', 'Ксения', 'Руслановна', '79077098549');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (30, 'Ксения', 'Никифоровна', 'Антонова', '79304977829');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (31, 'Жданова', 'Ульяна', 'Евгеньевна', '77613917119');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (32, 'Гришин', 'Фома', 'Аверьянович', '78760653587');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (33, 'Аким', 'Демьянович', 'Якушев', '79060877749');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (34, 'Тихонова', 'Пелагея', 'Семеновна', '79727842171');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (35, 'Ия', 'Степановна', 'Михеева', '70247996595');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (36, 'Юдина', 'Варвара', 'Феликсовна', '72722369687');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (37, 'Шарапова', 'Синклитикия', 'Альбертовна', '71842791688');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (38, 'Автоном', 'Адрианович', 'Комаров', '75414676741');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (39, 'Евлампий', 'Измаилович', 'Сорокин', '74237071098');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (40, 'Елисей', 'Матвеевич', 'Кириллов', '73391260092');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (41, 'Большакова', 'Лариса', 'Святославовна', '71838599830');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (42, 'Игнатов', 'Феликс', 'Денисович', '75854605350');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (43, 'Сидор', 'Богданович', 'Нестеров', '74147836795');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (44, 'Антонина', 'Михайловна', 'Степанова', '75782430042');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (45, 'Рогов', 'Капитон', 'Виленович', '73809640935');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (46, 'Силин', 'Валентин', 'Венедиктович', '75723244728');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (47, 'Горбачева', 'София', 'Эльдаровна', '70254184956');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (48, 'Мельникова', 'Екатерина', 'Тимуровна', '70945938206');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (49, 'Орлова', 'Раиса', 'Дмитриевна', '72230043442');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (50, 'Боброва', 'Лукия', 'Дмитриевна', '78698763002');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (51, 'Емельянова', 'Людмила', 'Сергеевна', '70825506789');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (52, 'Субботина', 'Таисия', 'Георгиевна', '70106679854');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (53, 'Антонин', 'Федотович', 'Мишин', '75354176089');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (54, 'Андреев', 'Пров', 'Викторович', '72007770897');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (55, 'Гаврилова', 'Елизавета', 'Ждановна', '77709307806');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (56, 'Жуков', 'Герман', 'Гордеевич', '74693122320');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (57, 'Гедеон', 'Артемьевич', 'Фокин', '76114978040');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (58, 'Анжела', 'Владимировна', 'Савельева', '77106370018');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (59, 'Авдей', 'Трофимович', 'Хохлов', '77556660540');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (60, 'Кира', 'Архиповна', 'Пахомова', '72745031068');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (61, 'тов.', 'Абрамова', 'Зоя', '74697594200');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (62, 'Раиса', 'Яковлевна', 'Дорофеева', '78975702645');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (63, 'Роман', 'Федосеевич', 'Афанасьев', '79763119407');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (64, 'тов.', 'Гордеев', 'Панфил', '73837238548');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (65, 'Клавдия', 'Николаевна', 'Шарова', '79119209066');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (66, 'Медведев', 'Афиноген', 'Трофимович', '79009532121');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (67, 'Сергеев', 'Спартак', 'Виленович', '76570294247');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (68, 'Никифорова', 'Екатерина', 'Афанасьевна', '79402642979');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (69, 'тов.', 'Пономарева', 'Пелагея', '72958852434');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (70, 'Самойлова', 'Олимпиада', 'Болеславовна', '73621841306');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (71, 'Анна', 'Антоновна', 'Вишнякова', '70816599359');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (72, 'Лукия', 'Вениаминовна', 'Шарова', '79334881597');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (73, 'Гаврилова', 'Валентина', 'Владиславовна', '74173706735');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (74, 'Громов', 'Аполлинарий', 'Матвеевич', '74171235037');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (75, 'Тамара', 'Геннадиевна', 'Мишина', '74042810972');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (76, 'Архипова', 'Ия', 'Федоровна', '74420848745');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (77, 'Митофан', 'Демидович', 'Панов', '71576566315');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (78, 'Сазонова', 'Людмила', 'Станиславовна', '72674242181');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (79, 'Алла', 'Геннадьевна', 'Лапина', '73920647842');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (80, 'Воробьев', 'Клавдий', 'Марсович', '79351410633');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (81, 'Анжелика', 'Филипповна', 'Брагина', '78968819704');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (82, 'Николай', 'Герасимович', 'Горбунов', '74121389592');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (83, 'Наталья', 'Викторовна', 'Лобанова', '72613541223');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (84, 'Кириллов', 'Ферапонт', 'Демьянович', '76098526531');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (85, 'Антонин', 'Ефимович', 'Уваров', '71452118971');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (86, 'Вишняков', 'Якуб', 'Федосеевич', '74833215058');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (87, 'Ширяев', 'Стоян', 'Гордеевич', '75037066824');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (88, 'Козлов', 'Михей', 'Абрамович', '71157731952');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (89, 'Эрнст', 'Юльевич', 'Селезнев', '74357962513');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (90, 'Горбунова', 'Василиса', 'Ефимовна', '72662463064');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (91, 'Евдокия', 'Филипповна', 'Лихачева', '76337605190');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (92, 'Вероника', 'Егоровна', 'Белякова', '70606868216');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (93, 'Павел', 'Архипович', 'Яковлев', '78370838653');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (94, 'Ефремов', 'Анисим', 'Игоревич', '78201480474');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (95, 'Захар', 'Игнатьевич', 'Емельянов', '77558826932');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (96, 'Фаина', 'Михайловна', 'Петрова', '77808650744');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (97, 'Белоусова', 'Екатерина', 'Мироновна', '75706355225');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (98, 'Захарова', 'Антонина', 'Александровна', '73775271009');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (99, 'Евгения', 'Кирилловна', 'Белозерова', '79256507439');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (100, 'Агап', 'Витальевич', 'Иванов', '72950465337');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (101, 'Данила', 'Феодосьевич', 'Павлов', '72578998775');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (102, 'Данилов', 'Роман', 'Харлампьевич', '77306235980');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (103, 'Исаков', 'Бажен', 'Ефимович', '70409561772');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (104, 'Бажен', 'Юлианович', 'Комаров', '79460098391');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (105, 'Капустина', 'Синклитикия', 'Антоновна', '70738280743');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (106, 'Носкова', 'Октябрина', 'Даниловна', '76961954227');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (107, 'Станислав', 'Вилорович', 'Тихонов', '79780338193');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (108, 'Борис', 'Давидович', 'Пономарев', '74265880501');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (109, 'Ираида', 'Тарасовна', 'Зуева', '75004724303');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (110, 'Кузьмин', 'Аникей', 'Аверьянович', '77561677079');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (111, 'Стоян', 'Ярославович', 'Суханов', '73359567564');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (112, 'Татьяна', 'Афанасьевна', 'Ермакова', '75704134484');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (113, 'Марк', 'Викентьевич', 'Тетерин', '77164283948');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (114, 'Григорьев', 'Эрнест', 'Демидович', '76970225220');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (115, 'Симон', 'Жанович', 'Беляев', '77774064923');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (116, 'Александров', 'Владислав', 'Гаврилович', '79694441577');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (117, 'Хохлов', 'Добромысл', 'Даниилович', '73505161423');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (118, 'Баранова', 'Валентина', 'Григорьевна', '79861768989');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (119, 'Евдокия', 'Александровна', 'Миронова', '77639338917');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (120, 'Максимильян', 'Терентьевич', 'Одинцов', '79295658645');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (121, 'Алевтина', 'Матвеевна', 'Рыбакова', '73612395545');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (122, 'Ипат', 'Жоресович', 'Князев', '73007739650');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (123, 'Ярополк', 'Авдеевич', 'Марков', '74535262800');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (124, 'Архип', 'Тарасович', 'Лазарев', '79411767190');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (125, 'Мельников', 'Никифор', 'Гаврилович', '78258566317');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (126, 'Борислав', 'Феофанович', 'Носков', '76688685722');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (127, 'Синклитикия', 'Богдановна', 'Стрелкова', '73447047037');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (128, 'Агата', 'Ильинична', 'Лебедева', '71210589951');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (129, 'Зинаида', 'Алексеевна', 'Мамонтова', '74783974051');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (130, 'Лукина', 'Фёкла', 'Михайловна', '75442453930');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (131, 'Дементий', 'Трофимович', 'Аксенов', '79704161550');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (132, 'Василиса', 'Ильинична', 'Коновалова', '76254547919');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (133, 'Сысоева', 'Полина', 'Константиновна', '73584490748');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (134, 'Ефим', 'Данилович', 'Цветков', '76060722158');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (135, 'Трофимов', 'Гордей', 'Эдуардович', '72820437310');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (136, 'Александра', 'Рудольфовна', 'Осипова', '73578288988');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (137, 'г-н', 'Макаров', 'Филипп', '77063172036');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (138, 'Игнатьев', 'Данила', 'Валерьянович', '77918282730');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (139, 'Зинаида', 'Владимировна', 'Шилова', '74111370723');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (140, 'Агафья', 'Рубеновна', 'Копылова', '79166974036');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (141, 'Вячеслав', 'Эдгарович', 'Пахомов', '74319700605');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (142, 'Михайлова', 'Варвара', 'Ильинична', '70566736107');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (143, 'Князев', 'Ладимир', 'Абрамович', '71207801621');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (144, 'Корнил', 'Адрианович', 'Тихонов', '79886983513');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (145, 'Алина', 'Федоровна', 'Рыбакова', '76359694742');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (146, 'Королев', 'Никандр', 'Власович', '76914077824');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (147, 'Щербаков', 'Всеслав', 'Валерьянович', '76423468110');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (148, 'Афанасьев', 'Евгений', 'Валентинович', '72154751678');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (149, 'Носкова', 'Эмилия', 'Эльдаровна', '77232086108');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (150, 'Вера', 'Альбертовна', 'Трофимова', '77780379934');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (151, 'Юлиан', 'Савельева', 'Арсенович', '70562445572');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (152, 'Корнил', 'Андреева', 'Венедиктович', '71662910649');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (153, 'Артемий', 'Соколова', 'Харламович', '75749726740');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (154, 'Моисей', 'Матвеева', 'Крылова', '74587551572');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (155, 'Владислав', 'Давыдова', 'Макаровна', '71877251827');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (156, 'Виктория', 'Доронина', 'Суханов', '74575738710');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (157, 'Маргарита', 'Копылова', 'Кузнецова', '74324512832');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (158, 'Рюрик', 'Устинова', 'Попова', '70882927140');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (159, 'Анисим', 'Сафонова', 'Корнилова', '75236824983');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (160, 'Аверьян', 'Шарапов', 'Руслановна', '77302407132');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (161, 'Маргарита', 'Лыткина', 'Григорьев', '70724376887');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (162, 'Онуфрий', 'Федоров', 'Аксёнович', '77636675380');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (163, 'Фрол', 'Ларионова', 'Кондратьева', '71110395423');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (164, 'Любосмысл', 'Блохин', 'Кирилловна', '71251878423');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (165, 'Максим', 'Капустин', 'Соболева', '72954663783');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (166, 'Мариан', 'Прохорова', 'Вадимовна', '77849995549');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (167, 'Август', 'Давыдова', 'Кононова', '79010186776');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (168, 'Евгений', 'Комаров', 'Григорьевна', '70088426072');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (169, 'Аникита', 'Матвеев', 'Устинович', '75036415101');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (170, 'Всеволод', 'Горбунов', 'Кудряшов', '73188488700');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (171, 'Мирон', 'Щербаков', 'Симонова', '73504240880');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (172, 'Порфирий', 'Филиппов', 'Назаров', '76682906492');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (173, 'Игорь', 'Фокина', 'Сергеевна', '74618017477');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (174, 'Фрол', 'Петухова', 'Федорова', '77681555883');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (175, 'Моисей', 'Капустина', 'Капустин', '74045300926');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (176, 'Юлий', 'Дроздов', 'Ниловна', '71249467241');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (177, 'Артем', 'Шилов', 'Владимировна', '79946449861');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (178, 'Тимур', 'Кириллов', 'Полякова', '70063510723');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (179, 'Маргарита', 'Захаров', 'Фадеева', '70441874315');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (180, 'Нестор', 'Макаров', 'Богданова', '79987230256');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (181, 'Мина', 'Петров', 'Брагина', '72704374075');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (182, 'Игорь', 'Константинов', 'Кирилловна', '74502543619');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (183, 'Савватий', 'Муравьева', 'Архиповна', '77347705403');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (184, 'Иванна', 'Блохина', 'Анатольевна', '78277476668');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (185, 'Мирослав', 'Гущина', 'Ефимовна', '76639935883');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (186, 'Евдоким', 'Белозерова', 'Викторовна', '72311974826');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (187, 'Аникита', 'Борисова', 'Щербаков', '77966650873');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (188, 'Дементий', 'Мельникова', 'Максимов', '79169462157');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (189, 'Гедеон', 'Шарапова', 'Леонидовна', '71056068579');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (190, 'Полина', 'Беспалов', 'Евсеевич', '79518413766');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (191, 'Порфирий', 'Федотов', 'Архиповна', '77541954273');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (192, 'Никанор', 'Андреев', 'Робертовна', '79544689866');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (193, 'Софрон', 'Брагин', 'Аркадьевна', '76907793220');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (194, 'Леонтий', 'Самсонова', 'Кулакова', '71880608400');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (195, 'Герман', 'Щукин', 'Захарова', '72155173819');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (196, 'Автоном', 'Логинов', 'Капустин', '75008813749');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (197, 'Трифон', 'Князева', 'Харитонов', '78132521065');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (198, 'Наум', 'Калашникова', 'Теймуразович', '78633616334');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (199, 'Осип', 'Зуев', 'Назаров', '70710309540');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (200, 'Варлаам', 'Макаров', 'Филатова', '75734540329');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (201, 'Марина', 'Меркушева', 'Пестов', '75342563885');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (202, 'Харлампий', 'Шубин', 'Геннадиевна', '71398886366');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (203, 'Изот', 'Гущина', 'Рогова', '75511141564');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (204, 'Вадим', 'Фокин', 'Воронцова', '76114456563');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (205, 'Виссарион', 'Князева', 'Буров', '70815462516');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (206, 'Яков', 'Миронова', 'Валериевна', '78285419747');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (207, 'Порфирий', 'Осипов', 'Максимовна', '75211796914');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (208, 'Вышеслав', 'Кошелев', 'Тихонов', '70622372152');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (209, 'Алевтина', 'Соболев', 'Субботин', '72662883486');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (210, 'Андрей', 'Казаков', 'Оскаровна', '78829193007');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (211, 'Евграф', 'Капустин', 'Герасимович', '70408239843');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (212, 'Надежда', 'Селезнева', 'Захаровна', '78273273221');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (213, 'Артем', 'Одинцова', 'Быкова', '78719552280');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (214, 'Павел', 'Лапин', 'Беляева', '74043410139');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (215, 'Анастасия', 'Третьякова', 'Титов', '76123265948');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (216, 'Варфоломей', 'Евдокимова', 'Мамонтова', '72933046754');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (217, 'Симон', 'Доронина', 'Аркадьевна', '76721503759');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (218, 'Автоном', 'Белов', 'Васильева', '77565380366');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (219, 'Иван', 'Воронцова', 'Никифорова', '78112934825');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (220, 'Роман', 'Доронин', 'Захарьевич', '71752361642');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (221, 'Аникита', 'Белякова', 'Артемьевич', '71783475780');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (222, 'Никита', 'Брагина', 'Исидорович', '79644022166');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (223, 'Александра', 'Гаврилова', 'Елисеев', '77518536688');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (224, 'Гаврила', 'Абрамов', 'Бобылева', '74137337295');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (225, 'Кондратий', 'Бобров', 'Валериевна', '74433473124');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (226, 'Данила', 'Прохорова', 'Тимофеевна', '73865051679');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (227, 'Олимпиада', 'Юдина', 'Кирилловна', '74831811029');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (228, 'Дементий', 'Королев', 'Шилов', '75773561456');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (229, 'Зинаида', 'Абрамов', 'Поляков', '73324735672');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (230, 'Кузьма', 'Пономарева', 'Терентьевич', '71288768874');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (231, 'Виктор', 'Ефремова', 'Гришин', '71747105656');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (232, 'Еремей', 'Анисимова', 'Романовна', '74469714391');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (233, 'Тамара', 'Герасимов', 'Константиновна', '79268567658');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (234, 'Фортунат', 'Савельева', 'Зиновьева', '73894382526');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (235, 'Мокей', 'Брагин', 'Арсеньевич', '71938948610');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (236, 'Милица', 'Блинов', 'Таисия', '77421307206');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (237, 'Ипполит', 'Логинова', 'Константинов', '72386779908');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (238, 'Ефим', 'Агафонов', 'Александровна', '72828886033');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (239, 'Боян', 'Рябов', 'Эльдаровна', '79052583970');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (240, 'Лонгин', 'Молчанова', 'Викторовна', '70722648827');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (241, 'Радован', 'Маслов', 'Селиверстова', '78572513115');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (242, 'Маргарита', 'Пономарева', 'Колесников', '75947923970');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (243, 'Аркадий', 'Мухина', 'Никифоров', '75368972979');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (244, 'Прокл', 'Тетерин', 'Максимильян', '70174223108');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (245, 'Конон', 'Сергеев', 'Абрамович', '79602369320');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (246, 'Ипат', 'Сафонова', 'Анатольевна', '77658464239');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (247, 'Арсений', 'Белоусов', 'Силин', '75408401521');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (248, 'Оксана', 'Борисов', 'Ильин', '76305821424');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (249, 'Лучезар', 'Гаврилов', 'Исидорович', '73153308418');
+INSERT INTO taxi.client (id, firstname, surname, patronymic, phone_number) VALUES (250, 'Матвей', 'Котов', 'Новикова', '70348415146');
+
+
+--
+-- TOC entry 3435 (class 0 OID 16427)
+-- Dependencies: 222
+-- Data for Name: employee; Type: TABLE DATA; Schema: taxi; Owner: postgres
+--
+
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (15, 'ул. Прудовая, д. 33, 90', 'Валерия', 'Мишин', 'Эдгарович', '1128649929', '74665151407', 4);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (19, 'ул. Водников, д. 71, 91', 'Януарий', 'Елисеев', 'Соколова', '3537201180', '78484115254', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (1, 'ул. Поперечная, д. 60 к. 3/8, 71', 'Любовь', 'Потапова', 'Максимов', '3025802961', '77539137931', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (2, 'наб. Кольцова, д. 5/2, 24', 'Лаврентий', 'Колобов', 'Андреев', '6082819656', '77332695886', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (3, 'бул. Радужный, д. 159, 6', 'Елизар', 'Зимина', 'Пестова', '4156630968', '72543101104', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (7, 'пер. Панфилова, д. 873 стр. 4, 44', 'Варвара', 'Ершов', 'Кондратьев', '5226660414', '77882424003', 3);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (8, 'пер. Пролетарский, д. 7, 14', 'Акулина', 'Овчинникова', 'Васильевич', '4526893206', '71042655371', 3);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (9, 'наб. Шевченко, д. 485 стр. 8, 51', 'Аггей', 'Игнатова', 'Гурьевич', '1761968866', '70710834155', 3);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (10, 'бул. Угловой, д. 316 к. 2, 49', 'Сергей', 'Ефимов', 'Соловьев', '3777348629', '75161487787', 3);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (11, 'бул. Ясный, д. 1/3 к. 3, 89', 'Виссарион', 'Власов', 'Эмилия', '4918066059', '71973358230', 3);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (12, 'алл. Лесхозная, д. 7/3, 63', 'Дмитрий', 'Меркушев', 'Юльевна', '8309784369', '77145176618', 3);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (13, 'алл. Геологов, д. 247 к. 7, 57', 'Мечислав', 'Кудрявцев', 'Мишин', '9089586544', '70878601632', 3);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (14, 'ул. Докучаева, д. 6/8 стр. 2, 35', 'Ананий', 'Комиссаров', 'Данилова', '4847090679', '76396736204', 3);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (16, 'наб. Сосновая, д. 8, 36', 'Ратмир', 'Меркушева', 'Ефимов', '1969765270', '79806899818', 4);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (17, 'алл. Металлургов, д. 915 стр. 4, 91', 'Прокл', 'Блохин', 'Федоровна', '9906173532', '78754604514', 4);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (18, 'бул. Морозова, д. 5/2, 71', 'Ефим', 'Ларионова', 'Филиппов', '6138413594', '76837454456', 4);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (20, 'бул. Казачий, д. 3/3, 9', 'Алексей', 'Максимов', 'Михайловна', '3036051267', '73446773367', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (21, 'алл. Водников, д. 8, 48', 'Полина', 'Васильева', 'Доронин', '1727477258', '76435327838', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (22, 'наб. Средняя, д. 93 стр. 4, 9', 'Вышеслав', 'Меркушев', 'Даниловна', '4496827935', '73799329146', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (24, 'бул. Водников, д. 4, 23', 'Эдуард', 'Наумова', 'Адамович', '4909214829', '78255276627', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (4, 'ул. Коммунистическая, д. 615 стр. 583, 73', 'Юлий', 'Рыбаков', 'Григорьевна', '2004250492', '71117947185', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (5, 'ш. Ясное, д. 3 к. 4, 96', 'Аполлон', 'Сафонов', 'Евсеевич', '1991972571', '74423762406', 3);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (6, 'пр. Белинского, д. 9 стр. 868, 82', 'Эраст', 'Галкин', 'Георгиевна', '3907187007', '70348124157', 3);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (23, 'пер. Российский, д. 97 стр. 8, 17', 'Осип', 'Поляков', 'Ждановна', '7917135071', '79127460157', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (25, 'ш. Прохладное, д. 19 к. 1, 88', 'Евфросиния', 'Самойлова', 'Фролов', '2227672349', '79266220398', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (26, 'алл. Димитрова, д. 2/7 стр. 9/8, 52', 'Эрнст', 'Егорова', 'Гришин', '3330476630', '77531443655', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (27, 'наб. Лазо, д. 7/7 стр. 5/8, 50', 'Владлен', 'Колобова', 'Геннадиевич', '2497237661', '75110255942', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (28, 'алл. Шевченко, д. 4 стр. 67, 17', 'Лука', 'Киселев', 'Кузьминична', '6079770925', '79651988842', 1);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (29, 'пер. Первомайский, д. 60 стр. 707, 92', 'Август', 'Потапова', 'Горбачева', '7553613986', '79840212470', 2);
+INSERT INTO taxi.employee (id, adress, firstname, surname, patronymic, passport_number, phone_number, position_id) VALUES (30, 'наб. Заовражная, д. 3 стр. 3/3, 63', 'Твердислав', 'Моисеев', 'Павлова', '9543666304', '71474032276', 2);
+
+
+--
+-- TOC entry 3446 (class 0 OID 25148)
+-- Dependencies: 233
+-- Data for Name: employee_shedule; Type: TABLE DATA; Schema: taxi; Owner: postgres
+--
+
+
+
+--
+-- TOC entry 3445 (class 0 OID 16530)
+-- Dependencies: 232
+-- Data for Name: orders; Type: TABLE DATA; Schema: taxi; Owner: postgres
+--
+
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (1, 'пр. Бабушкина, д. 8/2', 'бул. Кирпичный, д. 75 к. 3/8', '2023-01-12 23:23:45', '2023-01-12 23:45:22', 'by_card', 23, 1, 1, 3, 1, '2023-01-12 23:23:45', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (3, 'пер. 50 лет Победы, д. 6', 'наб. Заливная, д. 9', '2023-02-23 10:28:20', '2023-02-23 10:49:30', 'by_card', 4, 2, 1, 2, 2, '2023-02-23 10:28:20', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (4, 'пр. Глинки, д. 6', 'бул. Герцена, д. 9 к. 3/5', '2023-03-11 13:29:24', '2023-03-11 13:44:42', 'by_card', 30, 4, 2, 4, 4, '2023-03-11 13:29:24', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (5, 'алл. Буденного, д. 2/6 стр. 4/9', 'пер. Колхозный, д. 2', '2023-03-13 17:11:08', '2023-03-13 17:45:59', 'by_card', 30, 4, 2, 2, 4, '2023-01-12 23:23:45', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (17, 'бул. Путевой, д. 26 стр. 811', 'пер. Коминтерна, д. 63 к. 3/6', '2023-03-20 16:15:18', '2023-03-20 16:46:56', 'by_card', 19, 82, 1, 3, 82, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (18, 'алл. Торговая, д. 178 к. 2/8', 'пр. Шаумяна, д. 60 стр. 592', '2023-03-16 12:02:26', '2023-03-16 12:47:58', 'by_card', 19, 36, 1, 2, 36, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (19, 'бул. Высоковольтный, д. 6/7', 'ул. Челюскинцев, д. 843', '2023-03-25 22:22:25', '2023-03-25 22:59:36', 'by_card', 26, 56, 1, 4, 56, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (20, 'пер. Котовского, д. 6/2 стр. 440', 'ш. Глинки, д. 738', '2023-03-19 18:15:27', '2023-03-19 18:42:49', 'by_card', 22, 17, 1, 3, 17, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (21, 'наб. Киевская, д. 3/8 стр. 611', 'алл. Орловская, д. 33', '2023-03-13 10:16:16', '2023-03-13 10:38:39', 'by_card', 21, 24, 1, 2, 24, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (22, 'бул. Кузнецова, д. 3 стр. 5/8', 'ш. Харьковское, д. 671', '2023-03-14 16:29:13', '2023-03-14 16:52:31', 'by_card', 20, 23, 1, 3, 23, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (23, 'бул. Химиков, д. 104', 'алл. Герцена, д. 2/4 стр. 870', '2023-03-28 02:20:25', '2023-03-28 02:33:57', 'by_card', 20, 33, 1, 4, 33, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (24, 'ш. Леваневского, д. 5/1 к. 2', 'ш. Томское, д. 6', '2023-03-01 23:02:18', '2023-03-01 23:51:58', 'by_card', 1, 39, 1, 4, 39, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (25, 'алл. Локомотивная, д. 552', 'наб. Харьковская, д. 594 стр. 8/2', '2023-03-26 21:11:28', '2023-03-26 21:57:57', 'by_card', 2, 28, 1, 3, 28, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (26, 'ш. Свободное, д. 511 к. 53', 'наб. Радужная, д. 8', '2023-03-24 23:11:18', '2023-03-24 23:54:31', 'by_card', 1, 98, 1, 4, 98, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (27, 'бул. Стадионный, д. 9/7', 'пер. Кленовый, д. 72 стр. 4', '2023-03-01 15:07:02', '2023-03-01 15:56:33', 'by_card', 2, 100, 1, 3, 100, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (28, 'пер. Тихий, д. 9 к. 9/1', 'алл. Хуторская, д. 310', '2023-03-21 03:06:16', '2023-03-21 03:34:55', 'by_card', 3, 96, 1, 4, 96, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (29, 'ул. Высоковольтная, д. 55 стр. 731', 'ш. Полярное, д. 4/5 к. 37', '2023-03-07 11:04:16', '2023-03-07 11:52:51', 'by_card', 3, 105, 1, 2, 105, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (30, 'бул. Маяковского, д. 72 к. 7/9', 'ул. Тукая, д. 2', '2023-03-26 20:06:25', '2023-03-26 20:34:54', 'by_card', 4, 40, 1, 3, 40, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (31, 'пер. Славянский, д. 756 стр. 63', 'ул. Бригадная, д. 350 к. 20', '2023-03-07 22:03:20', '2023-03-07 22:44:39', 'by_card', 4, 59, 1, 4, 59, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (32, 'ул. 50 лет Победы, д. 32 к. 36', 'наб. Рылеева, д. 8/9', '2023-03-01 22:02:11', '2023-03-01 22:38:43', 'by_card', 4, 57, 1, 4, 57, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (33, 'пер. Флотский, д. 665 стр. 3', 'пер. Короткий, д. 210', '2023-03-03 19:22:05', '2023-03-03 19:38:38', 'by_card', 3, 114, 1, 3, 114, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (34, 'ул. Жданова, д. 700 стр. 524', 'пер. Вокзальный, д. 50 стр. 8', '2023-03-04 13:05:13', '2023-03-04 13:32:41', 'by_card', 1, 90, 1, 2, 90, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (35, 'ул. Гражданская, д. 489', 'ш. Кирова, д. 9 стр. 57', '2023-03-22 08:05:30', '2023-03-22 08:53:52', 'by_card', 2, 88, 1, 2, 88, NULL, NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (6, 'бул. Революции, д. 781 стр. 81', 'пер. Звездный, д. 7/3 к. 88', '2023-03-17 14:19:21', '2023-03-17 14:56:34', 'by_card', 30, 4, 2, 3, 4, '2023-01-12 23:23:45', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (7, 'пер. Слободской, д. 7 к. 5/1', 'пр. Марта 8, д. 3/1', '2023-03-17 14:12:20', '2023-03-17 14:41:46', 'by_card', 21, 7, 1, 3, 7, '2023-03-17 14:12:20', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (8, 'ул. Больничная, д. 2 стр. 2', 'бул. Целинный, д. 57 стр. 5/8', '2023-03-17 14:16:27', '2023-03-17 14:59:52', 'by_card', 21, 8, 1, 4, 8, '2023-03-11 18:23:13', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (9, 'ул. Таманская, д. 937 к. 6', 'ш. Бабушкина, д. 7 стр. 1/2', '2023-03-18 15:05:16', '2023-03-18 15:49:37', 'by_card', 25, 14, 1, 4, 14, '2023-03-11 18:23:13', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (10, 'пр. 50 лет ВЛКСМ, д. 3/9 стр. 735', 'алл. Дорожная, д. 9', '2023-03-18 08:26:15', '2023-03-18 08:47:38', 'by_card', 27, 14, 1, 2, 14, '2023-03-17 14:16:27', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (11, 'пр. Просторный, д. 660 к. 673', 'пр. Февральский, д. 545', '2023-03-11 18:23:13', '2023-03-11 18:54:46', 'by_card', 21, 60, 1, 3, 60, '2023-03-11 18:23:13', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (12, 'ш. Курское, д. 86', 'ул. Правды, д. 81 стр. 54', '2023-03-23 02:04:24', '2023-03-23 02:43:57', 'by_card', 21, 107, 1, 4, 107, '2023-03-11 05:05:20', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (13, 'пр. Гастелло, д. 394', 'ул. Лунная, д. 8/3 к. 5', '2023-03-23 08:22:16', '2023-03-23 08:40:40', 'by_card', 20, 100, 1, 2, 100, '2023-03-11 05:05:20', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (14, 'ул. Казанская, д. 3/6 стр. 18', 'наб. Высоцкого, д. 226', '2023-03-11 05:05:20', '2023-03-11 05:50:47', 'by_card', 20, 120, 1, 4, 120, '2023-03-16 12:02:26', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (15, 'пр. Короткий, д. 2/4', 'пер. Морозова, д. 3/3', '2023-03-09 01:06:02', '2023-03-09 01:36:52', 'by_card', 20, 20, 1, 4, 20, '2023-03-16 12:02:26', NULL);
+INSERT INTO taxi.orders (id, adress_from, adress_to, loading_time, unloading_time, payment_type, employee_driver_id, client_id, tariff_id, employee_operator_id, payment_card_id, planning_load_time, planning_unload_time) VALUES (16, 'наб. Омская, д. 51', 'ш. Целинное, д. 267 стр. 747', '2023-03-25 15:29:15', '2023-03-25 15:44:37', 'by_card', 19, 100, 1, 3, 100, '2023-03-16 12:02:26
+', NULL);
+
+
+--
+-- TOC entry 3431 (class 0 OID 16405)
+-- Dependencies: 218
+-- Data for Name: payment_card; Type: TABLE DATA; Schema: taxi; Owner: postgres
+--
+
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (1, '1699615970457220', 1);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (2, '8268457215246835', 2);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (3, '7194037346156507', 3);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (4, '8803161585897955', 4);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (5, '7980624887746747', 5);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (6, '3366442834474830', 6);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (7, '9200144270417478', 7);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (8, '7264937122611108', 8);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (9, '2759765584684056', 9);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (10, '3764274399612759', 10);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (11, '7307765479321996', 11);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (12, '3978480387796640', 12);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (13, '3628025811260814', 13);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (14, '9916860963253447', 14);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (15, '5943438950068869', 15);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (16, '2950630104386637', 16);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (17, '7157861242973433', 17);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (18, '2018267020824292', 18);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (19, '3268186789950091', 19);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (20, '3944956248711886', 20);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (21, '9837146071197788', 21);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (22, '4255325601146952', 22);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (23, '8111716689310816', 23);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (24, '1200868970726830', 24);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (25, '8772027127064493', 25);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (26, '2845623902736328', 26);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (27, '3990730977601656', 27);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (28, '4769613723035993', 28);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (29, '3813061322979396', 29);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (30, '3908123175790581', 30);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (31, '5061553073917376', 31);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (32, '3879315885069839', 32);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (33, '7692037442578036', 33);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (34, '6766843473284978', 34);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (35, '4508623220045643', 35);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (36, '7596603053830067', 36);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (37, '6034981025723861', 37);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (38, '1386477065353242', 38);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (39, '7120482733329111', 39);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (40, '3472701530731524', 40);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (41, '2670660056753515', 41);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (42, '7407821881124176', 42);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (43, '1142657586443153', 43);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (44, '2560178693813379', 44);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (45, '9675034181762004', 45);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (46, '4547699168718354', 46);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (47, '8743699902666631', 47);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (48, '5857421479932044', 48);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (49, '6126064615296532', 49);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (50, '7989504723813616', 50);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (51, '4444763016002491', 51);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (52, '7227451993423114', 52);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (53, '4925329439356171', 53);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (54, '4743098066174508', 54);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (55, '5956274575020932', 55);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (56, '7132716975617109', 56);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (57, '9868784128447359', 57);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (58, '5025371344459759', 58);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (59, '9744484401158862', 59);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (60, '2955200583757863', 60);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (61, '9830673547284116', 61);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (62, '4102470899660688', 62);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (63, '2662612692644739', 63);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (64, '3122459726960634', 64);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (65, '6382834487080221', 65);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (66, '2397693376086153', 66);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (67, '5211081539207824', 67);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (68, '5835332596388681', 68);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (69, '9518677675950917', 69);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (70, '7454770080853378', 70);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (71, '9279830064981980', 71);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (72, '4839265215494485', 72);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (73, '3710994647359729', 73);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (74, '8194301693443541', 74);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (75, '7430304096070330', 75);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (76, '3796804164729259', 76);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (77, '6349935334865278', 77);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (78, '3637678705914771', 78);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (79, '9047575583838089', 79);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (80, '9899470733812467', 80);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (81, '1718068075785595', 81);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (82, '9006901555624174', 82);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (83, '1413012330674653', 83);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (84, '8711415404107641', 84);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (85, '9752550160099374', 85);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (86, '6709642275579163', 86);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (87, '5697123236349794', 87);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (88, '9209433026936376', 88);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (89, '2407343242785398', 89);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (90, '2610550244685350', 90);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (91, '3188913427887468', 91);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (92, '4592691345202451', 92);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (93, '1343965490834881', 93);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (94, '3730257442722045', 94);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (95, '5212759862627545', 95);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (96, '7181465691496296', 96);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (97, '8169959461924194', 97);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (98, '3186922075078812', 98);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (99, '8011509511471945', 99);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (100, '4768526834459642', 100);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (101, '8505977780365298', 101);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (102, '8054933881303824', 102);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (103, '1450351617953874', 103);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (104, '8540797622344258', 104);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (105, '8825102747232003', 105);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (106, '8722319774888144', 106);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (107, '5329655202416474', 107);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (108, '8884426397737550', 108);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (109, '1713807243186001', 109);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (110, '7363857577392965', 110);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (111, '9827570774026418', 111);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (112, '7549271435155281', 112);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (113, '5346853072444232', 113);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (114, '2506327561141290', 114);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (115, '5712722857908423', 115);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (116, '5859068092024311', 116);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (117, '3402978137604747', 117);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (118, '2018210308461666', 118);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (119, '1675698367814831', 119);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (120, '8327053866694997', 120);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (121, '6428550194386638', 121);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (122, '8950814894786673', 122);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (123, '4448073597959088', 123);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (124, '4061733088252717', 124);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (125, '3513792570289648', 125);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (126, '9380370991173853', 126);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (127, '7957584100933359', 127);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (128, '9881550381560010', 128);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (129, '3090930896865814', 129);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (130, '4931449552110791', 130);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (131, '2765764304965424', 131);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (132, '5269600472972612', 132);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (133, '6229137863674352', 133);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (134, '4580154838314669', 134);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (135, '3070785179851413', 135);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (136, '6684488349824636', 136);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (137, '4719301048003283', 137);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (138, '7981817291307443', 138);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (139, '8434809225548688', 139);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (140, '5759019929567692', 140);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (141, '7162770084826334', 141);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (142, '5065598472125347', 142);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (143, '6058378634193134', 143);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (144, '5204471771657065', 144);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (145, '7632969919907755', 145);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (146, '1891439965006669', 146);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (147, '8595645374236417', 147);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (148, '9566817974316299', 148);
+INSERT INTO taxi.payment_card (id, card_number, client_id) VALUES (149, '1757867045647928', 149);
+
+
+--
+-- TOC entry 3433 (class 0 OID 16418)
+-- Dependencies: 220
+-- Data for Name: position; Type: TABLE DATA; Schema: taxi; Owner: postgres
+--
+
+INSERT INTO taxi."position" (id, name) VALUES (1, 'Водитель');
+INSERT INTO taxi."position" (id, name) VALUES (2, 'Водитель комфорт');
+INSERT INTO taxi."position" (id, name) VALUES (3, 'Оператор');
+INSERT INTO taxi."position" (id, name) VALUES (4, 'Менеджер');
+
+
+--
+-- TOC entry 3441 (class 0 OID 16479)
+-- Dependencies: 228
+-- Data for Name: tariff; Type: TABLE DATA; Schema: taxi; Owner: postgres
+--
+
+INSERT INTO taxi.tariff (id, name, base_cost) VALUES (1, 'Эконом', 200);
+INSERT INTO taxi.tariff (id, name, base_cost) VALUES (2, 'Комфорт', 300);
+
+
+--
+-- TOC entry 3443 (class 0 OID 16511)
+-- Dependencies: 230
+-- Data for Name: work_schedule; Type: TABLE DATA; Schema: taxi; Owner: postgres
+--
+
+INSERT INTO taxi.work_schedule (id, days_per_week, time_of_day, start_time, end_time) VALUES (2, 'пн-пт', 'утро', '06:00:00', '14:00:00');
+INSERT INTO taxi.work_schedule (id, days_per_week, time_of_day, start_time, end_time) VALUES (3, 'пн-пт', 'день', '14:00:00', '22:00:00');
+INSERT INTO taxi.work_schedule (id, days_per_week, time_of_day, start_time, end_time) VALUES (4, 'пн-пт', 'ночь', '22:00:00', '06:00:00');
+INSERT INTO taxi.work_schedule (id, days_per_week, time_of_day, start_time, end_time) VALUES (5, 'сб-вс', 'утро', '06:00:00', '14:00:00');
+INSERT INTO taxi.work_schedule (id, days_per_week, time_of_day, start_time, end_time) VALUES (6, 'сб-вс', 'день', '14:00:00', '22:00:00');
+INSERT INTO taxi.work_schedule (id, days_per_week, time_of_day, start_time, end_time) VALUES (7, 'сб-вс', 'ночь', '22:00:00', '06:00:00');
+
+
+--
+-- TOC entry 3465 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: car_model_id_seq; Type: SEQUENCE SET; Schema: taxi; Owner: postgres
+--
+
+SELECT pg_catalog.setval('taxi.car_model_id_seq', 9, true);
+
+
+--
+-- TOC entry 3466 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: cars_id_seq; Type: SEQUENCE SET; Schema: taxi; Owner: postgres
+--
+
+SELECT pg_catalog.setval('taxi.cars_id_seq', 17, true);
+
+
+--
+-- TOC entry 3467 (class 0 OID 0)
+-- Dependencies: 215
+-- Name: client_id_seq; Type: SEQUENCE SET; Schema: taxi; Owner: postgres
+--
+
+SELECT pg_catalog.setval('taxi.client_id_seq', 250, true);
+
+
+--
+-- TOC entry 3468 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: employee_id_seq; Type: SEQUENCE SET; Schema: taxi; Owner: postgres
+--
+
+SELECT pg_catalog.setval('taxi.employee_id_seq', 30, true);
+
+
+--
+-- TOC entry 3469 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: employee_shedule_id_seq; Type: SEQUENCE SET; Schema: taxi; Owner: postgres
+--
+
+SELECT pg_catalog.setval('taxi.employee_shedule_id_seq', 1, false);
+
+
+--
+-- TOC entry 3470 (class 0 OID 0)
+-- Dependencies: 231
+-- Name: orders_id_seq; Type: SEQUENCE SET; Schema: taxi; Owner: postgres
+--
+
+SELECT pg_catalog.setval('taxi.orders_id_seq', 35, true);
+
+
+--
+-- TOC entry 3471 (class 0 OID 0)
+-- Dependencies: 217
+-- Name: payment_card_id_seq; Type: SEQUENCE SET; Schema: taxi; Owner: postgres
+--
+
+SELECT pg_catalog.setval('taxi.payment_card_id_seq', 149, true);
+
+
+--
+-- TOC entry 3472 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: position_id_seq; Type: SEQUENCE SET; Schema: taxi; Owner: postgres
+--
+
+SELECT pg_catalog.setval('taxi.position_id_seq', 4, true);
+
+
+--
+-- TOC entry 3473 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: tariff_id_seq; Type: SEQUENCE SET; Schema: taxi; Owner: postgres
+--
+
+SELECT pg_catalog.setval('taxi.tariff_id_seq', 2, true);
+
+
+--
+-- TOC entry 3474 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: work_schedule_id_seq; Type: SEQUENCE SET; Schema: taxi; Owner: postgres
+--
+
+SELECT pg_catalog.setval('taxi.work_schedule_id_seq', 7, true);
+
+
+--
+-- TOC entry 3233 (class 2606 OID 25170)
+-- Name: tariff base_cost; Type: CHECK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE taxi.tariff
+    ADD CONSTRAINT base_cost CHECK ((base_cost > 0)) NOT VALID;
+
+
+--
+-- TOC entry 3255 (class 2606 OID 16441)
+-- Name: car_model car_model_pkey; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.car_model
+    ADD CONSTRAINT car_model_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3257 (class 2606 OID 16448)
+-- Name: cars cars_pkey; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.cars
+    ADD CONSTRAINT cars_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3238 (class 2606 OID 16403)
+-- Name: client client_pkey; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.client
+    ADD CONSTRAINT client_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3232 (class 2606 OID 25169)
+-- Name: car_model cost_positive_check; Type: CHECK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE taxi.car_model
+    ADD CONSTRAINT cost_positive_check CHECK ((cost > 0)) NOT VALID;
+
+
+--
+-- TOC entry 3249 (class 2606 OID 16912)
+-- Name: employee employee_passport_number_unique; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.employee
+    ADD CONSTRAINT employee_passport_number_unique UNIQUE (passport_number);
+
+
+--
+-- TOC entry 3251 (class 2606 OID 16434)
+-- Name: employee employee_pkey; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.employee
+    ADD CONSTRAINT employee_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3273 (class 2606 OID 25157)
+-- Name: employee_shedule employee_shedule_pkey; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.employee_shedule
+    ADD CONSTRAINT employee_shedule_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3234 (class 2606 OID 25171)
+-- Name: work_schedule end_time_after_start_time_check; Type: CHECK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE taxi.work_schedule
+    ADD CONSTRAINT end_time_after_start_time_check CHECK ((end_time > start_time)) NOT VALID;
+
+
+--
+-- TOC entry 3271 (class 2606 OID 16535)
+-- Name: orders orders_pkey; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.orders
+    ADD CONSTRAINT orders_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3241 (class 2606 OID 16920)
+-- Name: payment_card payment_card_id_pk; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.payment_card
+    ADD CONSTRAINT payment_card_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3235 (class 2606 OID 16728)
+-- Name: orders payment_type_check; Type: CHECK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE taxi.orders
+    ADD CONSTRAINT payment_type_check CHECK (((payment_type)::bpchar = ANY (ARRAY['by_card'::bpchar, 'by_cash'::bpchar]))) NOT VALID;
+
+
+--
+-- TOC entry 3243 (class 2606 OID 16416)
+-- Name: payment_card paymernt_card_card_number_unique; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.payment_card
+    ADD CONSTRAINT paymernt_card_card_number_unique UNIQUE (card_number);
+
+
+--
+-- TOC entry 3253 (class 2606 OID 16914)
+-- Name: employee phone_number_unique; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.employee
+    ADD CONSTRAINT phone_number_unique UNIQUE (phone_number);
+
+
+--
+-- TOC entry 3245 (class 2606 OID 16916)
+-- Name: position posigion_name_unique; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi."position"
+    ADD CONSTRAINT posigion_name_unique UNIQUE (name);
+
+
+--
+-- TOC entry 3247 (class 2606 OID 16425)
+-- Name: position position_pkey; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi."position"
+    ADD CONSTRAINT position_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3259 (class 2606 OID 16918)
+-- Name: tariff tariff_name_unique; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.tariff
+    ADD CONSTRAINT tariff_name_unique UNIQUE (name);
+
+
+--
+-- TOC entry 3261 (class 2606 OID 16484)
+-- Name: tariff tariff_pkey; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.tariff
+    ADD CONSTRAINT tariff_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3236 (class 2606 OID 16717)
+-- Name: orders unloading_after_loading_check; Type: CHECK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE taxi.orders
+    ADD CONSTRAINT unloading_after_loading_check CHECK (((unloading_time)::bpchar > (loading_time)::bpchar)) NOT VALID;
+
+
+--
+-- TOC entry 3263 (class 2606 OID 16516)
+-- Name: work_schedule work_schedule_pkey; Type: CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.work_schedule
+    ADD CONSTRAINT work_schedule_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3239 (class 1259 OID 16414)
+-- Name: fki_client_id_fk; Type: INDEX; Schema: taxi; Owner: postgres
+--
+
+CREATE INDEX fki_client_id_fk ON taxi.payment_card USING btree (client_id);
+
+
+--
+-- TOC entry 3264 (class 1259 OID 16541)
+-- Name: fki_e; Type: INDEX; Schema: taxi; Owner: postgres
+--
+
+CREATE INDEX fki_e ON taxi.orders USING btree (employee_driver_id);
+
+
+--
+-- TOC entry 3265 (class 1259 OID 25135)
+-- Name: fki_f; Type: INDEX; Schema: taxi; Owner: postgres
+--
+
+CREATE INDEX fki_f ON taxi.orders USING btree (payment_card_id);
+
+
+--
+-- TOC entry 3266 (class 1259 OID 16547)
+-- Name: fki_orders_client_id_fk; Type: INDEX; Schema: taxi; Owner: postgres
+--
+
+CREATE INDEX fki_orders_client_id_fk ON taxi.orders USING btree (client_id);
+
+
+--
+-- TOC entry 3267 (class 1259 OID 25141)
+-- Name: fki_orders_employee_id_operator_fk; Type: INDEX; Schema: taxi; Owner: postgres
+--
+
+CREATE INDEX fki_orders_employee_id_operator_fk ON taxi.orders USING btree (employee_operator_id);
+
+
+--
+-- TOC entry 3268 (class 1259 OID 16553)
+-- Name: fki_orders_tariff_id_fk; Type: INDEX; Schema: taxi; Owner: postgres
+--
+
+CREATE INDEX fki_orders_tariff_id_fk ON taxi.orders USING btree (tariff_id);
+
+
+--
+-- TOC entry 3269 (class 1259 OID 16559)
+-- Name: fki_orders_work_schedule_id_fk; Type: INDEX; Schema: taxi; Owner: postgres
+--
+
+CREATE INDEX fki_orders_work_schedule_id_fk ON taxi.orders USING btree (employee_operator_id);
+
+
+--
+-- TOC entry 3274 (class 1259 OID 25168)
+-- Name: fki_w; Type: INDEX; Schema: taxi; Owner: postgres
+--
+
+CREATE INDEX fki_w ON taxi.employee_shedule USING btree (employee_id);
+
+
+--
+-- TOC entry 3277 (class 2606 OID 16768)
+-- Name: cars cars_car_model_id; Type: FK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.cars
+    ADD CONSTRAINT cars_car_model_id FOREIGN KEY (car_model_id) REFERENCES taxi.car_model(id) NOT VALID;
+
+
+--
+-- TOC entry 3278 (class 2606 OID 16773)
+-- Name: cars cars_employee_id; Type: FK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.cars
+    ADD CONSTRAINT cars_employee_id FOREIGN KEY (employee_id) REFERENCES taxi.employee(id) NOT VALID;
+
+
+--
+-- TOC entry 3284 (class 2606 OID 25163)
+-- Name: employee_shedule employee_idFK; Type: FK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.employee_shedule
+    ADD CONSTRAINT "employee_idFK" FOREIGN KEY (employee_id) REFERENCES taxi.employee(id) NOT VALID;
+
+
+--
+-- TOC entry 3276 (class 2606 OID 16473)
+-- Name: employee employee_position_id; Type: FK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.employee
+    ADD CONSTRAINT employee_position_id FOREIGN KEY (position_id) REFERENCES taxi."position"(id) NOT VALID;
+
+
+--
+-- TOC entry 3279 (class 2606 OID 16542)
+-- Name: orders orders_client_id_fk; Type: FK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.orders
+    ADD CONSTRAINT orders_client_id_fk FOREIGN KEY (client_id) REFERENCES taxi.client(id) NOT VALID;
+
+
+--
+-- TOC entry 3280 (class 2606 OID 16536)
+-- Name: orders orders_employee_id_fk; Type: FK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.orders
+    ADD CONSTRAINT orders_employee_id_fk FOREIGN KEY (employee_driver_id) REFERENCES taxi.employee(id) NOT VALID;
+
+
+--
+-- TOC entry 3281 (class 2606 OID 25136)
+-- Name: orders orders_employee_id_operator_fk; Type: FK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.orders
+    ADD CONSTRAINT orders_employee_id_operator_fk FOREIGN KEY (employee_operator_id) REFERENCES taxi.employee(id) NOT VALID;
+
+
+--
+-- TOC entry 3282 (class 2606 OID 16548)
+-- Name: orders orders_tariff_id_fk; Type: FK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.orders
+    ADD CONSTRAINT orders_tariff_id_fk FOREIGN KEY (tariff_id) REFERENCES taxi.tariff(id) NOT VALID;
+
+
+--
+-- TOC entry 3275 (class 2606 OID 16409)
+-- Name: payment_card payment_card_client_id_fk; Type: FK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.payment_card
+    ADD CONSTRAINT payment_card_client_id_fk FOREIGN KEY (client_id) REFERENCES taxi.client(id) NOT VALID;
+
+
+--
+-- TOC entry 3283 (class 2606 OID 25130)
+-- Name: orders payment_card_fk; Type: FK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.orders
+    ADD CONSTRAINT payment_card_fk FOREIGN KEY (payment_card_id) REFERENCES taxi.payment_card(id) NOT VALID;
+
+
+--
+-- TOC entry 3285 (class 2606 OID 25158)
+-- Name: employee_shedule work_schedule_idFK; Type: FK CONSTRAINT; Schema: taxi; Owner: postgres
+--
+
+ALTER TABLE ONLY taxi.employee_shedule
+    ADD CONSTRAINT "work_schedule_idFK" FOREIGN KEY (work_schedule_id) REFERENCES taxi.work_schedule(id) NOT VALID;
+
+
+-- Completed on 2023-12-27 17:13:26 MSK
+
+--
+-- PostgreSQL database dump complete
+--
+
