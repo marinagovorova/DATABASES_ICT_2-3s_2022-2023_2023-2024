@@ -127,3 +127,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/.vs
+/.vs/DATABASES_ICT_2-3s_2022-2023_2023-2024
+/.vs/DATABASES_ICT_2-3s_2022-2023_2023-2024/FileContentIndex
+/.vs/DATABASES_ICT_2-3s_2022-2023_2023-2024/FileContentIndex/be0c1897-902b-4030-872e-b3ce23908faf.vsidx
+/.vs/DATABASES_ICT_2-3s_2022-2023_2023-2024/v17
+/.vs/DATABASES_ICT_2-3s_2022-2023_2023-2024/v17/.wsuo
+/.vs/DATABASES_ICT_2-3s_2022-2023_2023-2024/v17/TestStore/0
+/.vs/DATABASES_ICT_2-3s_2022-2023_2023-2024/v17/TestStore/0/000.testlog
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
