@@ -7,4 +7,4 @@ from
     reader
 where
     reader.id_reader = book_circulation.id_reader and
-    book_circulation.issue_date < date('2022-12-22');
+    book_circulation.issue_date < current_date - interval '1' year;
