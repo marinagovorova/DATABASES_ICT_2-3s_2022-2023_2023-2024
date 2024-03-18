@@ -1,0 +1,7 @@
+"type_code","comodity_type","person_capacity","base_price"
+1,"single base",1,"100000"
+4,"double luxury",2,"250000"
+5,"queen base",2,"150000"
+6,"queen luxury",2,"270000"
+3,"double base",2,"180000"
+2,"single luxury",1,"190000"
